@@ -8,7 +8,8 @@ If you want 32-bit binaries then download the original archive from Enchantia an
 those sources.  MacOS users will need to ensure that they've installed XQuartz or other X window manager
 on the Mac in order to run the binaries properly.  Pre-compiled binaries and a link-time library for
 Windows users can be found in the "Windows Binaries" folder of this repository.  This repository has also
-been successfully compiled using cygwin.
+been successfully compiled using cygwin.  A progress-bar indicator has also been added to this fork which
+is not present in the original library.  
 
 A complete reference manual can be found online at:  http://enchantia.com/software/graphapp/doc/manual/index.html
 
@@ -16,8 +17,8 @@ Tutorials can be found here:  http://enchantia.com/software/graphapp/doc/tutoria
 
 Windows Build:
 
-To build Windows binaries from source uisng Visual Studio, open a Visual Studio x64 native tools command prompt.  Go to the GraphApp
-directory and run the Build_MSVC.bat
+To build Windows binaries from source using Visual Studio, open a Visual Studio x64 native tools command prompt.  Go to the GraphApp
+directory and run the Build_MSVC.bat  Builds have been tested on Visual Studio 2010 thru 2019 successfully.
 
 Linux Build:
 
