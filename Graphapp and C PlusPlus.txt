@@ -1,0 +1,21 @@
+To use Graphapp as a C++ Library instead of just a plain C Library,
+modify the graphapp.h header and recompile the library.
+
+Add the following code pieces at top and bottom of graphapp.h before
+building the GraphApp library.  The resulting LIB will now work
+properly with C++ without any name mangling.
+
+#ifndef __GRAPHAPP_H__
+#define __GRAPHAPP_H__
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+(rest of file)
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

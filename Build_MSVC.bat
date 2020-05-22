@@ -1,0 +1,1 @@
+nmake /f src/builds/msvc.mak
