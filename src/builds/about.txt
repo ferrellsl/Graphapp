@@ -1,0 +1,34 @@
+Unified Make System for Building GraphApp
+by Alex
+
+This Makefile system uses a unified Makefile (common.mak)
+which contains the rules for building the various source
+files in GraphApp. Then there are various platform-specific
+Makefiles which set up the variables needed to make
+the unified Makefile work.
+
+Alex wrote some instructions which I have included below:
+
+There is just ONE master make file that contains all compilation
+rules and files to be compiled.
+This makes maintainance and updating a lot easier.
+So far, it has been used sucessfully with the following combinations :
+1 - Win32 + MSVC
+2 - Win32 + gcc
+3 - Linux + gcc
+4 - TRU64 + cc
+For each combination, I have a set of platform specific variables :
+compiler options, file extensions and so on. Just ten lines each
+(well, more or less) in separate files. Then, at the end of each of
+these files, the same master common make file is included.
+(There is a template file that can be used to test any other combination.)
+
+Building GraphApp becomes very straightforward (no need to copy
+anything anywhere). Just type one of :
+1 - 'nmake /f builds\msvc.mak'
+2 - 'make -f builds\gnuw32.mak'
+3 - 'make -f builds/gnux11.mak'
+4 - 'make -f builds/tru64.mak'
+There are also a couple of other platform specific set of variables
+in the subdir builds, that I have filled after the examples already
+in 'src/rules', but I have never tested them.
