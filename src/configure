@@ -1,0 +1,387 @@
+#!/bin/sh
+
+# This is a 'configure' script for App.
+#
+# It looks for a variety of things such as a compiler,
+# X-Windows installations, etc and generates a
+# Makefile which is appropriate for your system.
+# It also compiles and runs a program, apptypes,
+# which generates the file apptypes.h which contains
+# some important type definitions for your system.
+#
+# To run this script, type './configure'.
+
+
+echo "# Configure script for App"
+
+if ( [ "$0" != "./configure" ] ) then
+	echo "Please run the configure program while in the src directory"
+	echo "usage: ./configure [--help] [paths]"
+	exit 2
+fi
+
+# PATHS is the default set of directories to search for
+# programs such as gcc, ld, libraries, etc.
+# If something is missing here you could add it here, or
+# just supply it as a command-line parameter to this script.
+
+PATHS="/bin /usr /usr/local /usr/bin /usr/local/bin $HOME/bin /"
+
+
+# XPATHS is the default set of directories to search for
+# X-Windows libraries, header files, etc.
+# It automatically searches subdirectories such as lib/ and include/
+
+XPATHS="/usr/X11 /usr/X11R6 /usr/openwin /usr/local/X11 /usr/X /usr/dt /X11 /usr /usr/local"
+
+
+# Set INFO to true if you want to see what values this script uses.
+# Otherwise set it to false.
+# The values appear at the top of the generated Makefile anyway.
+
+INFO=false
+
+
+# Check if the user has asked for help.
+
+if ( [ "$1" = '-?' ] ) then
+	SHOW_USAGE=true
+elif ( [ "$1" = 'help' ] ) then
+	SHOW_USAGE=true
+elif ( [ "$1" = '--help' ] ) then
+	SHOW_USAGE=true
+fi
+
+if ( [ "$1" = '--info' ] ) then
+	INFO=true
+fi
+
+if ( [ "$SHOW_USAGE" = 'true' ] ) then
+	echo 'usage: ./configure [options] [paths]'
+	echo
+	echo '  Options can be:'
+	echo '    -?, --help, help  see this help page'
+	echo '    --info            show path to compiler, etc'
+	echo '    x11               build the X11 version (default)'
+	echo
+	echo '  Paths are optional, and point to locations to search for'
+	echo '  libraries, compilers, etc, for example:'
+	echo '    ./configure /usr/X11 /usr/local/X11 /usr/bin'
+	echo
+	echo '  By default, paths is set to a variety of likely locations'
+	echo '  but if you specify one or more paths, they will be'
+	echo '  searched before the default paths.'
+	exit 0
+fi
+
+
+# Check target options and path options.
+
+TARGET=x11
+EXTRA_PATHS=""
+
+for OPTION in $*
+do
+	if ( [ "$OPTION" = 'x11' ] ) then
+		TARGET=x11
+	else
+		EXTRA_PATHS="$EXTRA_PATHS $OPTION"
+	fi
+done
+
+
+# Find the "which" program.
+
+WHICH=""
+
+if ( [ -x "/usr/bin/which" ] ) then
+	WHICH="/usr/bin/which"
+elif ( [ -x "/usr/local/bin/which" ] ) then
+	WHICH="/usr/local/bin/which"
+elif ( [ -x "/bin/which" ] ) then
+	WHICH="/bin/which"
+fi
+
+# Check if gcc or cc is in the path somewhere.
+
+if ( [ "$CC" = "" ] ) then
+	# Try to find gcc
+
+	for DIR in $EXTRA_PATHS $PATHS
+	do
+		if ( [ -x $DIR/gcc ] ) then
+			CC=$DIR/gcc
+			break
+		fi
+	done
+fi
+
+if ( [ "$CC" = "" ] ) then
+	# Try to find gcc using the which command
+
+	if ( [ "$WHICH" != "" ] ) then
+		CC=`$WHICH gcc`
+	fi
+fi
+
+if ( [ "$CC" = "" ] ) then
+	# Try to find cc
+
+	for DIR in $EXTRA_PATHS $PATHS
+	do
+		if ( [ -x $DIR/cc ] ) then
+			CC=$DIR/cc
+			break
+		fi
+	done
+fi
+
+if ( [ "$CC" = "" ] ) then
+	# Try to find cc using the which command
+
+	if ( [ "$WHICH" != "" ] ) then
+		CC=`$WHICH cc`
+	fi
+fi
+
+if ( [ "$CC" = "" ] ) then
+	# Couldn't find a C compiler!
+	echo 'configure: error: cannot find a C-compiler to use!'
+	echo 'configure: try supplying the directory of your compiler'
+	SHOW_USAGE=true
+fi
+
+
+# Try to find the library archiver program "ar"
+
+if ( [ "$AR" = "" ] ) then
+	for DIR in $EXTRA_PATHS $PATHS
+	do
+		if ( [ -x $DIR/ar ] ) then
+			AR=$DIR/ar
+			break
+		fi
+	done
+fi
+
+if ( [ "$AR" = "" ] ) then
+	# Try to find ar using the which command
+
+	if ( [ "$WHICH" != "" ] ) then
+		AR=`$WHICH ar`
+	fi
+fi
+
+if ( [ "$AR" = "" ] ) then
+	# Couldn't find the program used to create libraries!
+	echo 'configure: error: cannot find a library archiver (ar) to use!'
+	echo 'configure: try supplying the ar directory as a parameter'
+	SHOW_USAGE=true
+fi
+
+
+# Try to find the linker program "ld"
+
+if ( [ "$LD" = "" ] ) then
+	for DIR in $EXTRA_PATHS $PATHS
+	do
+		if ( [ -x $DIR/ld ] ) then
+			LD=$DIR/ld
+			break
+		fi
+	done
+fi
+
+if ( [ "$LD" = "" ] ) then
+	# Try to find ld using the which command
+
+	if ( [ "$WHICH" != "" ] ) then
+		LD=`$WHICH ld`
+	fi
+fi
+
+if ( [ "$LD" = "" ] ) then
+	# Couldn't find the loader/linker!
+	echo 'configure: error: cannot find a loader/linker (ld) to use!'
+	echo 'configure: try supplying the ld directory as a parameter'
+	SHOW_USAGE=true
+fi
+
+
+# Try to find the library archive indexing program "ranlib"
+
+if ( [ "$RANLIB" = "" ] ) then
+	for DIR in $EXTRA_PATHS $PATHS
+	do
+		if ( [ -x $DIR/ranlib ] ) then
+			RANLIB=$DIR/ranlib
+			break
+		fi
+	done
+fi
+if ( [ "$RANLIB" = "" ] ) then
+	# no-op
+	RANLIB=":"
+	echo 'configure: cannot find ranlib program, assuming it is a no-op'
+	echo 'configure: if this is not correct, try supplying the ranlib directory'
+fi
+
+
+# Try to find X-Windows libraries and include files.
+
+X11_LIB=""
+X11_LIB_DIR=""
+X11_INC_DIR=""
+
+for DIR in $EXTRA_PATHS $XPATHS $PATHS
+do
+	if ( [ -r $DIR/lib/libX11.so ] ) then
+		X11_LIB=$DIR/lib/libX11.so
+		X11_LIB_DIR=$DIR/lib
+		break
+	elif ( [ -r $DIR/libX11.so ] ) then
+		X11_LIB=$DIR/libX11.so
+		X11_LIB_DIR=$DIR
+		break
+	elif ( [ -r $DIR/lib/libX11.a ] ) then
+		X11_LIB=$DIR/lib/libX11.a
+		X11_LIB_DIR=$DIR/lib
+		break
+	elif ( [ -r $DIR/libX11.a ] ) then
+		X11_LIB=$DIR/libX11.a
+		X11_LIB_DIR=$DIR
+		break
+	elif ( [ -r $DIR/lib/libX11.dll.a ] ) then
+		X11_LIB=$DIR/lib/libX11.dll.a
+		X11_LIB_DIR=$DIR/lib
+		break
+	elif ( [ -r $DIR/libX11.dll.a ] ) then
+		X11_LIB=$DIR/libX11.dll.a
+		X11_LIB_DIR=$DIR
+		break
+	fi
+done
+
+for DIR in $EXTRA_PATHS $XPATHS $PATHS
+do
+	if ( [ -r $DIR/include/X11/Xlib.h ] ) then
+		X11_INC_DIR=$DIR/include
+		break
+	elif ( [ -r $DIR/include/Xlib.h ] ) then
+		X11_INC_DIR=$DIR/include
+		break
+	elif ( [ -r $DIR/Xlib.h ] ) then
+		X11_INC_DIR=$DIR
+		break
+	fi
+done
+
+if ( [ "$X11_LIB_DIR" = "" ] ) then
+	echo 'configure: error: cannot find libX11.so or libX11.a!'
+	echo 'configure: try supplying the directory of libX11.a'
+	SHOW_USAGE=true
+fi
+
+if ( [ "$X11_INC_DIR" = "" ] ) then
+	echo 'configure: error: cannot find Xlib.h!'
+	echo 'configure: try supplying the X-Windows installation directory'
+	SHOW_USAGE=true
+fi
+
+
+# Operating-system specific stuff
+
+if ( [ "`uname`" = "Linux" ] ) then
+	DLL_FLAGS="-shared -fPIC -Bdynamic -o"
+elif ( [ "`uname`" = "SunOS" ] ) then
+	DLL_FLAGS="-B dynamic -o"
+elif ( [ "`uname`" = "Solaris" ] ) then
+	DLL_FLAGS="-B dynamic -o"
+else
+	# default
+	DLL_FLAGS="-shared -o"
+fi
+
+
+# Debugging printing
+
+if ( [ "$INFO" != "false" ] ) then
+	echo "# Settings:"
+	echo "CC               = $CC"
+	echo "AR               = $AR"
+	echo "RANLIB           = $RANLIB"
+	echo "LD               = $LD"
+	echo "MAKE_STATIC_LIB  = $AR rc"
+	echo "MAKE_DYNAMIC_LIB = $LD $DLL_FLAGS"
+	echo "X11_LIB          = $X11_LIB"
+	echo "X11_LIB_DIR      = $X11_LIB_DIR"
+	echo "X11_INC_DIR      = $X11_INC_DIR"
+fi
+
+# in the case of error, show usage options.
+
+if ( [ "$SHOW_USAGE" = 'true' ] ) then
+	echo
+	echo 'usage: ./configure [options] [paths]'
+	echo
+	echo '  Options can be:'
+	echo '    -?, --help, help  see this help page'
+	echo '    x11               build the X11 version (default)'
+	echo
+	echo '  Paths are optional, and point to locations to search for'
+	echo '  libraries, compilers, etc, for example:'
+	echo '    ./configure /usr/X11 /usr/local/X11 /usr/bin'
+	echo
+	echo '  By default, paths is set to a variety of likely locations'
+	echo '  but if you specify one or more paths, they will be'
+	echo '  searched before the default paths.'
+	exit 2
+fi
+
+# Build any utility programs that are needed.
+
+echo "# Generating apptypes.h"
+/bin/rm -f ./apptypes.h
+
+echo "$CC apptypes.c -o apptypes"
+$CC apptypes.c -o apptypes
+
+echo "./apptypes"
+./apptypes
+
+echo "/bin/rm ./apptypes"
+/bin/rm -f ./apptypes
+
+if ( [ -r "./apptypes.h" ] ) then
+	echo "# apptypes.h generated."
+else
+	echo 'configure: error: apptypes.h does not exist - did apptypes.c compile?'
+	exit 2
+fi
+
+
+# Now create a Makefile.
+
+echo "# Creating Makefile"
+
+MAKEFILE="./Makefile"
+
+echo                                       > "$MAKEFILE"
+echo "# Makefile for App:"                >> "$MAKEFILE"
+echo                                      >> "$MAKEFILE"
+echo "CC               = $CC"             >> "$MAKEFILE"
+echo "AR               = $AR"             >> "$MAKEFILE"
+echo "RANLIB           = $RANLIB"         >> "$MAKEFILE"
+echo "LD               = $LD"             >> "$MAKEFILE"
+echo "MAKE_STATIC_LIB  = $AR rc"          >> "$MAKEFILE"
+echo "MAKE_DYNAMIC_LIB = $LD $DLL_FLAGS"  >> "$MAKEFILE"
+echo "X11_LIB          = $X11_LIB"        >> "$MAKEFILE"
+echo "X11_LIB_DIR      = $X11_LIB_DIR"    >> "$MAKEFILE"
+echo "X11_INC_DIR      = $X11_INC_DIR"    >> "$MAKEFILE"
+echo                                      >> "$MAKEFILE"
+cat ./rules/x11rules.txt                  >> "$MAKEFILE"
+
+echo "# Makefile created."
+echo "# You will need to edit utility/fontutil.c to set the font path,"
+echo "# if the font path is neither /apps/app/fonts nor $HOME/apps/app/fonts"
+echo "# Now type make."
