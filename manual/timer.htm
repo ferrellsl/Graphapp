@@ -1,0 +1,54 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Timers</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="timer">Timer Functions</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef struct Timer  Timer;
+  typedef void (*TimerAction)(Timer *t);
+
+  struct Timer {
+    App *       app;            /* associated App */
+    int         milliseconds;   /* interval between actions */
+    int         remaining;      /* time until action */
+    TimerAction action;         /* user-defined action */
+    void *      data;           /* user-defined data */
+    int         value;          /* user-defined value */
+  };
+</PRE>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  int     delay(App *app, int milliseconds);
+  long    current_time(App *app);
+
+  Timer * new_timer(App *app, TimerAction action, int milliseconds);
+  void    del_timer(Timer *t);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+The <B>delay</B> function suspends program operation for the required number of <TT>milliseconds</TT>, returning the number of milliseconds elapsed. The return value may be less than the required milliseconds if the delay was interrupted by an external event. The timing of this function is likely to be inaccurate for very small delays, since operating system activity and hardware interrupts are likely to produce small variations in the actual delay time. This function should be used sparingly.
+<P>
+The <B>current_time</B> function returns the approximate time in milliseconds since the program began. This number will overflow if the program is used continuously for more than a month.
+<P>
+A <I>Timer</I> is an object which allows a program to have a function repeatedly called at certain intervals. It is created by <B>new_timer</B>, which is passed the number of <TT>milliseconds</TT> which should elapse between calls to the given <I>TimerFunction</I>. A <I>TimerFunction</I> is a user defined function which is called when the timer activates, and is passed a pointer to the <I>Timer</I>.
+<P>
+A timer can be stopped using <B>del_timer</B>, which also deletes the timer's data structure from memory.
+<P>
+Timers are inexact and not likely to occur more often than at one tenth of a second intervals.
+<P>
+<H3>EXAMPLES</H3>
+<P>
+<UL>
+	<LI><A HREF="../examples/polygons.c">polygons.c</A></LI>
+	<LI><A HREF="../examples/clock.c">clock.c</A></LI>
+	<LI><A HREF="../examples/moire.c">moire.c</A></LI>
+</UL>
+</BODY>
+</HTML>

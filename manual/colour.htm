@@ -1,0 +1,90 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Colours</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="rgb">Colours</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef struct Colour  Color;
+  typedef struct Colour  Colour;
+
+  struct Colour {
+    byte  alpha;  /* 0=opaque, 255=transparent */
+    byte  red;    /* intensity of red light, 0=none, 255=bright */
+    byte  green;  /* intensity of green light, 0=none, 255=bright */
+    byte  blue;   /* intensity of blue light, 0=none, 255=bright */
+  };
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Colour  rgb(int red, int green, int blue);     /* create Colour */
+  Colour  argb(int alpha, int r, int g, int b);  /* with alpha */
+
+  Colour  new_color(int r, int g, int b);    /* create Colour */
+  Colour  new_colour(int r, int g, int b);   /* create Colour */
+
+  int     rgbs_equal(Colour a, Colour b);    /* compare Colours */
+  int     colors_equal(Colour a, Colour b);  /* compare Colours */
+  int     colours_equal(Colour a, Colour b); /* compare Colours */
+</PRE>
+<P>
+<H3>CONSTANTS</H3>
+<P>
+<PRE>
+  #define CLEAR           argb(0xFF,0xFF,0xFF,0xFF)
+
+  #define BLACK           rgb(0x00,0x00,0x00)
+  #define WHITE           rgb(0xFF,0xFF,0xFF)
+  #define BLUE            rgb(0x00,0x00,0xFF)
+  #define YELLOW          rgb(0xFF,0xFF,0x00)
+  #define GREEN           rgb(0x00,0xFF,0x00)
+  #define MAGENTA         rgb(0xFF,0x00,0xFF)
+  #define RED             rgb(0xFF,0x00,0x00)
+  #define CYAN            rgb(0x00,0xFF,0xFF)
+
+  #define GREY            rgb(0x80,0x80,0x80)
+  #define GRAY            rgb(0x80,0x80,0x80)
+  #define LIGHT_GREY      rgb(0xC0,0xC0,0xC0)
+  #define LIGHT_GRAY      rgb(0xC0,0xC0,0xC0)
+  #define DARK_GREY       rgb(0x40,0x40,0x40)
+  #define DARK_GRAY       rgb(0x40,0x40,0x40)
+
+  #define DARK_BLUE       rgb(0x00,0x00,0x80)
+  #define DARK_GREEN      rgb(0x00,0x80,0x00)
+  #define DARK_RED        rgb(0x80,0x00,0x00)
+  #define LIGHT_BLUE      rgb(0x80,0xC0,0xFF)
+  #define LIGHT_GREEN     rgb(0x80,0xFF,0x80)
+  #define LIGHT_RED       rgb(0xFF,0xC0,0xFF)
+  #define PINK            rgb(0xFF,0xAF,0xAF)
+  #define BROWN           rgb(0x60,0x30,0x00)
+  #define ORANGE          rgb(0xFF,0x80,0x00)
+  #define PURPLE          rgb(0xC0,0x00,0xFF)
+  #define LIME            rgb(0x80,0xFF,0x00)
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+A <I>Colour</I> value is a structure used to represent a colour, using four integer components: three to represent the intensity of red, green and blue light, and one to represent the transparency of the colour against a background, otherwise known as the alpha channel value. The names <I>Colour</I> and <I>Color</I> are interchangeable.
+<P>
+The <B>rgb</B> function constructs a fully-opaque <I>Colour</I> value, given the required intensity of red, green and blue light. The values of red, green and blue can range from zero (no intensity) to 255 (maximum intensity). The <B>rgb</B> function is implemented as a macro.
+<P>
+Pre-defined colours are available, such as <B>BLACK, WHITE, GREY, BLUE, RED, GREEN,</B> etc. These are defined using the C pre-processor as calls to the <B>rgb</B> function, and as such, cannot be used outside of function blocks (for instance, you cannot use the pre-defined colours in an initialising structure). The bit-patterns these colours become when inside a bitmap are not generally defined; bitmaps are platform-dependent data structures, and should be treated as output devices only. (Note that both American and British English spellings are supported, both for colour-names and functions which employ the word 'colour' or 'color'. Thus <B>GREY</B> and <B>GRAY</B> are quite legal, and interchangeable.)
+<P>
+The alpha byte of a <I>Colour</I> value is used to represent a transparency value. If this byte is equal to 255, that Colour is fully transparent. If the alpha value is zero, the Colour is fully opaque. In theory, an alpha value between zero and 255 can be used to perform 'colour blending', however currently only fully transparent and fully opaque rgb values are supported. The special constant <B>CLEAR</B> can be used to represent fully transparent Colour values in images, and so forth.
+<P>
+The <B>argb</B> function constructs a <I>Colour</I> value which has an explicit alpha value between 0 and 255 inclusive.
+<P>
+The <B>new_color</B> and <B>new_colour</B> functions are macros which call <B>rgb</B> to create fully-opaque colours.
+<P>
+Colours can be be compared using <B>rgbs_equal</B>. The macro functions <B>colors_equal</B> and <B>colours_equal</B> are synonyms for this comparison function.
+<P>
+Important note: Colours, when passed as function parameters, are generally passed by value on the stack. This means that modifying a colour within a function will not change its value outside that function. Colours can thus be treated as numeric objects, like integers. (Were they to be passed by pointer, this would not be the case.) This differs somewhat from the way Java implicitly passes all objects by pointer, except for numbers.
+<P>
+</BODY>
+</HTML>

@@ -1,0 +1,96 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Graphics Objects</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="graphics">Graphics Objects</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef void (*WindowDrawFunc)(Window *w, Graphics *g);
+  typedef void (*DrawFunc)(Control *c, Graphics *g);
+
+  typedef struct Graphics  Graphics;
+
+  struct Graphics {
+    Colour    colour;     /* current drawing colour */
+    Font *    font;       /* current text drawing font */
+    int       line_width; /* line width in pixels */
+    Window *  win;        /* target window, or */
+    Bitmap *  bmap;       /* target bitmap, or */
+    Control * ctrl;       /* target control, or */
+    Image *   img;        /* target image */
+    Region *  clip;       /* clip all drawing to this region */
+    Point     offset;     /* where (0,0) really is */
+    CopyRect  copy_rect;  /* pointer to drawing func */
+    FillRect  fill_rect;  /* pointer to drawing func */
+    DrawUTF8  draw_utf8;  /* pointer to drawing func */
+    void *    extra;      /* platform-specific data */
+  };
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Graphics *get_window_graphics(Window *w);
+  Graphics *get_control_graphics(Control *c);
+  Graphics *get_bitmap_graphics(Bitmap *b);
+  Graphics *get_image_graphics(Image *i);
+
+  void    del_graphics(Graphics *g);
+
+  void    set_rgb(Graphics *g, Colour col);
+  void    set_rgbindex(Graphics *g, int index);
+
+  void    set_xor_mode(Graphics *g, Colour alt);
+  void    set_paint_mode(Graphics *g);
+
+  void    set_line_width(Graphics *g, int width);
+  void    set_font(Graphics *g, Font *f);
+
+  void    set_clip_rect(Graphics *g, Rect r);
+  void    set_clip_region(Graphics *g, Region *rgn);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+A <I>Graphics</I> object is required whenever a program needs to draw. A graphics object is an abstract object obtained prior to drawing, and is released after drawing has finished. Drawing functions (see later sections) use a graphics object as a common parameter when drawing to windows, controls, bitmaps and images. Hence, the drawing operations all behave the same on different objects, through the use of the common graphics object interface.
+<P>
+Sometimes the system obtains and releases a graphics object automatically for the program, for example, in certain window system call-back functions. When a window or control is redrawn, its <I>redraw</I> call-back function is called by the system. This will be defined as a <I>WindowDrawFunc</I> or a <I>DrawFunc</I> (see above definitions for details). The first parameter passed to this function is the object being drawn, the second parameter is a graphics object obtained by the system. The programmer writes code in the call-back function to use the graphics object for drawing, but does not need to release the graphics object; the system automatically releases it after the call-back has returned.
+<P>
+If the programmer needs to draw to an object, but does not currently have a valid graphics object to use, one can be obtained using <B>get_window_graphics</B> (to draw to a window), <B>get_control_graphics</B> (to draw to a control on a window), <B>get_bitmap_graphics</B> (to draw to a bitmap) or <B>get_image_graphics</B> (to draw to an image in memory).
+<P>
+Graphics objects obtained through one of those functions should later be deleted using <B>del_graphics</B>. As stated earlier, this function should not be used on a graphics object passed to a call-back by the system.
+<P>
+A graphics object keeps track of the target object (the object to which drawing is directed) as well as some drawing state information, such as the current drawing colour (which is initially black), the text drawing font (which is initially a Unicode system font) and the pixel width to draw lines (which is initially set to one).
+<P>
+The <B>set_rgb</B> function causes the drawing colour to change to the specified colour. There are two synonyms for this function: <B>set_colour</B> and <B>set_color</B> both do the same thing. Note that it is not correct to simply change the <TT>colour</TT> field in the graphics object directly; the drawing colour must be changed via the <B>set_rgb</B> function or nothing will happen. The <TT>colour</TT> field is merely a way of reporting what the system believes is the current drawing colour. If the alpha field in the chosen colour is CLEAR (255), no drawing will occur.
+<P>
+The <B>set_rgbindex</B> function changes the drawing colour to a particular integer pixel value, by-passing the sometimes slow colour-matching algorithms used in <B>set_rgb</B>. This can only be used on indexed-colour displays; it will not work as expected on TrueColour or DirectColour displays.
+<P>
+The <B>set_xor_mode</B> function changes the drawing mode so that the pixels being drawn are combined with existing pixels using a bitwise exclusive-or operation. The <TT>alt</TT> parameter gives the alternate colour with which drawing will occur. When drawing shapes, pixels which are the alternate colour will become the current drawing colour, and vice versa. Interactions with other colours are unpredictable but reversible; if the same shape is drawn twice the original colours will be restored.
+<P>
+The <B>set_paint_mode</B> function restores normal drawing operation after the exclusive-or drawing mode has been used. This is the default mode whenever a Graphics object is obtained, and signifies that the drawing colour overwrites existing pixels wherever drawing occurs.
+<P>
+Use <B>set_line_width</B> to change the pixel width of lines drawn using the graphics object. The default line width is 1 pixel.
+<P>
+Use <B>set_font</B> to change the font used when drawing text using this graphics object. The default font is a Unicode system font. See the section on fonts for details of obtaining fonts.
+<P>
+The <B>set_clip_rect</B> function restricts drawing to within a certain rectangle. The rectangle is given in co-ordinates relative to the object
+to which drawing is directed (the target object). All drawing will thereafter be clipped to within that rectangle.
+<P>
+The <B>set_clip_region</B> functions restricts drawing to a given region (collection of rectangles). The region is given in co-ordinates relative to the target object. All drawing will be clipped to the region, so that no pixels outside that region will be changed. The region is copied by this function, so the original region can be safely modified or deleted after this function has been called, without affecting the clipping region.
+<P>
+Initially, drawing is only clipped to the boundaries of the target object. When setting a new clipping rectangle or region, drawing is also still clipped to the rectangle of the target object. Hence, it is not possible to draw outside a window, control, bitmap or image.
+<P>
+A note about windows: if a graphics object for a window has been obtained and then the window is resized, the graphics object must be destroyed and obtained again. Otherwise the clipping region in the graphics object will be incorrect, and may restrict drawing to the wrong areas.
+<P>
+<H3>EXAMPLES</H3>
+<P>
+<UL>
+	<LI><A HREF="../examples/editdraw.c">editdraw.c</A></LI>
+</UL>
+</BODY>
+</HTML>

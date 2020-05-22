@@ -1,0 +1,83 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Regions</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="region">Regions</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef struct Region  Region;
+
+  struct Region {
+    Rect    extents;    /* enclosing rectangle */
+    int     size;       /* allocated size of rectangle list */
+    int     num_rects;  /* list of non-intersecting rects */
+    Rect *  rects;
+  };
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Region * new_region(void);
+  void     del_region(Region *rgn);
+  Region * new_rect_region(Rect r);
+  Region * copy_region(Region *rgn);
+
+  void move_region(Region *rgn, int dx, int dy);
+  int  union_region(Region *rgn1, Region *rgn2, Region *dest);
+  int  union_region_with_rect(Region *rgn, Rect r, Region *dest);
+  int  intersect_region(Region *rgn1, Region *rgn2, Region *dest);
+  int  intersect_region_with_rect(Region *rgn, Rect r, Region *dest);
+  int  subtract_region(Region *rgn1, Region *rgn2, Region *dest);
+  int  xor_region(Region *rgn1, Region *rgn2, Region *dest);
+
+  int  region_is_empty(Region *rgn);
+  int  regions_equal(Region *rgn1, Region *rgn2);
+  int  point_in_region(Point p, Region *rgn);
+  int  rect_intersects_region(Rect r, Region *rgn);
+  int  rect_in_region(Rect r, Region *rgn);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+A <I>Region</I> defines an arbitrary collection of points. It is implemented as an array of non-intersecting rectangles.
+<P>
+Important note: Regions, unlike <I>Rect</I> objects, are usually passed by pointer, not on the stack. Hence, changing a region within a function will usually also change it outside that function.
+<P>
+A new empty region can be returned using <B>new_region</B>. The function returns NULL if it runs out of memory and cannot create the region.
+<P>
+The <B>del_region</B> function should be used to delete regions when they are no longer needed.
+<P>
+The <B>new_rect_region</B> function creates a new region which contains all points within a given rectangle. It returns NULL if it runs out of memory.
+<P>
+To create a complete copy of an existing region, use <B>copy_region</B>. This function returns NULL if it runs out of memory.
+<P>
+To move a region to a new location, <B>move_region</B> is used. It adds <TT>(dx,dy)</TT> to all points within a region.
+<P>
+<B>union_region</B> forms in <TT>dest</TT> a region which is the union of all points within the regions <TT>rgn1</TT> and <TT>rgn2</TT>. The <TT>dest</TT> parameter must be an existing region, which may or may not be empty. The function returns one on success, zero if it runs out of memory. The union of two regions is defined as all points which are within either region.
+<P>
+<B>union_region_with_rect</B> performs the same operation, but using a rectangle as one of the items in the union.
+<P>
+<B>intersect_region</B> forms the intersection of two regions, placing the result in <TT>dest</TT>, which must be an existing, possibly empty, region. It returns one on success, zero if it runs out of memory. The intersection of two regions is defined as all points within both regions.
+<P>
+<B>intersect_region_with_rect</B> performs the same operation, but using a rectangle as one of the items to be intersected.
+<P>
+<B>subtract_region</B> forms a region which is <TT>rgn1</TT> with <TT>rgn2</TT> removed, storing the result into the already existing, possibly empty, region <TT>dest</TT>. Only <TT>dest</TT> is changed. This will be the set of all points which are inside <TT>rgn1</TT>, but not inside <TT>rgn2</TT>. The function returns one on success, zero if it runs out of memory.
+<P>
+<B>xor_region</B> forms the exclusive-or of two regions, placing the result in <TT>dest</TT>, which must be an existing, possibly empty, region. It returns one on success, zero if it runs out of memory. The exclusive-or of two regions is defined as all points which are within either region <TT>rgn1</TT> or <TT>rgn2</TT>, but not within both regions.
+<P>
+<B>region_is_empty</B> return one if the region is empty, zero if it is not. A region is empty if it encloses no points.
+<P>
+<B>regions_equal</B> returns one if the two regions enclose the same set of points, or zero if they differ.
+<P>
+<B>point_in_region</B> returns one if the given point is within the region, or zero if it is not.
+<P>
+<B>rect_intersects_region</B> returns one if any part of the given rectangle lies within the region (some parts of the rectangle may also lie outside the region). It returns zero if they are completely distinct.
+<P>
+<B>rect_in_region</B> returns one if the <I>entire</I> rectangle lies within the region, or zero if any part of the rectangle lies outside the region.
+</BODY>
+</HTML>

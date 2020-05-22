@@ -1,0 +1,38 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Image Buttons</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="imagebtn">Image Buttons</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef void (*ControlFunc)  (Control *c);
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Control *new_image_button(Window *w, Rect r, Image *i, ControlFunc fn);
+  Control *add_image_button(Control *c, Rect r, Image *i, ControlFunc fn);
+
+  void     set_control_image(Control *c, Image *img);
+  Image *  get_control_image(Control *c);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+The <B>new_image_button</B> function creates a push-button control, which has the specified <I>image</I> drawn within it. The button will appear on the specified window, in the rectangle given in window co-ordinates. The image is not copied by this function, so the image should not be released from memory or modified while it is being used by the control.
+<P>
+When the user clicks on the button with the mouse, the specified call-back function <TT>fn</TT> is called. The parameter to this function will be the button which called the function.
+<P>
+If the button is disabled, an algorithm is used to generate a 'greyed out' image based on the original image.
+<P>
+The <B>add_image_button</B> function works in the same way as <B>new_image_button</B>, except that it attaches the button to a control rather than directly to a window.
+<P>
+To change the image used by a button, call <B>set_control_image</B>, and to retrieve a pointer to the image currently being used by the button, use <B>get_control_image</B>.
+<P>
+</BODY>
+</HTML>

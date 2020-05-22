@@ -1,0 +1,96 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Fonts</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="font">Fonts</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef struct Font        Font;
+  typedef struct Subfont     Subfont;
+  typedef struct FontWidth   FontWidth;
+
+  struct Font {
+    int             refcount;       /* used when caching fonts */
+    int             maximum_width;  /* maximum character width */
+    int             height;         /* pixel height of chars */
+    char *          name;           /* UTF-8 encoded font name */
+    int             style;          /* style */
+    App *           app;            /* back pointer to cache */
+    int             num_subfonts;
+    Subfont **      subfonts;       /* list of subfonts */
+    void *          extra;          /* platform-specific data */
+  };
+
+  struct Subfont {
+    unsigned long   base;           /* Unicode value of first char */
+    int             num_widths;     /* list of font width records */
+    FontWidth **    widths;
+    void *          extra;          /* platform-specific data */
+  };
+
+  struct FontWidth {
+    int             width;          /* in pixels, -1=non-existent */
+    int             num_ranges;     /* number of (start,end) pairs */
+    byte *          range_list;     /* (start,end) pairs of bytes */
+  };
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Font *new_font(App *app, char *name, int style, int height);
+  void  del_font(Font *f);
+
+  int   font_height(Font *f);
+  int   font_width(Font *f, char *utf8, int nbytes);
+
+  Font *find_default_font(App *app);
+
+  void  set_font(Graphics *g, Font *f);
+  void  set_default_font(Graphics *g);
+</PRE>
+<P>
+<H3>CONSTANTS</H3>
+<P>
+<PRE>
+  enum {
+    PLAIN  = 0,
+    BOLD   = 1,
+    ITALIC = 2,
+    PORTABLE_FONT = 16,
+    NATIVE_FONT   = 32
+  };
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+A <I>Font</I> is a typeface of a certain size and style.
+<P>
+A font can be obtained using <B>new_font</B>. The name parameter is a UTF-8 encoded string like "serif" or "unifont", while the style is a bit-field composed of any of the styles <B>PLAIN</B>, <B>BOLD</B>, <B>ITALIC</B>, <B>PORTABLE_FONT</B> or <B>NATIVE_FONT</B>. Use the bitwise-or operator to combine these styles. The height field specifies a pixel-height for the font. The function may return NULL if it cannot find a suitable font.
+<P>
+Hence <B>new_font</B>(app, "serif", BOLD, 12) returns a bold serif 12-pixel-high font.
+<P>
+If the <B>PORTABLE_FONT</B> style flag is included, only portable fonts supplied with the library will be searched for a matching font. If the <B>NATIVE_FONT</B> style flags is given, only native platform-specific fonts will be searched. Native fonts are inherently non-portable and usually do not handle anything more than ISO-Latin-1 text, but are generally rendered fast. If neither of these flags, or both of them, are given, first portable fonts and then native fonts are searched for a matching name, style and size; the first matching font is returned.
+<P>
+The <B>del_font</B> function releases the memory used by a font. In general this function does not need to be used unless memory is critical, as fonts will automatically be released from memory when the program ends.
+<P>
+The <B>font_height</B> functions reports the pixel height of the font. All characters within the font will use this height as their inter-line spacing.
+<P>
+The <B>font_width</B> function reports the pixel width of the given UTF-8 encoded string in the supplied font. The <TT>nbytes</TT> parameter specifies the number of bytes within the string, thus allowing '\0' characters to be within the string.
+<P>
+The <B>find_default_font</B> function returns the default font. The supplied <TT>App</TT> object's font list is searched for the font first, and loaded into that object if it hasn't already been loaded.
+<P>
+The current font used for drawing within a given <I>Graphics</I> context can be set using the <B>set_font</B> function.
+<P>
+The <B>set_default_font</B> function loads the default font and sets that font in the Graphics context. It is the equivalent of <TT>set_font(g, find_default_font(g->app));</TT>
+<P>
+Three portable fonts are currently supplied with GraphApp: "serif", "plain" and "unifont", the last being the default Unicode font. Portable fonts are stored as bitmaps. Each bitmap contains space for exactly 256 characters, and is called a <I>Subfont</I>. Subfonts are loaded on demand by the font rendering engine, and cached in a list on the <I>Font</I> structure. The details of this caching mechanism, and the other data associated with a subfont, are not, in general, relevant to the programmer.
+<P>
+If a particular character glyph cannot be found on a font by the font rendering engine, it will then search for it on the default font. If it still isn't found, a rectangular box shape will be drawn instead. Since the supplied Unicode font contains some 35,000 characters, this event should be rare in normal usage.
+<P>
+</BODY>
+</HTML>

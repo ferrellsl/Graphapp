@@ -1,0 +1,50 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Text Fields</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="field">Text Fields</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef void (*ControlFunc)  (Control *c);
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Control *new_field(Window *w, Rect r, char *text);
+  Control *add_field(Control *c, Rect r, char *text);
+
+  void     set_control_text(Control *c, char *newtext);
+  char *   get_control_text(Control *c);
+
+  void     set_focus(Control *c);
+
+  void     set_field_allowed_width(Control *c, int width);
+  void     set_field_allowed_chars(Control *c, char *allowed);
+  void     set_field_disallowed_chars(Control *c, char *disallowed);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+The <B>new_field</B> function creates an editable text <I>field</I>, with the specified text string displayed within it. The text field will be displayed on one line only and will scroll horizontally if the user enters more text into it than will fit within the rectangle.
+<P>
+The <B>add_field</B> function works in the same way as <B>new_field</B>, except that it attaches the field to a control rather than directly to a window.
+<P>
+The text inside a field can be changed using the <B>set_control_text</B> function. This function makes a copy of the string and stores it into the text field.
+<P>
+Use <B>get_control_text</B> to find the current text inside a textbox or field.
+The string returned from <B>get_control_text</B> is a read-only string, so care must be taken to avoid modifying or deleting it.
+<P>
+Note that keyboard events will not be sent to a field unless it currently has keyboard focus. The <B>set_focus</B> function can be used to set a window's key focus to a given control. Setting focus will remove the focus from whichever control previously had it, if any.
+<P>
+The maximum number of characters which can be typed into a field can be controlled with the <B>set_field_allowed_width</B> function. The <TT>width</TT> parameter controls the number of Unicode characters which can be typed. If the value is zero, the field is unrestricted in width, which is the default.
+<P>
+A field can be restricted with <B>set_field_allowed_chars</B>, so that only a set of allowed characters can be typed into the field by the user. All other characters will be passed to the parent control or window. Setting the <TT>allowed</TT> characters to the UTF-8 encoded string "0123456789", for example, restricts a field so it only accepts digits, while setting the allowed string to "0123456789.$" additionally allows the decimal point and dollar sign. Setting the allowed string to NULL removes all restrictions, which is the default situation.
+<P>
+A field can also be instructed to ignore certain characters, and instead pass them up to its parent control or window, using the <B>set_field_disallowed_chars</B> function. For example, if the <TT>disallowed</TT> string was set to "\n\t", the enter and tab keys could not be typed into a field, and could thus propagate to the window, where a key handler function could decide to shift focus, or perform some other action as a result. By default, the tab, newline and escape keys are disallowed for fields, but the tab and newline keys are allowed in text boxes, so this function is particularly useful for controlling multi-line text boxes.
+</BODY>
+</HTML>

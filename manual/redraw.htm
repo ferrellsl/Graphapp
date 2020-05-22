@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Drawing Controls</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="redraw">Drawing Controls</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef void (*DrawFunc)(Control *c, Graphics *g);
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  void  on_control_redraw(Control *c, DrawFunc redraw);
+
+  void  draw_control(Control *c);
+  void  redraw_control(Control *c);
+  void  redraw_control_rect(Control *c, Rect r);
+  Rect  get_control_area(Control *c);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+The <B>on_control_redraw</B> function is used to attach a call-back function to a control which will be called every time that control needs to be redrawn. There is no need for this call-back to clear the control's background since this will done automatically. The call-back function should use drawing operations (see later sections) to draw the entire contents of the control.
+<P>
+Built-in controls such as buttons, scrollbars, etc have their own redrawing functions, so it is unwise to use the functions in this section on anything except custom-defined controls.
+<P>
+The <B>draw_control</B> function calls the control's redraw call-back, as set using <B>on_control_redraw</B> (see above). The redraw call-back, which is supplied by the programmer, is passed two parameters: the control which needs to be redrawn, and a <I>Graphics</I> object which can be used to draw to the control's surface (see later sections).
+<P>
+The <B>redraw_control</B> function behaves in a similar way, except it first clears the control's visible area using the control's background colour, unless that colour is transparent.
+<P>
+The <B>redraw_control_rect</B> function redraws a rectangular portion of the control. The rectangule is specified in control-relative co-ordinates.
+<P>
+The <B>get_control_area</B> function can be used within the drawing call-back, to obtain the rectangle of the control, in its own co-ordinate system. Hence, the top-left point of this rectangle will be (0,0).
+</BODY>
+</HTML>

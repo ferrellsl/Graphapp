@@ -1,0 +1,30 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Pop-up Lists</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="poplist">Pop-up Lists</A></H2>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  int  pop_up_list(Window *w, Font *f, char **lines,
+                       int buttons, Point p);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+A <I>pop-up list</I> is a menu which appears at the press of a mouse button and contains a list of selectable names. The menu will appear on the specified window, and vanish when the user releases the mouse button which was used to invoke the menu. The given font is used for menu text, unless it is NULL, in which case the default font is used.
+<P>
+The <TT>lines</TT> parameter is a NULL-terminated list of strings, to be displayed in the menu. The <TT>buttons</TT> parameter specifies which mouse button(s) were used to invoke the menu. Constants such as LEFT_BUTTON or RIGHT_BUTTON can be used here. The menu will appear near the given point.
+<P>
+The function returns -1 if no list item was chosen when the mouse button was released, or else a number between 0 and the number of strings in the list minus one, indicating which item was chosen.
+<P>
+<H3>EXAMPLES</H3>
+<P>
+<UL>
+	<LI><A HREF="../examples/imagine.c">imagine.c</A></LI>
+</UL>
+</BODY>
+</HTML>

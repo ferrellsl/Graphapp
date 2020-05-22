@@ -1,0 +1,41 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Regular Expressions</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="regex">Regular Expressions</A></H2>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  int  regex_match(char *regexp, char *text);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+The <B>regex_match</B> function performs a regular expression
+match on the given expression <TT>regexp</TT> and <TT>text</TT>.
+It returns non-zero (true) if there is a match, or zero (false)
+if there is no match. Both strings are assumed to be UTF-8 strings.
+<P>
+The regular expression language is very simple:
+<P>
+<UL>
+<LI>"abc"	matches the exact string "abc"</LI>
+<LI>"a*bc"	matches "a" followed by zero or more chars, then "bc"</LI>
+<LI>"abc*"	matches any string which starts with "abc"</LI>
+<LI>"*abc"	matches any string which ends with "abc"</LI>
+<LI>"*abc*"	matches any string which contains "abc"</LI>
+<LI>"a?bc"	matches "a" followed by any one UTF-8 char, then "bc"</LI>
+<LI>"*.jpg"	matches any string which ends in ".jpg"</LI>
+</UL>
+<P>
+The only special characters are '*' and '?'.
+There is currently no way to escape these characters.
+The '.', '^', '$', and '\' characters all have no special meaning.
+Strings must match at the start and end of the string unless
+the '*' character is used at the start or end.
+This scheme is similar to a shell match, rather than <TT>grep</TT>.
+</BODY>
+</HTML>

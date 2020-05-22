@@ -1,0 +1,47 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Radio Buttons</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="radiobtn">Radio Buttons and Radio Groups</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef void (*ControlFunc)  (Control *c);
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Control *new_radio_button(Window *w, Rect r, char *text,
+                                ControlFunc fn);
+  Control *add_radio_button(Control *c, Rect r, char *text,
+                                ControlFunc fn);
+
+  Control *new_radio_group(Window *w);
+  Control *add_radio_group(Control *c);
+
+  int      is_checked(Control *c);  /* is it checked? */
+  void     check(Control *c);       /* check the radio button */
+  void     uncheck(Control *c);     /* uncheck the button */
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+The <B>new_radio_button</B> function creates a <I>radio button</I> control, which is similar to a check box except that it has a circle which is filled in with a large dot when the user clicks with the mouse.
+<P>
+The <B>add_radio_button</B> function works in the same way as <B>new_radio_button</B>, except that it attaches the radio button to a control rather than directly to a window.
+<P>
+Whenever the user changes the checked-state of a radio button, the action function <TT>fn</TT> is called after the change. Often this parameter can be left as NULL, which signifies that no function need be called in response to a change of state; instead the state can be determined at some later stage.
+<P>
+One difference between check boxes and radio buttons is that a check box can be freely switched on and off by the user, while radio buttons automatically belong to a mutually exclusive set of radio buttons, known as a 'radio group'. Activating one radio button will therefore switch off the previously active radio button.
+<P>
+Initially, no radio buttons in a radio group will be checked. If a 'default' option needs to be specified, use the <B>check</B> function to check one radio button after creating it.
+<P>
+To begin a new radio group, the <B>new_radio_group</B> function can be used. After calling this function, all radio buttons subsequently created attached to the same window will belong to a new mutually exclusive set of buttons. Similarly <B>add_radio_group</B> starts a new radio group within a control. Radio groups can exist only within one window or control, so each new window has its own initial radio group, as does each separate control.
+<P>
+The function <B>is_checked</B> can be used to determine if a radio button is currently checked. The function <B>check</B> can be used to activate a radio button while <B>uncheck</B> can be used to remove the dot from a radio button.
+</BODY>
+</HTML>

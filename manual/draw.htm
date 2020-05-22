@@ -1,0 +1,69 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Drawing Functions</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="draw">Drawing Functions</A></H2>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  int  draw_point(Graphics *g, Point p);
+  int  draw_rect(Graphics *g, Rect r);
+  int  fill_rect(Graphics *g, Rect r);
+  int  draw_shadow_rect(Graphics *g, Rect r,
+                            Colour c1, Colour c2);
+  int  draw_line(Graphics *g, Point p1, Point p2);
+  int  draw_round_rect(Graphics *g, Rect r);
+  int  fill_round_rect(Graphics *g, Rect r);
+  int  draw_ellipse(Graphics *g, Rect r);
+  int  fill_ellipse(Graphics *g, Rect r);
+  int  draw_arc(Graphics *g, Rect r,
+                    int start_angle, int end_angle);
+  int  fill_arc(Graphics *g, Rect r,
+                    int start_angle, int end_angle);
+  int  draw_polyline(Graphics *g, Point *p, int n);
+  int  draw_polygon(Graphics *g, Point *p, int n);
+  int  fill_polygon(Graphics *g, Point *p, int n);
+  void draw_all(App *app);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+All drawing operations require a valid <I>Graphics</I> object to allow drawing. This graphics object is used to determine where and how pixels will be drawn. See the section on graphics object for details on how to obtain a graphics object to draw to a window, control, bitmap or image.
+<P>
+All of the drawing operations described here return 1 on success, or 0 if a memory error prevents successful completion.
+<P>
+The <B>draw_point</B> function sets the colour of the given point to be the current drawing colour. It will change only one pixel, regardless of the current line width.
+<P>
+The <B>draw_rect</B> function draws a rectangle within the given rectangle. The lines will have a thickness defined by the current line width and will be wholly within the rectangle.
+<P>
+The <B>draw_shadow_rect</B> function is similar, but draws the box in two colours. The first colour <TT>c1</TT> is used to draw the top and left portions of the box, and the second colour <TT>c2</TT> is used to draw the bottom and right portions. This creates a raised border effect, as used by push-buttons and some other controls.
+<P>
+The <B>fill_rect</B> function fills the specified rectangle with the current colour.
+<P>
+The <B>draw_line</B> function draws a line starting at point <TT>p1</TT> and extending up to but not including point <TT>p2.</TT> The line will have a width equal to the current line width.
+<P>
+The <B>draw_round_rect</B> function draws a box with rounded edges. The <B>fill_round_rect</B> function fills the rounded box with the current colour.
+<P>
+The <B>draw_ellipse</B> function draws a complete ellipse within the supplied rectangle. Remember that the right and bottom edges of a rectangle are not included within the rectangle. To draw a circle, make the rectangle a square. The <B>fill_ellipse</B> function fills the corresponding ellipse with the current colour.
+<P>
+The <B>draw_arc</B> function draws an ellipsoid arc centred in the middle of the rectangle <TT>r</TT>, extending anti-clockwise from the <TT>start_angle</TT> to the <TT>end_angle.</TT> Angles are measured in degrees, with 0 degrees being in the 3 o'clock position on the arc. The arc will fit within the rectangle. The <B>fill_arc</B> function creates a pie-shape with the end-points of the arc joined to the centre point.
+<P>
+To draw many lines at once, the <B>draw_polyline</B> function is used. It is passed an array of <TT>n</TT> points, and connects each point to the next in the array using <B>draw_line</B>.
+<P>
+The <B>draw_polygon</B> function is given an array of <TT>n</TT> points. It will draw lines from the first point in the array to the next, and so on until it joins the last point back to the first. The <B>fill_polygon</B> function will create a polygon filled with the current colour.
+<P>
+Graphics operations on some platforms (such as X-Windows) may be buffered, and for those platforms calling <B>draw_all</B> ensures all pending graphics requests are processed immediately. On other platforms the function exists and does nothing. This function is called during event handling anyway, and so is not generally called explicitly.
+<P>
+<H3>EXAMPLES</H3>
+<P>
+<UL>
+	<LI><A HREF="../examples/arcs.c">arcs.c</A></LI>
+	<LI><A HREF="../examples/ellipses.c">ellipses.c</A></LI>
+	<LI><A HREF="../examples/polygons.c">polygons.c</A></LI>
+	<LI><A HREF="../examples/smiley.c">smiley.c</A></LI>
+</UL>
+</BODY>
+</HTML>

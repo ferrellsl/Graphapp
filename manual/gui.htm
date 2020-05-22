@@ -1,0 +1,206 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: The GraphApp User Interface</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="hilite">The GraphApp User Interface</A></H2>
+<P>
+<H3>EMULATED INTERFACE</H3>
+<P>
+GraphApp allows programs to have a graphical user interface.
+This interface is designed to look very similar to many common
+graphical user interfaces, such as the Microsoft Windows interface
+and the various X-Windows interfaces, such as Motif and Gnome.
+<P>
+GraphApp does not use other GUI toolkits or native widget sets
+to implement its graphical user interface. Instead, it uses its
+own code. This means that GraphApp can provide its own features,
+such as support for Unicode fonts and text, which other toolkits
+may be lacking. Conversely, GraphApp widgets may not work in
+precisely the same manner as the native widgets on a given platform.
+<P>
+Because GraphApp emulates the widgets found on other platforms,
+it is a cross-platform programming tool. That is, it is possible
+to create a GraphApp program and compile it for two different
+operating systems (for example, Windows and Linux) and it will
+look and function the same way on both platforms.
+This is a different approach to portability than is advocated
+by those who assert that a graphical program's appearance on
+each platform should blend in with the appearance of the other
+applications on that platform.
+Both approaches to portability are valid and have their uses.
+GraphApp is designed with inter-platform portability in mind,
+rather than the more common "local look and feel" approach.
+<P>
+<H3>UNICODE SUPPORT</H3>
+<P>
+GraphApp provides support for Unicode fonts and text encodings
+for internationalised text. Internally, GraphApp code assumes
+the use of the UTF-8 text encoding. A bitmapped Unicode font
+is also provided with GraphApp to allow display and editing
+of UTF-8 encoded Unicode strings.
+<P>
+Text can be cut, copied and pasted using Control-X, Control-C
+and Control-V respectively. GraphApp checks to see if the text
+can be represented in one-byte-per-character format, and if so,
+pastes text in that format. This gives interoperability with
+many existing applications, which assume text on the clipboard
+is in that format. GraphApp will accept from the clipboard
+such text or else UTF-8 text. It converts all text into UTF-8
+for use internally.
+<P>
+There is a way to input Unicode characters into any GraphApp
+program. The ALT key can be used to compose some characters.
+For example, ALT ' e produces é and ALT / O produces Ø.
+This composition technique allows the input of many glyphs
+from European languages.
+<P>
+The Alt key is held down to produce the accent, then released,
+followed by the letter. The Shift key may also be needed to
+type the appropriate accent or the following character.
+<P>
+For example:<BR>
+Alt ~ n produces the Spanish small letter n with tilde: ñ<BR>
+Alt / o produces the Danish/Norwegian small letter o with a slash: ø<BR>
+Alt ` E produces capital E with a grave accent: È<BR>
+Alt A E produces capital AE ligature: Æ<BR>
+<P>
+The general rules are:<BR>
+Alt ' produces an acute (rising line) above a letter.<BR>
+Alt ` produces a grave (falling line) above a letter.<BR>
+Alt ~ produces a tilde above a letter: ñ<BR>
+Alt ^ produces a circumflex above a letter: â<BR>
+Alt " produces a diaeresis (double dots) above a letter: ö<BR>
+Alt . produces a dot above a letter.<BR>
+Alt - produces a macron (line) above a letter, or a stroke through it: Ð<BR>
+Alt _ produces a horizontal line joined to the bottom of a letter.<BR>
+Alt | produces a vertical line joined to the left of a letter.<BR>
+Alt / produces an angled stroke through a letter: Ø<BR>
+Alt , produces a cedilla for consonants or an ogonek for vowels: ç<BR>
+Alt u produces a breve (u shape) above a letter.<BR>
+Alt n produces an inverted breve above a letter.<BR>
+Alt v produces a caron (v shape) above a letter.<BR>
+Alt o produces a ring above a letter: Å<BR>
+Alt O produces a ring around a letter, e.g. copyright or registered symbol.<BR>
+<P>
+Ligatures are produced by typing the two letters, so<BR>
+Alt o e produces lowercase oe ligature (not e with a ring above!)<BR>
+Alt D z produces Dz ligature.<BR>
+<P>
+Alt 1 2 produces the fraction one half: ½. Some other fractions work similarly.<BR>
+<P> 
+If the second letter typed is a space, it can modify the first.<BR>
+Alt ! (space) produces upside-down exclamation mark: ¡<BR>
+Alt ? (space) produces upside-down question mark: ¿<BR>
+Alt x (space) produces a multiplication symbol.<BR>
+Alt ' (space) produces an acute accent (similar for other accents listed).<BR>
+<P>
+Greek letters are produced phonetically by preceding with Alt \<BR>
+Alt \ a produces lowercase alpha<BR>
+Alt \ p produces lowercase pi<BR>
+Alt \ f produces lowercase phi<BR>
+Alt \ u produces lowercase upsilon<BR>
+Alt \ U produces uppercase upsilon<BR>
+In some cases there is no obvious equivalent in English:<BR>
+Alt \ Y produces uppercase psi<BR>
+Alt \ H produces uppercase eta<BR>
+Alt \ C produces uppercase xi<BR>
+Alt \ X produces uppercase chi<BR>
+Alt \ v produces lowercase non-final sigma<BR>
+<P>
+Cyrillic letters are produced phonetically by preceding with Alt ]<BR>
+Some letters require Alt [ as the prefix instead.<BR>
+Alt ] A produces uppercase Cyrillic A.<BR>
+Alt ] T produces uppercase Cyrillic TE.<BR>
+Alt [ T produces uppercase Cyrillic TSE.<BR>
+<P>
+Any GraphApp program which has a text entry field can thus be
+used to compose European characters, for pasting into other
+applications.
+<P>
+<H3>PORTABILITY SUPPORT</H3>
+<P>
+GraphApp implements a core set of routines which behave the
+same way on each platform. This core set include drawing
+routines, font selection, and navigation of folders
+(directories).
+<P>
+Folder names are assumed to be separated by forward slashes,
+following the Web and Unix convention. So, a program would
+open a file using <TT>open_file("/My Documents/stuff.txt", "r")</TT>
+rather than <TT>fopen("\My Documents\stuff.txt, "r")</TT>
+on a Windows platform (or any platform, for that matter).
+Internally, GraphApp converts forward slashes to whatever
+the native directory separator is.
+This allows GraphApp programs a great degree of portability.
+Folder and file names can be represented in one format
+in source code and in data files, and the library handles
+the conversion to whatever the operating system requires.
+<P>
+Text can be written to and read from files in either the
+UTF-8 or ISO-Latin-1 encodings. All text is converted to
+the UTF-8 format internally, so it is not valid to assume
+one character is stored in one byte if you use the
+GraphApp file input routines. This is convenient for
+manipulating Unicode text, such as a document which
+contains a mixture of English, Greek and Chinese text.
+<P>
+If you read data into a GraphApp program as ISO-Latin-1
+text (one byte per character) it will probably be displayed
+and edited correctly, but there is no guarantee that this
+will always work. For example, the ligature Æ followed
+immediately by the English pound sign £ is actually a
+UTF-8 encoding for a completely different letter
+(Latin small letter OI). To avoid this problem, use
+the GraphApp input routines to correctly convert the
+data based on its original encoding.
+<P>
+Because GraphApp implements drawing routines portably,
+the appearance of a program will generally be exactly
+the same on another computer or operating system.
+This means you can rely on the pixel placement of
+buttons, lines, and fonts (if using the portable fonts
+included in the GraphApp package).
+<P>
+One problem with this pixel-level approach to portability
+is that screen resolutions may differ, and so the bitmapped
+font supplied with GraphApp may not be of a good resolution
+for all platforms. In practice, this seems to not be too
+much of a problem, because the font is quite large (it has
+to be, to allow correct rendering of complex Asian glyphs).
+Also, GraphApp programs can be configured to use native
+fonts, such as Helvetica and Times, although this usually
+precludes the correct display of Unicode glyphs.
+
+<P>
+<H3>RESOURCES</H3>
+<P>
+Application resources can be added into a GraphApp application.
+A resource is a font or other file or directory structure
+containing files. These can be added on to the end of a
+compiled program, and used at run-time by that program.
+The tools directory within the GraphApp package contains
+some tools for manipulating resources, as well as documentation.
+<P>
+One benefit of resources is that the portable Unicode font
+can be added onto a compiled application, and that program
+can then be distributed to friends or clients, and there
+is no installation required for them to use the program.
+The font will automatically be found and used by the
+GraphApp program because it is visible to GraphApp within
+the program's resources.
+<P>
+This means it is possible to completely guarantee a program's
+look-and-feel using GraphApp, down to the availability of
+a Unicode font and its pixel representation. This level of
+portability is not even available within Java.
+<P>
+Resources are simply files tacked on the end of a program's
+executable file, separated by a single NUL byte and indexed
+by a "resource directory" data structure which is the last
+thing added to the application. It's quite a simple but
+powerful idea, because it's trivial to implement, but saves
+a lot of tedious mucking about with installation programs.
+</BODY>
+</HTML>

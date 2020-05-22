@@ -1,0 +1,30 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Keyboard Focus</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="focus">Keyboard Focus</A></H2>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  void  set_focus(Control *c);
+  int   has_focus(Control *c);
+
+  void  pass_event(Control *c);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+A control can have the keyboard focus, which means that in its parent window, if a user types a key on the keyboard, that key click will be sent to the control which has focus rather than to the window itself.
+<P>
+To set focus to a particular control, use <B>set_focus</B>. This will remove focus from whatever control previously had the focus, if any, and it will redraw all affected controls (since some controls appear differently if they have the focus).
+<P>
+Use <B>has_focus</B> to determine if the given control has the keyboard focus.
+<P>
+Focus has no effect on mouse events.
+<P>
+The <B>pass_event</B> function can be called within a call-back function to pass a keyboard event up the object hierarchy (to the enclosing parent control or window). This might be used if a control handles some events, but not others. For instance, a text field handles ordinary key strokes, but might not want to accept 'Enter' or 'Tab' key events; instead it might want to pass these events to the window's call-back functions.
+</BODY>
+</HTML>

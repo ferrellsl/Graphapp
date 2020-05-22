@@ -1,0 +1,52 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Palettes</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="palette">Palettes</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef struct Palette  Palette;
+
+  struct Palette {
+    int     size;       /* number of colours */
+    Colour *element;    /* array of colours */
+  };
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Palette * new_palette(int size, Colour *elem);
+  void      del_palette(Palette *pal);
+
+  void      set_window_palette(Window *w, Palette *pal);
+  Palette * get_window_palette(Window *w);
+
+  byte *    palette_translation(Palette *target, byte *dest,
+                                    int size, Colour *elem);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+A <I>Palette</I> defines an indexed array of up to 256 colours. The colours are usually all different, but do not have to be.
+<P>
+The <B>new_palette</B> function creates a palette by copying the supplied array of colours, given the number of elements to copy and a pointer to the start of the array. Because the palette is a copy of the colours, the supplied array may be deleted after this function completes.
+<P>
+A palette should be destroyed using <B>del_palette</B>.
+<P>
+The <B>set_window_palette</B> functions sets the window's private palette to a copy of the given set of colours, if the window manager supports this operation. If the depth of the screen is greater than 8 (for example, if the screen is in TrueColour or DirectColour mode) this operation will do nothing, since there are already more colours available than would be possible using a private window palette. If the screen cannot display enough colours to display the entire requested palette, the first N entries will be used, where N is the number of colours the screen can display. Therefore, the palette should be sorted in order of most important colours, for maximum portability. Passing a NULL palette pointer to this function removes any private palette from the window.
+<P>
+If a window has a private palette, the window manager guarantees to display that set of colours if the window has mouse focus. When another window has focus, the colours may be remapped. Usually all windows share the common system palette, so that no colour 'flashing' occurs when focus changes between windows. Such 'flashing' is minimized in this library due to the way <B>set_window_palette</B> matches the requested palette to the closest set of colours in the system palette <I>before</I> the window manager is notified of the request.
+<P>
+The <B>get_window_palette</B> function returns a pointer to the actual palette used by a window. This will be a copy of the requested palette, but might be smaller if not all the colours could be allocated. It returns NULL if the window does not have private palette, or if a private palette is not needed (for instance, if the screen is in TrueColour mode).
+<P>
+The <B>palette_translation</B> function writes into <TT>dest</TT> a series of integers which show the best match between the colours in the array of colours named <TT>elem</TT> and the <TT>target</TT> palette, such that <TT>elem[i]</TT> is closest to <TT>palette-&gt;element[dest[i]]</TT> for <TT>0&lt;=i&lt;size</TT>. It returns <TT>dest</TT>.
+<P>
+This function can be used to determine which entry in a palette has the closest visual match to one given colour (if <TT>size</TT> is 1, and <TT>elem</TT> points to one colour) or it can generate an entire list of matches at once, for efficiency. The matching approximates the way the human eye matches colours. <TT>dest</TT> must be an array large enough to hold all the answers; it must be at least <TT>size</TT> bytes long. Note that although a palette can only hold 256 colours, the <TT>elem</TT> array might hold more if, for example, it is a scanline of colours within an Image that is being matched to a palette.
+<P>
+</BODY>
+</HTML>

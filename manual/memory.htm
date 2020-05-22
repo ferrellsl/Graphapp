@@ -1,0 +1,36 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Memory Management</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="memory">Memory Management</A></H2>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  void * alloc(long size);
+  void * zero_alloc(long size);
+  void * realloc(void *ptr, long newsize);
+  void   free(void *ptr);
+  void   debug_memory(int on);
+  long   memory_used(void);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+All memory allocation in the library uses the functions described in this section.
+<P>
+The <B>alloc</B> function allocates a block of memory <TT>size</TT> bytes in length. This is usually just a safe wrapper around the standard C function <B>malloc</B>, but may perform additional integrity checks. It aborts the program if it runs out of memory. Allocating a zero-sized block is valid and returns NULL.
+<P>
+Use <B>free</B> to release from memory any blocks allocated by <B>alloc</B>. Never use the standard C function <B>free</B> on a block. Passing NULL to <B>free</B> is allowed, and does nothing.
+<P>
+The <B>zero_alloc</B> function uses <B>alloc</B> to create a block of memory, and then uses the standard C function <B>memset</B> to set every byte of that block to the value zero. It returns NULL only if <B>alloc</B> returned NULL.
+<P>
+The <B>realloc</B> function accepts a pointer to a memory block which was previously allocated using <B>alloc</B>, and resizes it to the <TT>newsize</TT> (in bytes). It keeps the old contents, or as much as will fit in the new block if making it smaller. The block may be moved around in memory, so a new pointer is returned by this function, and the old pointer becomes invalid. If the function runs out of memory, it aborts the program. The block may be resized to zero bytes, in which case the function frees the block and returns NULL. The pointer passed in may be NULL, in which case it just calls <B>alloc</B>. This function is essentially a safe wrapper around the standard C function <B>realloc</B>, except that it operates only on blocks produced from <B>alloc</B>.
+<P>
+The <B>debug_memory</B> function activates or deactivates a memory debugger, which replaces internal calls to <B>malloc</B>, <B>realloc</B> and <B>free</B> with calls to custom, portable, debugging functions. Once activated by passing a non-zero integer to this function, debugging should not be deactivated, since this might cause blocks allocated using a custom allocator to be deallocated using the standard <B>free</B> function, which would cause a crash. The option to switch off memory debugging (by passing zero to <B>debug_memory</B>) exists because there are certain controlled conditions where it might be possible to do this.
+<P>
+The <B>memory_used</B> function attempts to report how many bytes are currently allocated by these memory functions. This will only be correct if the debugging mode was activated before any other library functions were called. If the debugging mode was never activated, the function reports how many bytes have been allocated through <B>alloc</B> only, ignoring changes made through calls to <B>free</B> or <B>realloc</B>.
+</BODY>
+</HTML>

@@ -1,0 +1,54 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Mouse Events</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="mouse">Responding to Mouse Events</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef void (*MouseFunc)(Control *c, int buttons, Point xy);
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  void  on_control_mouse_down(Control *c, MouseFunc mouse_down);
+  void  on_control_mouse_up  (Control *c, MouseFunc mouse_up);
+  void  on_control_mouse_drag(Control *c, MouseFunc mouse_drag);
+  void  on_control_mouse_move(Control *c, MouseFunc mouse_move);
+</PRE>
+<P>
+<H3>CONSTANTS</H3>
+<P>
+<PRE>
+  enum {
+    NO_BUTTON     = 0,
+    LEFT_BUTTON   = 1,
+    MIDDLE_BUTTON = 2,
+    RIGHT_BUTTON  = 4
+  };
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+The functions <B>on_control_mouse_down</B>, <B>on_control_mouse_up</B>, <B>on_control_mouse_drag</B>, <B>on_control_mouse_move</B> allow controls to respond to mouse events. They associate call-back functions with a control, so that when a certain kind of mouse events occurs, the relevant call-back function is called.
+<P>
+Each of the functions handles a different kind of mouse event:
+<P>
+<UL>
+<LI>A <B>mouse_down</B> occurs when a mouse button is clicked while the mouse pointer is inside a control.
+<LI>A <B>mouse_move</B> occurs when the mouse is moved within a control, but no mouse buttons are held down at the time.
+<LI>A <B>mouse_drag</B> occurs when the mouse is moved while one or more mouse buttons are held down at the same time.
+<LI>A <B>mouse_up</B> occurs when any mouse button is released (some mouse buttons may still be held down).
+</UL>
+<P>
+Each of the call-backs are defined as <I>MouseFunc</I>. A MouseFunc has an integer parameter <TT>buttons</TT> and a point <TT>xy</TT> expressed in the control's own co-ordinate system. These refer to the mouse state at the time the event happened.
+<P>
+If any of the mouse buttons are held down when the call-back is activated, the <TT>buttons</TT> parameter will be set to reflect the fact. It is a bit-field which is organised so that <TT>buttons & LEFT_BUTTON</TT> is set when the left mouse button is down, <TT>buttons & MIDDLE_BUTTON</TT> corresponds to the middle mouse button and <TT>buttons & RIGHT_BUTTON</TT> corresponds to the right mouse button. It will be zero if no buttons are held down.
+<P>
+For systems which have a mouse with fewer than three buttons, extra buttons can be simulated by holding down modifier keys and clicking with the left button. Holding down Shift simulates a right mouse button click, while holding down Ctrl simulates a middle button click. Holding down Alt simulates a left mouse button click, which is useful for situations where the user wants several buttons clicked at the same time on a two or one button mouse.
+</BODY>
+</HTML>

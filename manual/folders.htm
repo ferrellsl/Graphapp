@@ -1,0 +1,95 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Files and Folders</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="folders">Files and Folders</A></H2>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  FILE *open_file(char *filepath, char *mode);
+  int   close_file(FILE *f);
+  int   remove_file(char *filepath);
+  int   rename_file(char *oldpath, char *newpath);
+
+  Folder *open_folder(char *foldername);
+  char *  read_folder(Folder *f);
+  int     close_folder(Folder *f);
+  int     make_folder(char *folderpath, int mode);
+  int     remove_folder(char *folderpath);
+  int     rename_folder(char *oldpath, char *newpath);
+  char *  current_folder(void);
+  int     set_current_folder(char *folderpath);
+
+  int   file_info(char *filepath);
+  long  file_size(char *filepath);
+  long  file_time(char *filepath);
+
+  char *form_file_path(char *foldername, char *filename);
+  char *get_file_name(char *filepath);
+</PRE>
+<P>
+<H3>CONSTANTS</H3>
+<P>
+<PRE>
+  enum FileInfo {
+    IS_APP    = 1,
+    IS_WRITE  = 2,
+    IS_READ   = 4,
+    IS_FOLDER = 8,
+    IS_FILE   = 16
+  };
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+Operating systems often differ when it comes to accessing files and directories (folders). There are many differences, but two of the main differences are the directory separator character (which is '/' in Unix), and the way to up one directory level (which is '..' in Unix).
+<P>
+The functions in this section have been provided to allow all code to access files and folders using the Unix-style notation.
+<P>
+Ordinarily, a standard C function such as <TT>fopen</TT> accepts a platform-specific C string to use to locate a file. On a Linux platform this might be a string such as "../manual/folders.htm" while on Windows this would be "..\manual\folders.htm" and on some Macintosh systems might be written as "::manual:folders.htm". These differences cause difficulties when porting C source code.
+<P>
+The <B>open_file</B> function can be used as a cross-platform replacement for <B>fopen</B>. It translates the given Unix-style file path string into whatever style the operating system requires. On Windows, for instance, it exchanges '/' for '\' in a copy of the file path string, then calls <B>fopen</B>, then frees the temporary string. Using <B>open_file</B> instead of <B>fopen</B> allows code to assume Unix-style file and directory names everywhere.
+<P>
+Correspondingly, <B>close_file</B> replaces <B>fclose</B>, except that it returns 1 for success, and 0 for failure. Passing a NULL file pointer to this function is valid and returns 1.
+<P>
+The <B>remove_file</B> function attempts to delete the named file, returning 1 for success, 0 for failure. The name is given in Unix-style notation.
+<P>
+The <B>rename_file</B> function renames a file on the file system from the old path name to the new, both given in Unix-style notation. This can be used to rename a file, and/or move a file to a new folder. It returns 1 for success, 0 for failure.
+<P>
+The <B>open_folder</B> function opens a directory for reading, using a Unix-style directory specifier. The ".." path component causes a textual removal of the previous path component, if any, and "." components are removed, since they represent the same directory. Again, '/' represents the directory path separator on all platforms, but is internally substituted with the platform-specific separator.
+<P>
+The <B>read_folder</B> function reads one file or directory name from the open folder, returning a pointer to a static zero-terminated string which contains the name, or NULL if there are no more names listed in that directory. The names "." and ".." will usually be present as the first items on the list. The list of names will not be sorted into alphabetic order.
+<P>
+The <B>close_folder</B> function closes an open folder, returning 1 for success, 0 if there is an error. Passing a NULL folder pointer to this function is valid and returns 1.
+<P>
+Use <B>make_folder</B> to create a new folder with the given name and mode, if possible. The name is given in Unix-style notation. The mode is a bit-field, consisting of three groups of three permission bits, in the order <TT>rwxrwxrwx</TT> where 'r' means read access, 'w' means write access, and 'x' means execute or search access. The first (highest) group of bits refers to user-level access, the next to group access, and the last to world access. The mode is often written as an octal constant, such as 0755 (which is <TT>rwxr-xr-x</TT> mode), or 0700 (which is <TT>rwx------</TT> mode, or user access only). The mode may be ignored by some implementations if the operating system cannot support such access modes. The function returns 1 for success, 0 for failure.
+<P>
+The <B>remove_folder</B> function attempts to delete the named folder from the file system, returning 1 for success, 0 for failure. The name is given in Unix-style notation. The operation will fail if there are any files or folders contained within the folder which is being deleted.
+<P>
+The <B>rename_folder</B> function renames a folder on the file system from the old path name to the new, both given in Unix-style notation. This can be used to rename a folder, and/or move a folder into a new folder. It returns 1 for success, 0 for failure.
+<P>
+Use <B>current_folder</B> to discover the current working directory, given using Unix-style notation.
+<P>
+The <B>set_current_folder</B> function changes the current working directory to the specified path, given in Unix-style notation. It returns 1 for success, 0 for failure.
+<P>
+The <B>file_info</B> function is a cross-platform version of the standard C function <B>fstat</B>, which returns some flags yielding information about the given file or directory. The returned integer is a bit-field with the following possible values:
+<UL>
+<LI><TT>IS_APP</TT> is set if the executable flag is present on the file or folder.</LI>
+<LI><TT>IS_WRITE</TT> is set if the file or folder can be written to.</LI>
+<LI><TT>IS_READ</TT> is set if the file or folder can be read.</LI>
+<LI><TT>IS_FOLDER</TT> is set if the path refers to a directory.</LI>
+<LI><TT>IS_FILE</TT> is set if the path refers to a file.</LI>
+</UL>
+<P>
+The <B>file_size</B> function reports the size in bytes of the specified file. The path uses Unix-style notation.
+<P>
+The <B>file_time</B> function returns the last modification time of the specified file, represented in seconds since the start of the epoch (the current epoch is from Jan 1, 1970). The path uses Unix-style notation.
+<P>
+The <B>form_file_path</B> function joins a Unix-style directory path name and a file name, to produce a new correct Unix-style path name. The string is created using <B>alloc</B>, and so should later be freed using <B>free</B>. The function inserts a '/' between the path and the file name if necessary.
+<P>
+The <B>get_file_name</B> function returns a pointer to the start of just the file name from a full path name, discarding the folder information. Because this is just a pointer to the first character in the file name, the returned string should not be freed.
+</BODY>
+</HTML>

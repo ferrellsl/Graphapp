@@ -1,0 +1,115 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Image Readers</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="imgread">Image Readers</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef struct ImageReader  ImageReader;
+
+  typedef int (*ImageMessageFunc) (ImageReader *reader, char *message);
+  typedef int (*ImageProgressFunc)(ImageReader *reader);
+
+  struct ImageReader {
+    char *              filename;           /* user-given fields */
+    FILE *              file;               /* file to read from */
+    Palette *           src_pal;            /* dither to this palette */
+    int                 max_cmap_size;      /* only use this many colours */
+    int                 required_depth;     /* 8 or 32 */
+
+    ImageMessageFunc    message_func;       /* report warnings */
+    ImageProgressFunc   error_func;         /* if error, tidy up */
+    ImageProgressFunc   startup_func;       /* called before start */
+    ImageProgressFunc   after_dither_func;  /* called after dither */
+    ImageProgressFunc   progress_func;      /* called after each line */
+    ImageProgressFunc   rendering_func;     /* called after each line */
+    ImageProgressFunc   success_func;       /* called after success */
+    void *              user_data;          /* user-defined data */
+
+    int                 state;          /* DITHERING, RENDERING etc */
+    int                 stage;          /* 1 <= stage <= max_stages */
+    int                 max_stages;     /* total number of stages */
+    int                 row;            /* 0 <= row < height, random */
+    int                 rows_done;      /* 0,1,...,height in order */
+    int                 row_height;     /* of current stage */
+    int                 width;          /* in pixels */
+    int                 height;         /* in pixels */
+    byte **             data8;          /* implies palette */
+    Colour **           data32;         /* implies no palette */
+    Palette *           pal;            /* if data8 used */
+  };
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  ImageReader * new_image_reader(void);
+  void    del_image_reader(ImageReader *reader);
+
+  Image * read_image(char *filename, int required_depth);
+  Image * read_image_file(FILE *file, int required_depth);
+  Image * read_image_progressively(ImageReader *reader);
+  int     find_image_format(FILE *file);
+</PRE>
+<P>
+<H3>CONSTANTS</H3>
+<P>
+<PRE>
+  enum ImageReaderState {
+    STOPPED         = 0,    /* at start or end of processing */
+    STARTING,               /* creating data structures */
+    DITHERING,              /* now dithering to a palette */
+    RENDERING,              /* processing lines of pixels */
+    IMAGE_ERROR     = -1    /* an error has happened */
+  };
+
+  enum ImageFormat {
+    PNG_FORMAT      = 1,    /* Portable Network Graphics */
+    JPEG_FORMAT     = 2,    /* Joint Photographic Experts Group */
+    GIF_FORMAT      = 3,    /* Graphic Interchange Format */
+    UNKNOWN_FORMAT  = -1
+  };
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+An <I>ImageReader</I> is an abstract object used to read an <I>Image</I> from a file. It can be used to control how an image is read and to receive notifications as lines of the image are completed.
+<P>
+An empty <I>ImageReader</I> structure is first obtained using <B>new_image_reader</B>, and then fields are assigned to control the reading process. The fields <TT>filename, file, src_pal, max_cmap_size,</TT> and <TT>required_depth</TT> should be assigned values. If dithering to a user-specified palette is not required, the <TT>src_pal</TT> and <TT>max_cmap_size</TT> can be left as their initial empty values.
+<P>
+Call-back functions can be assigned which will notify the program when the image reading process has completed certain stages:
+<UL>
+<LI>The <B>message_func</B> call-back is used whenever a warning or error message must be issued to the user. Setting this to NULL prevents any messages being shown. Typically this function will display the message in a dialog box, or to the terminal using <B>printf</B>.</LI>
+<LI>The <B>error_func</B> call-back is used if a critical error occurs, such as the image being damaged or truncated. Typically this will tidy up and place the program in a state where it is no longer expecting a valid image pointer.</LI>
+<LI>The <B>startup_func</B> call-back is called before any image processing occurs. It can be used to initialise program values needed to display the progress of the image reader. The image <TT>width</TT> and <TT>height</TT> fields will be correct at this point.</LI>
+<LI>The <B>after_dither_func</B> call-back happens after the image reader has dithered the image to the programmer-specified palette (if any). This happens before reading any lines of pixels. The image palette will be correct at this point, and will either be a copy of the programmer-specified palette (if one was given), or the palette stored within the image (if any), or else NULL.</LI>
+<LI>The <B>progress_func</B> call-back occurs after each line of pixels has been read. It is typically used to update some area on the screen showing how much of the image has now been read.</LI>
+<LI>The <B>rendering_func</B> call-back occurs after each line of pixels has been read, just after the progress function. It is typically used to copy the current line of pixels to the screen. The <TT>row</TT> and <TT>row_height</TT> fields will be set before calling this function, and report which horizontal line in the image has just been read.</LI>
+<LI>The <B>success_func</B> call-back is called after all image processing has finished successfully.</LI>
+</UL>
+<P>
+If an error occurs part-way through processing, some of the call-backs may not occur at all. For instance, the success function only happens if the image has been completely processed. Any of the call-backs can be set to NULL (which they are initialised to in any case), which prevents that function from being called.
+<P>
+A programmer-specified data pointer can be set in the <TT>user_data</TT> field, for use during the call-back functions. The pointer is never touched by the image reader code.
+<P>
+The remaining fields of the <I>ImageReader</I> structure are modified automatically during image processing.
+<P>
+The <TT>state</TT> field begins (and ends) at <TT>STOPPED</TT> and is set to different values as image reading progresses: <TT>STARTING</TT> means that data structures are being allocated, <TT>DITHERING</TT> means the reader is dithering the image to the required palette, <TT>RENDERING</TT> means lines of pixels are being read from the image. The <TT>IMAGE_ERROR</TT> state only happens if there is an error in the image, or if the connection to the image's file is somehow broken.
+<P>
+The <TT>stage</TT> field reports the current stage in processing, from 1 to <TT>max_stages</TT> inclusive. Different image formats will have a different maximum number of stages. Interlaced images, for example, may have between 3 and 7 stages, depending on the interlacing technique. Dithering may also be counted as a stage. In general, it is not possible to determine in advance how many stages there are for a given image, but it will either be 1, or a small integer usually less than 10.
+<P>
+The <TT>row</TT> gives the current pixel line which is being decoded. This will be a number greater than or equal to zero, and less than the pixel height of the image.
+<P>
+The <TT>row_height</TT> field reports the pixel height of this line of pixels when drawn. Usually this will be equal to one pixel, but it could be larger in the case of interlacing, where lines are read in a non-linear order. For example, a GIF image might store lines in the file in the order 0,4,2,1. In that case, it might be desirable to draw the line taller than 1 pixel, so that the image appears as a series of filled rectangles. Ignoring <TT>row_height</TT> and using a height of 1 for each line in an interlaced image will instead produce a Venetian blind effect.
+<P>
+The <TT>rows_done</TT> field increases from 0 to the image height, inclusive. It is a cumulative total of the number of lines read so far.
+<P>
+The lines of image pixels are stored into either the <TT>data8</TT> or <TT>data32</TT> fields, depending on whether the <TT>required_depth</TT> field was set to 8 or 32.
+<P>
+The <TT>pal</TT> field will point to the image's palette if the <TT>required_depth</TT> was 8, NULL otherwise. This will either be a copy of the <TT>src_pal</TT> supplied by the programmer, or it will be the palette given in the image file, or a constructed palette if the image file contains 24-bit or 32-bit data. The <TT>max_cmap_size</TT> field given by the programmer can be zero, which means the palette can have the maximum possible size (256 elements), or it can be set to a positive integer between 1 and 256 inclusive, to specify the maximum number of colours that may be present in the final image.
+</BODY>
+</HTML>

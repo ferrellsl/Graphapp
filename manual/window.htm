@@ -1,0 +1,171 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Windows</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="window">Windows</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef struct Window  Window;
+
+  typedef void (*WindowFunc)      (Window *w);
+  typedef void (*WindowMouseFunc) (Window *w, int buttons, Point xy);
+  typedef void (*WindowKeyFunc)   (Window *w, unsigned long key);
+  typedef void (*WindowDrawFunc)  (Window *w, Graphics *g);
+
+  struct Window  {
+    App *           app;          /* system connection */
+    char *          text;         /* title bar string */
+    long            flags;        /* status flags */
+    Rect            area;         /* drawable area */
+    void *          data;         /* user-defined pointer */
+    Palette *       pal;          /* private colour palette */
+    int             num_children; /* list of child controls */
+    Control **      children;
+    WindowFunc      close;        /* the user closed the window */
+    WindowFunc      resize;       /* the user resized the window */
+    WindowDrawFunc  redraw;       /* some part(s) exposed */
+    WindowMouseFunc mouse_down;   /* mouse button clicked */
+    WindowMouseFunc mouse_up;     /* mouse button released */
+    WindowMouseFunc mouse_drag;   /* mouse moved, button down */
+    WindowMouseFunc mouse_move;   /* mouse moved, no buttons down */
+    WindowKeyFunc   key_down;     /* Unicode key press */
+    WindowKeyFunc   key_action;   /* arrow keys, function keys, etc */
+  };
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Window *new_window(App *app, Rect area, char *name, long flags);
+  void    del_window(Window *w);
+
+  void    show_window(Window *w);
+  void    hide_window(Window *w);
+
+  void    move_window(Window *w, Rect r);
+  void    size_window(Window *w, Rect r);
+  void    redraw_rect(Window *w, Rect r);
+  void    draw_window(Window *w);
+  void    redraw_window(Window *w);
+  Rect    get_window_area(Window *w);
+
+  void    set_window_title(Window *w, char *title);
+  char *  get_window_title(Window *w);
+  void    set_window_icon(Window *win, Image *icon);
+
+  void    on_window_close (Window *w, WindowFunc close);
+  void    on_window_resize(Window *w, WindowFunc resize);
+  void    on_window_redraw(Window *w, WindowDrawFunc redraw);
+
+  void    on_window_mouse_down(Window *w, WindowMouseFunc mouse_down);
+  void    on_window_mouse_up  (Window *w, WindowMouseFunc mouse_up);
+  void    on_window_mouse_drag(Window *w, WindowMouseFunc mouse_drag);
+  void    on_window_mouse_move(Window *w, WindowMouseFunc mouse_move);
+  void    on_window_key_down  (Window *w, WindowKeyFunc key_down);
+  void    on_window_key_action(Window *w, WindowKeyFunc key_action);
+
+  void    set_window_background(Window *w, Colour bg);
+  Colour  get_window_background(Window *w);
+
+  void    set_window_data(Window *w, void *data);
+  void *  get_window_data(Window *w);
+
+  void    hide_all_windows(App *app);
+  void    del_all_windows(App *app);
+</PRE>
+<P>
+<H3>CONSTANTS</H3>
+<P>
+<PRE>
+  #define SIMPLE_WINDOW   0x00000000L
+
+  #define MENUBAR         0x00000010L
+  #define TITLEBAR        0x00000020L
+  #define CLOSEBOX        0x00000040L
+  #define RESIZE          0x00000080L
+  #define MAXIMIZE        0x00000100L
+  #define MINIMIZE        0x00000200L
+
+  #define MODAL           0x00001000L
+  #define FLOATING        0x00002000L
+  #define CENTERED        0x00004000L
+  #define CENTRED         0x00004000L
+
+  #define STANDARD_WINDOW (TITLEBAR|CLOSEBOX|RESIZE|MAXIMIZE|MINIMIZE)
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+A <I>Window</I> is a rectangular area displayed on a screen. A window has a zero origin in its own co-ordinate system, but may have various structures built around its drawable area, such as title bars, borders and menu bars.
+A window can be drawn to by obtaining an appropriate <I>Graphics</I> object.
+<P>
+The <B>new_window</B> function creates an initially invisible window with the given name. The app parameter specifies the connection to the windowing system.
+The rectangle specifies where the window's drawable area should appear on the screen, with zero being the top-left point of the screen. The window manager is free to ignore the x and y components of this rectangle, depending on its window placement policies, but most window managers honour these values and try to place the window in the correct place. If the width and height values are too large, the window manager may reduce the size of the window.
+The flags parameter is usually the constant <B>STANDARD_WINDOW</B>.
+If an error occurs the function returns NULL.
+<P>
+The flags field supplied to <B>new_window</B> is a bit-field. Various constants can be combined using the plus or bitwise-or operators to specify how the window should look. Here is a list of those constants and their meanings:
+<P>
+<UL>
+<LI>The <B>TITLEBAR</B> flag gives the window a title bar which can be used for moving it around the screen and also for displaying the window's name.
+<LI>The <B>MENUBAR</B> flag can be used to reserve space for a menu bar on the window, if the platform allows this.
+<LI><B>CLOSEBOX</B> gives the user a way of closing the window.
+<LI><B>MAXIMIZE</B> gives the user a way of increasing the size of the window to its maximum, and
+<LI><B>MINIMIZE</B> allows the window to be shrunk to an icon.
+<LI><B>RESIZE</B> gives the user a method of changing the size of the window.
+<LI>The <B>CENTERED</B> or <B>CENTRED</B> flag causes the window to appear at the centre of the screen.
+<LI>Adding the <B>MODAL</B> flag means the window will be in front of all other application windows when it is displayed, and no mouse or keyboard events will be sent to the other windows until it is hidden.
+<LI><B>FLOATING</B> windows will appear in front of all other application windows even when not active.
+<LI>A <B>SIMPLE_WINDOW</B> is a window with no 'decorations' at all.
+<LI>The <B>STANDARD_WINDOW</B> constant is defined as having the following flags set: <B>TITLEBAR, RESIZE, CLOSEBOX, MINIMIZE, MAXIMIZE.</B> It is provided as a convenience, and is sufficient for most uses of <B>new_window.</B>
+</UL>
+<P>
+The window manager might not be able to implement all of the above functionality, and some platforms have different policies regarding placement of menu bars, for instance. The flags should be treated as a request to the windowing system, but that request may be partially or completely ignored. For instance, a window manager might force all windows to have a title bar, whether one was requested or not.
+<P>
+The <B>del_window</B> function destroys the specified window, hiding it first if it is currently visible. If a window can be re-used, it is more efficient to hide it and then show it later on, rather than delete the window and recreate it every time the user needs the window.
+<P>
+The <B>show_window</B> function makes the specified window visible on the screen and ensures it is the frontmost application window.
+The <B>hide_window</B> function causes the specified window to vanish from the screen. These functions do not destroy the window, so the window can be shown and hidden many times. This is faster than deleting and recreating a window.
+<P>
+The <B>set_window_title</B> function changes the name of the window as shown in the window's title bar, and <B>get_window_title</B> returns the current title. Titles must currently be zero-terminated C strings, not UTF-8 encoded Unicode strings, since many window managers are not yet Unicode aware.
+<P>
+The <B>set_window_icon</B> function associates an icon image with a window. This icon may be visible when the window is minimised, or in other circumstances. An icon can use colour and transparent pixels, although some window managers, notably under X11, will only display the icon as monochrome. Icons should be at least 32 pixels tall and wide, and might be automatically scaled, cropped or centered to fit the window manager's expectations.
+<P>
+Use <B>move_window</B> to change the window's top-left location without changing the size of the window. The supplied rectangle's width and height parameters are ignore by this function.
+<P>
+Use <B>size_window</B> to change the window's size without changing the location of the window. The supplied rectangle's x and y parameters are ignore by this function.
+<P>
+The <B>redraw_rect</B> function just forces a redrawing of the given rectangle (in window co-ordinates), while the <B>draw_window</B> function forces the entire window to be drawn. The <B>redraw_window</B> function is the same as <B>draw_window</B> except that the existing window contents are first erased using the window's background colour.
+<P>
+The <B>get_window_area</B> function returns the window's drawable rectangle in window co-ordinates; hence the top-left point will be zero.
+<P>
+The <B>on_window_close</B> function sets the call-back to be used when the user tries to close the window using the window's close-box. If this call-back is not set, the window will simply be hidden. If the call-back is supplied, it will be called instead, and the window will not be hidden. It is then up to the programmer to achieve the desired effect.
+<P>
+The <B>on_window_resize</B> function sets the call-back to be used when a window is resized by the user. The window is always <I>resized</I> before being <I>redrawn</I>, in circumstances where both of these events must be occur.
+<P>
+The <B>on_window_redraw</B> function is used to attach a call-back function to a window, which will be called every time that window needs to be redrawn. There is no need for this call-back to clear the window since this will automatically be done by the window manager.
+<P>
+Mouse events are handled busing the various <B>on_window_mouse</B> functions to set call-back functions. A <B>mouse_down</B> occurs when a mouse button is clicked within the window; a <B>mouse_up</B> occurs when a mouse button is released. Mouse ups may occur outside the window since the event mechanism tracks the mouse even if it leaves the window where a mouse down first occurred. A <B>mouse_drag</B> occurs when a mouse button is held down and then the mouse is moved, while a <B>mouse_move</B> occurs when no buttons are held down.
+<P>
+Keyboard events are handled using call-back functions. The <B>on_window_key_down</B> function sets the handler to be used for most keyboard events, except for the arrow keys, function keys, home, end, page up, page down, insert and delete keys, or keys modified by holding down CONTROL, which are instead handled by <B>on_window_key_action</B>. Normal key events are mapped to Unicode values, where possible, and passed as unsigned long integers to the call-back function. Not all operating systems allow the input of Unicode values.
+<P>
+Note that mouse and keyboard events which are intercepted first by a <I>Control</I> may not be seen by the underlying window. A control is a separate area placed on a window's surface, which can have its own mouse and keyboard handler functions.
+<P>
+When a window is redrawn, empty areas are first filled with the colour white, by default. A different background colour can be used to fill empty areas, by using the <B>set_window_background</B> function. Which colour is currently selected for use as a background can be determined by using <B>get_window_background</B>.
+<P>
+A user-supplied pointer may be associated with a window using <B>set_window_data</B>. This pointer is converted to a pointer to void and stored in the window's data structure, for later use by the programmer. It can be retrieved using <B>get_window_data</B>.
+<P>
+The <B>hide_all_windows</B> function hides every window created using the given app parameter, while <B>del_all_windows</B> hides and then deletes all such windows. This can be used when terminating the application. The <B>stop</B> function automatically calls these when stopping the application anyway, so they may not be needed in many cases.
+<P>
+<H3>EXAMPLES</H3>
+<P>
+<UL>
+	<LI><A HREF="../examples/smiley.c">smiley.c</A></LI>
+	<LI><A HREF="../examples/scribble.c">scribble.c</A></LI>
+</UL>
+</BODY>
+</HTML>

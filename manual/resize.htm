@@ -1,0 +1,26 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Resizing and Moving Controls</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="resize">Resizing and Moving Controls</A></H2>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Rect  get_control_area(Control *c);
+
+  void  move_control(Control *c, Rect r);
+  void  size_control(Control *c, Rect r);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+The <B>get_control_area</B> function can be used to discover the rectangle of a control in its own co-ordinate system. Hence, the top-left point of this rectangle will be (0,0).
+<P>
+A control can be moved using the <B>move_control</B> function. This will change the location (but not the size) of the control on its parent. The width and height fields in the supplied rectangle will be ignored, while the x and y field must be expressed relative the parent's top-left point.
+<P>
+A control's size can be changed without moving it, using <B>size_control</B>. Here, the given rectangle's width and height field are used, while the x and y fields are ignored. The control's top-left point will remain in the same location.
+</BODY>
+</HTML>

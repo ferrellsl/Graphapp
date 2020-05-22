@@ -1,0 +1,133 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Initialisation and Events</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="init">Initialisation and Event Handling</A></H2>
+<P>
+<H3>HEADERS</H3>
+
+<P>
+<PRE>
+  #include &lt;stdio.h&gt;
+  #include &lt;graphapp.h&gt;
+</PRE>
+
+<P>
+<H3>OBJECTS</H3>
+
+<P>
+<PRE>
+  typedef struct App  App;
+
+  struct App {
+    int       gui_available;    /* is the GUI available? */
+    Rect      screen_area;      /* screen pixel dimensions */
+    Rect      screen_mm;        /* size in millimetres */
+    int       num_windows;      /* a list of windows */
+    Window ** windows;
+    int       visible_windows;  /* how many windows visible */
+    int       fonts_loaded;     /* a list of loaded fonts */
+    Font **   fonts;
+    char *    program_name;     /* absolute path to program */
+    int       has_resources;    /* is it a resource file? */
+    void *    data;             /* user-defined data */
+    void *    extra;            /* platform-specific data */
+  };
+</PRE>
+
+<P>
+<H3>FUNCTIONS</H3>
+
+<P>
+<PRE>
+  int   main(int argc, char **argv);        /* definition of main */
+
+  App * new_app(int argc, char **argv); /* initialise library */
+  void  del_app(App *app);              /* shut-down program */
+
+  void  main_loop(App *app);            /* handle all events */
+  int   peek_event(App *app);           /* is there an event? */
+  int   wait_event(App *app);           /* wait for one event */
+  int   do_event(App *app);             /* handle one event */
+
+  int   exec(App *app, char *cmd);      /* execute a program */
+
+  void  error(App *app, char *message); /* exit with message */
+</PRE>
+
+<P>
+<H3>NOTES</H3>
+
+<P>
+The two header files which must be included in any GraphApp program are
+named <TT>&lt;stdio.h&gt;</TT> and <TT>&lt;graphapp.h&gt;</TT>, and they
+must be included in that order, since the GraphApp functions make use of
+the <TT>stdio</TT> <I>FILE</I> type.
+Programs begin, as usual, in the <B>main</B> function, which
+<I>must</I> be defined as above.
+
+<P>
+The function <B>new_app</B> initialises the structures and variables necessary to use the graphics library's interface, storing the data into a structure called an <I>App</I>, and returning a pointer to it. This pointer is required by other functions. If there is no memory remaining, NULL will be returned. If the program is being run from a non-graphical terminal, the structure will still be created, the <TT>gui_available</TT> field will be set to zero, and some functions will still work, such as drawing into images, but functions which require access to the windowing system, such as creating a window, or drawing to a bitmap, will not work.
+<P>
+If the graphical user interface could be initialised, the <TT>gui_available</TT> field will be set to non-zero. The <TT>screen_area</TT> field will be initialised to the screen's dimensions in pixels. Typically the <TT>x</TT> and <TT>y</TT> fields of this rectangle will be zero, while the <TT>width</TT> and <TT>height</TT> fields will contain the size of the screen in pixels. The <TT>screen_mm</TT> field will contain the dimensions of the screen in millimetres (there are 25.4 millimetres in an inch).
+<P>
+The function takes parameters <TT>argc</TT> and <TT>argv</TT> from the <B>main</B> function and searches them for interface-specific options (such as those found in X-Windows environments). If it finds any such initialisation parameters, it removes them from the <TT>argv</TT> list by moving the next parameters forwards in the list, and <TT>argc</TT> will be invalid after this process (a NULL value in the <TT>argv</TT> array now signals the end of parameters).
+<P>
+The <B>del_app</B> function is called at the end of the program.
+It closes all windows and releases from the memory the <I>App</I>
+structure.
+<P>
+The <B>main_loop</B> function is called after creation of graphical
+objects, such as windows and controls. It polls the windowing system for
+events and dispatches them to the appropriate callback functions. The
+function will terminate when there are no windows visible. It is thus
+possible to call this function again if other windows become visible.
+<P>
+The <B>peek_event</B> is true when there are events to be processed
+in the event queue. It is rarely used, since it polls the windowing
+system each time.
+<P>
+The <B>do_event</B> function checks if there is an event to be processed, and if there is, dispatches it. It returns zero only if there are no
+more events possible, for instance, if there are no visible windows.
+It is generally not used, since it polls the windowing system each time
+it is called.
+<P>
+The <B>wait_event</B> function waits until an event is available,
+then handles that event using <B>do_event</B>. If there are no more
+events possible, it returns zero. It is called repeatedly by the
+<B>main_loop</B> function to handle events.
+<P>
+The <B>exec</B> function launches the specified application, returning
+1 on success and 0 on failure. This function exists because the standard
+C function <B>system</B> is not always implemented on all platforms
+(e.g. MS-Windows).
+<P>
+The <B>error</B> function displays an error message in a window and
+then stops the application.
+<P>
+<H3>EXAMPLES</H3>
+<P>
+Here is an example program skeleton:
+<P>
+<PRE>
+  #include &lt;stdio.h&gt;
+  #include &lt;graphapp.h&gt;
+
+  int main(int argc, char *argv[])
+  {
+    App *app;
+
+    /* some initialisation code here */
+    app = new_app(argc, argv);
+    if ((app == NULL) || (app->gui_available == 0))
+      error(app, "Couldn't initialise the graphics library.");
+    /* rest of initialisation and drawing code here */
+    main_loop(app);
+    del_app(app);
+    return 0;
+  }
+</PRE>
+</BODY>
+</HTML>

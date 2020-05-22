@@ -1,0 +1,72 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Drawing Text</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="drawtext">Drawing Text</A></H2>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  int   draw_utf8(Graphics *g, Point p, char *utf8, int nbytes);
+  char *draw_text(Graphics *g, Rect r, int align, char *utf8, int nbytes);
+  int   text_height(Font *f, int width, char *utf8, int nbytes);
+  int   text_width(Font *f, int width, char *utf8, int nbytes);
+  int   text_line_length(Font *f, int width, char *utf8, int nbytes);
+  void  set_text_direction(Graphics *g, int direction);
+</PRE>
+<P>
+<H3>CONSTANTS</H3>
+<P>
+<PRE>
+  enum {
+    ALIGN_LEFT     = 1,
+    ALIGN_RIGHT    = 2,
+    ALIGN_JUSTIFY  = 3,
+    ALIGN_CENTER   = 4,
+    ALIGN_CENTRE   = 4,
+    VALIGN_TOP     = 8,
+    VALIGN_BOTTOM  = 16,
+    VALIGN_JUSTIFY = 24,
+    VALIGN_CENTER  = 32,
+    VALIGN_CENTRE  = 32,
+    LR_TB          = 64,
+    RL_TB          = 128,
+    TB_LR          = 256,
+    TB_RL          = 512
+  };
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+The <B>draw_utf8</B> function draws the Unicode text characters from the UTF-8 encoded string, using the current font and the current colour. The number of bytes in the string is given by <TT>nbytes</TT>, so the string may contain '\0' characters if required.
+<P>
+The upper left corner of the first character is placed at point <TT>p</TT>, and subsequent characters are placed to the right of each previous character. It will <I>not</I> wrap the text to the next line if the edge of a window is encountered; it will instead simply stop drawing.
+The function returns one if it succeeded, or zero if a problem happened, such as an inability to load parts of the font or a lack of memory.
+<P>
+The <B>draw_text</B> function draws UTF-8 text within a bounding box, using a given text-alignment. Words are wrapped to the next line as necessary. The possible text-alignments are: <TT>ALIGN_LEFT, ALIGN_RIGHT, ALIGN_JUSTIFY, ALIGN_CENTRE, VALIGN_TOP, VALIGN_BOTTOM, VALIGN_JUSTIFY</TT> or <TT>VALIGN_CENTRE</TT> (American spellings are also allowed).
+The first four of these refer to the horizontal alignment of text within the bounding box, the other four refer to the vertical placement of text.
+A horizontal and a vertical alignment may be combined using the plus or bit-wise or operators.
+An alignment of zero is equivalent to <TT>ALIGN_LEFT+VALIGN_TOP</TT>.
+<P>
+The <B>draw_text</B> function draws only as much text as will fit in the bounding box. It uses the current colour and the current font.
+The function returns a pointer to the first character in the text string which could not be drawn within the bounding box; hence this pointer can be used to continue drawing the text string elsewhere.
+It will return NULL if the entire string was drawn.
+<P>
+The <B>text_height</B> function returns the pixel height of the given string using the given font and a supplied maximum pixel width for the UTF-8 text.
+The number of lines over which the text will be displayed can thus be determined by dividing the returned pixel height by the height of the font.
+<P>
+The <B>text_width</B> function returns the pixel width of a line of UTF-8 text, if it was drawn in the given font. The maximum pixel width parameter specifies how wide a space the text is to be drawn within. Tab characters will align on boundaries which are multiples of 8 spaces, and newline characters will end the line, otherwise the line ends when a word wraps to the next line.
+<P>
+The <B>text_line_length</B> function returns the length in bytes of the largest line of text which will fit in the given pixel width in the given font. If a newline occurs in the text, this will end the line and return the length.
+<P>
+The <B>set_text_direction</B> function sets the direction in which text will be drawn. The default direction is <TT>LR_TB</TT> which means left to right lines stacked top to bottom (as in Latin languages such as English), but this can be changed to <TT>RL_TB</TT> which means right to left lines stacked top to bottom (as in Middle Eastern lanuages). In that case, the point passed to <B>draw_utf8</B> should refer to the <I>top-right</I> point of the text to be drawn, not the top-left, and the text will be drawn a character at a time to the left of that point. Similarly, <B>draw_text</B> will still draw all text within the rectangle, but will draw the letters and words from the right to the left. Alignment is separate to text direction, so it is possible to have text written right-to-left, but left-aligned. Vertical text, as specified by <TT>TB_LR</TT> or <TT>TB_RL</TT>, is not yet implemented.
+<P>
+<H3>EXAMPLES</H3>
+<P>
+<UL>
+	<LI><A HREF="../examples/viewutf8.c">viewutf8.c</A></LI>
+</UL>
+</BODY>
+</HTML>

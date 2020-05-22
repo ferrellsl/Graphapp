@@ -1,0 +1,72 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Internationalisation</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="hide">Internationalisation</A></H2>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  void  set_string(App *app, char *key, char *value);
+  char *get_string(App *app, char *key);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+The <B>set_string</B> function associates a string value with a string key, for use in internationalising programs. Keys and values are case-sensitive and UTF-8 encoded. Once a value is associated with a key, that stored value can be returned by passing the key to <B>get_string</B>, otherwise NULL is returned.
+<P>
+The dialog functions use certain keys to determine what message strings to display. Changing the values associated with these keys allows a program to internationalise the dialog functions.
+<P>
+The current set of dialog keys and values are given in the table below.
+<P>
+<FLOAT>
+<CENTER>
+<TABLE BORDER="1">
+<TR><TD><B>Key</B></TD><TD><B>Default Value</B></TD></TR>
+<TR><TD>"Yes"</TD><TD>"Yes"</TD></TR>
+<TR><TD>"No"</TD><TD>"No"</TD></TR>
+<TR><TD>"Cancel"</TD><TD>"Cancel"</TD></TR>
+<TR><TD>"OK"</TD><TD>"OK"</TD></TR>
+<TR><TD>"Quit"</TD><TD>"Quit"</TD></TR>
+<TR><TD>"Create"</TD><TD>"Create"</TD></TR>
+<TR><TD>"Overwrite"</TD><TD>"Overwrite"</TD></TR>
+<TR><TD>"Error"</TD><TD>"Error"</TD></TR>
+<TR><TD>"File:"</TD><TD>"File:"</TD></TR>
+<TR><TD>"Files:"</TD><TD>"Files:"</TD></TR>
+<TR><TD>"Path:"</TD><TD>"Path:"</TD></TR>
+<TR><TD>"Folder:"</TD><TD>"Folder:"</TD></TR>
+<TR><TD>"Folders:"</TD><TD>"Folders:"</TD></TR>
+<TR><TD>"Create file?"</TD><TD>"That file does not exist. Create the file?"</TD></TR>
+<TR><TD>"Already a folder!"</TD><TD>"That file name is already is use as a folder."</TD></TR>
+<TR><TD>"Overwrite file?"</TD><TD>"That file already exists. Overwrite the file?"</TD></TR>
+<TR><TD>"Create File"</TD><TD>"Create File"</TD></TR>
+<TR><TD>"Error: Create File"</TD><TD>"Error: Create File"</TD></TR>
+<TR><TD>"Overwrite File"</TD><TD>"Overwrite File"</TD></TR>
+<TR><TD>"Error: Save File"</TD><TD>"Error: Save File"</TD></TR>
+</TABLE>
+<BR>
+<I>Standard keys and default values used by dialog functions.</I>
+</CENTER>
+</FLOAT>
+<P>
+To create a program which uses dialogs in a language other than English, each of the above values should be translated into the new language, using <B>set_string</B> after the <I>App</I> structure has been created but before using any dialog functions. For example, a French program might begin:
+<P>
+<PRE>
+  int main(int argc, char *argv[])
+  {
+    App *app = new_app(argc, argv);
+    set_string(app, "Yes", "Oui");
+    set_string(app, "No", "Non");
+    set_string(app, "Cancel", "Annuler");
+    set_string(app, "OK", "Oui");
+    ...
+    ask_yes_no(app, "Quitter?", "Quitter le programme?");
+    ...
+  }
+</PRE>
+<P>
+Some of the defined strings appear on dialog buttons, some in the title bar of dialog windows, some as messages. Those strings that appear in title bars (the last 4 in the given table) may be impossible to properly internationalise, since some window managers incorrectly display Unicode text, and might only allow ISO Latin 1 or even only ASCII text to be used in title bars.
+</BODY>
+</HTML>

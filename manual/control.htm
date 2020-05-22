@@ -1,0 +1,80 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Controls</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="control">Controls</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  struct Control {
+    Rect            area;           /* rectangle on parent */
+    Point           offset;         /* to window's co-ordinates */
+    Window *        win;            /* parent window, if any */
+    Control *       parent;         /* parent control, if any */
+    int             num_children;   /* list of child controls */
+    Control **      children;
+    Colour          bg;             /* background fill colour */
+    Colour          fg;             /* foreground drawing colour */
+    int             state;          /* VISIBLE, CHECKED, etc */
+    Region *        visible;        /* in window co-ords */
+    void *          data;           /* user-defined pointer */
+    char *          text;           /* text to display */
+    void *          extra;          /* internal pointer */
+    long            value;          /* internal integer value */
+    Image *         img;            /* internal image pointer */
+    Font *          font;           /* internal image pointer */
+    ControlFunc     resize;         /* event handlers */
+    DrawFunc        redraw;
+    MouseFunc       mouse_down;
+    MouseFunc       mouse_up;
+    MouseFunc       mouse_drag;
+    MouseFunc       mouse_move;
+    KeyFunc         key_down;
+    KeyFunc         key_action;
+    ControlFunc     action;
+    ControlFunc     update;
+    ControlFunc     refocus;
+    ControlFunc     del;
+  };
+
+  typedef void (*ControlFunc)  (Control *c);
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Control *new_control(Window *parent, Rect r);
+  Control *add_control(Ctronol *parent, Rect r);
+  void     del_control(Control *c);
+
+  int      remove_control(Control *c);
+  int      attach_to_window(Window *parent, Control *c);
+  int      attach_to_control(Control *parent, Control *c);
+  int      bring_control_to_front(Control *c);
+  int      send_control_to_back(Control *c);
+
+  Window * parent_window(Control *c);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+A <I>Control</I> is a area on a window which responds to user's actions, such as mouse clicks and the keyboard, to perform some function. Functions which create controls take as an argument a rectangle, which specifies where on the current window the control should be placed. The rectangle is measured in pixels, relative to the top-left point of the window which is the point (0,0).
+<P>
+Buttons, check boxes, text fields, etc are all kinds of <I>Controls</I>, so many of the functions described in the following sections apply equally to those objects, as they do to custom-made controls.
+<P>
+The <B>new_control</B> function creates and returns a generic control of the requested size and attaches it to the given window. The control can have call-backs added to it using <B>on_control_redraw, ap_on_control_mouse_down</B> etc (see later sections), to allow the control to respond to events.
+<P>
+The <B>add_control</B> function behaves much the same, except the created control is attached to the given parent control. Controls can have other controls attached to their surfaces. These child controls will appear inside the parent control, and cannot move outside of the parent's boundary.
+<P>
+The <B>del_control</B> function destroys a control and removes it from any window to which it is attached. Normally this function is not used, since destroying a window will destroy all of its child controls.
+<P>
+The <B>remove_control</B> function removes a control from its parent window or control. A side-effect of this function is that the control will become invisible since the parent window or control will be redrawn. Such a removed control can be re-attached to a window or control's surface using <B>attach_to_window</B> or <B>attach_to_control</B>.
+<P>
+A control's position in the stacking hierarchy can be manipulated. The <B>bring_control_to_front</B> function moves a control in front of its siblings, while <B>send_control_to_back</B> places it behind its siblings.
+<P>
+The <B>parent_window</B> function returns the window where the control resides. If a control is a child of another control, this function looks up the parent window of the parent controls until it finds the enclosing window. If the control or its parents are not currently attached to any window, this function returns NULL.
+</BODY>
+</HTML>

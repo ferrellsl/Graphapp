@@ -1,0 +1,27 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Hiding Controls</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="hide">Hiding Controls</A></H2>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  void  show_control(Control *c);
+  void  hide_control(Control *c);
+  int   is_visible(Control *c);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+The <B>show_control</B> and <B>hide_control</B> functions make a control visible or invisible on its parent. The <B>is_visible</B> function returns zero if the control's state indicates it is not visible, or one if it is visible.
+<P>
+By default, controls are visible when they are created, but windows are not.
+Visibility is the quality of whether the control should be drawn if it is not obscured, <I>not</I> whether the control is currently unobscured.
+<P>
+A control might be visible, even if its parent window is not. Every object has its own visibility state, which is separate to every other object's state.
+<P>
+</BODY>
+</HTML>

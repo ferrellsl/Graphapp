@@ -1,0 +1,41 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Drop-down Lists</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="droplist">Drop-down Lists</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef void (*ControlFunc)  (Control *c);
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Control *new_drop_list(Window *w, Rect r, char **lines,
+                             ControlFunc fn);
+  Control *add_drop_list(Control *c, Rect r, char **lines,
+                             ControlFunc fn);
+
+  long	   get_control_value(Control *c);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+A <I>drop list</I> is a push-button which, when clicked, displays a drop-down menu list of selectable names. The control is created by <B>new_drop_list</B> on the specified window, within the given rectangle. The <TT>lines</TT> parameter is a NULL-terminated list of strings, to be displayed in the menu.
+The function pointer <TT>fn</TT> will be called when the user chooses one of the lines from the menu.
+<P>
+The <B>add_drop_list</B> function works in the same way as <B>new_drop_list</B>, except that it attaches the list to a control rather than directly to a window.
+<P>
+The program can determine which item was chosen by examining the control's value, using <B>get_control_value</B>. The first string in the list is numbered 0, the next 1, and so on.
+<P>
+<H3>EXAMPLES</H3>
+<P>
+<UL>
+	<LI><A HREF="../examples/scribble.c">scribble.c</A></LI>
+</UL>
+</BODY>
+</HTML>

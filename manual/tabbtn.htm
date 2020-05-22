@@ -1,0 +1,30 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Tab Buttons</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="button">Tab Buttons</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef void (*ControlFunc)  (Control *c);
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Control *new_tab_button(Window *w, Rect r, char *text, ControlFunc fn);
+  Control *add_tab_button(Control *c, Rect r, char *text, ControlFunc fn);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+The <B>new_tab_button</B> function creates a tab-pane button control, with the given text string being centered within the button. The button will appear on the specified window in the rectangle, given in window co-ordinates.
+<P>
+When the user clicks on the tab button with the mouse, the specified call-back function <TT>fn</TT> is called. The parameter to this function will be a pointer to the button which called the function. Usually, this function will bring a control 'pane' to the front within a window, to display that pane, as well as bringing the tab button itself to the front.
+<P>
+The <B>add_tab_button</B> function works in the same way as <B>new_tab_button</B>, except that it attaches the tab button to a control rather than directly to a window.
+</BODY>
+</HTML>

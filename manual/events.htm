@@ -1,0 +1,43 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Event Handlers</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="events">Event Handlers</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef void (*ControlFunc)(Control *c);
+  typedef void (*MouseFunc)  (Control *c, int buttons, Point xy);
+  typedef void (*KeyFunc)    (Control *c, unsigned long key);
+  typedef void (*DrawFunc)   (Control *c, Graphics *g);
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  void  on_control_resize    (Control *c, ControlFunc resize)
+  void  on_control_redraw    (Control *c, DrawFunc redraw);
+  void  on_control_mouse_down(Control *c, MouseFunc mouse_down);
+  void  on_control_mouse_up  (Control *c, MouseFunc mouse_up);
+  void  on_control_mouse_drag(Control *c, MouseFunc mouse_drag);
+  void  on_control_mouse_move(Control *c, MouseFunc mouse_move);
+  void  on_control_key_down  (Control *c, KeyFunc key_down);
+  void  on_control_key_action(Control *c, KeyFunc key_action);
+  void  on_control_action    (Control *c, ControlFunc action);
+  void  on_control_update    (Control *c, ControlFunc update);
+  void  on_control_refocus   (Control *c, ControlFunc refocus);
+  void  on_control_deletion  (Control *c, ControlFunc del);
+
+  void  pass_event(Control *c);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+Above is a list of the event handling call-back functions which can be set for programmer-defined controls. Some of these functions will do nothing for pre-defined controls such as buttons, check boxes etc. See the individual sections for more details.
+<P>
+The <B>pass_event</B> function can be called within a call-back function to pass the event up the object hierarchy. This might be used if a control handles some events, but not others. For instance, a text field handles ordinary key strokes, but might not want to accept 'Enter' or 'Tab' key events; instead it might want to pass these events to the window's call-back functions.
+</BODY>
+</HTML>

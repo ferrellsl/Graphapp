@@ -1,0 +1,48 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Resources</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="resource">Resources</A></H2>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  FILE * open_resource(char *file, char *resource, long *length);
+  int    file_has_resources(char *file);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+The <B>open_resource</B> function attempts to locate a named
+resource within a given file. A resource is a sub-file, associated
+with a file using the AddRes tool available from the tools folder.
+This function returns an open file pointer, pointing to the located
+resource.
+<P>
+The resource descriptor string can be a regular expression as
+described in the section on regular expressions.
+The first matching resource will be used if there are several
+matching names.
+<P>
+If the resource is found, the return value will be non-NULL,
+and the length parameter will point to the length in bytes
+of the resource (which will be zero or greater).
+If the resource is not found, the return value will be NULL,
+and the length parameter will point to zero.
+<P>
+The file pointer returned by this function will not signal EOF
+when the resource has ended. Rather, the length parameter must
+be used, or the resource must have a way of telling the program
+that it has ended. For example, an embedded image file may contain
+a marker meaning "end of image". For embedded text files, the
+zero byte which separates one resource from the next may be
+the only other way to determine this end point.
+<P>
+The <B>file_has_resources</B> function returns non-zero if
+the named file ends with the byte sequence that specifies
+a resource file, otherwise it returns zero. The byte sequence
+is <TT>"\nApp Resource File Type 1\n"</TT>.
+</BODY>
+</HTML>

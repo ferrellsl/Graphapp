@@ -1,0 +1,46 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: List Boxes</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="listbox">List Boxes</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef void (*ControlFunc)  (Control *c);
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Control *new_list_box(Window *w, Rect r, char *list[],
+                            ControlFunc fn);
+  Control *add_list_box(Control *c, Rect r, char *list[],
+                            ControlFunc fn);
+
+  int 	get_list_box_item(Control *c);
+  void	set_list_box_item(Control *c, int index);
+  void	change_list_box(Control *c, char **list);
+  void  reset_list_box(Control *c);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+The <B>new_list_box</B> function creates a <I>list box</I>, which displays lines of text from a NULL-terminated array of strings in a scrollable area on screen. Only one line of text can be selected at any one time.
+<P>
+Whenever the user clicks on one of the text strings with the mouse, that string becomes <I>selected</I> (is drawn highlighted) and the call-back function <TT>fn</TT> is called. The list box control is passed as a parameter, and its value field specifies which string was selected.
+Any previous selection is deselected first.
+<P>
+The <B>add_list_box</B> function works in the same way as <B>new_list_box</B>, except that it attaches the list box to a control rather than directly to a window.
+<P>
+The <B>get_list_box_item</B> function returns which item is selected or -1 if none are selected. Selected values range from zero to the number of strings minus one. The value will be -1 if no string is currently selected.
+<P>
+Which string is currently selected in the list box can be changed using the <B>set_list_box_item</B> function. This will change the hilighting to reflect the new selected item. Passing -1 to this function will remove all hilighting.
+<P>
+The <B>change_list_box</B> function sets a new array of strings to use in the list box, and redraws the list. The list of strings is copied, so modification or deletion of the passed-in list is possible without affecting the list box. The existing selection and scroll bar positions are retained if possible.
+<P>
+The <B>reset_list_box</B> function removes the selection highlighting (if any) and positions the scroll bars of the list box so that the first element is visible.
+</BODY>
+</HTML>

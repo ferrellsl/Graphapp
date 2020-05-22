@@ -1,0 +1,58 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Rectangles</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="rect">Rectangles</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef struct Rect  Rect;
+
+  struct Rect {
+    int x, y;           /* top-left point inside rectangle */
+    int width, height;  /* width and height in pixels */
+  };
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Rect  rect(int left, int top, int width, int height);
+  Rect  new_rect(int left, int top, int width, int height);
+
+  Rect  inset_rect(Rect r, int i);      /* by i pixels */
+  Rect  center_rect(Rect r1, Rect r2);  /* center r1 on r2 */
+  int   rects_equal(Rect r1, Rect r2);  /* is r1 equal to r2? */
+  int   rect_in_rect(Rect r1, Rect r2); /* is r1 inside r2? */
+  int   rect_intersects_rect(Rect r1, Rect r2);
+  Rect  clip_rect(Rect r1, Rect r2);    /* clip r1 inside r2 */
+  Rect  rect_abs(Rect r);               /* force positive size */
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+A <I>Rect</I> defines a rectangular area. The x and y co-ordinates define the top-left point within the rectangle, and the rectangle's width and height are recorded in pixels. The point (x+width,y+height) will thus be outside the rectangle.
+<P>
+<CENTER><IMG SRC="coord.png"></CENTER>
+<P>
+Important note: Rectangles, when passed as function parameters, are generally passed by value on the stack. This means that modifying a rectangle within a function will not change its co-ordinates outside that function. Rectangles can thus be treated as numeric objects, like integers. (Were they to be passed by pointer, this would not be the case.) This differs somewhat from the way Java implicitly passes all objects by pointer, except for numbers.
+<P>
+A new rectangle can be returned using <B>rect</B>(x,y,width,height). This is a macro which just calls <B>new_rect</B>, but which has a shorter name for convenience.
+<P>
+The <B>inset_rect</B> function returns a rectangle which is inset from the given rectangle by the specified number of pixels all the way around. So <B>inset_rect</B>(r,i) is equivalent to <B>rect</B>(r.x+i,r.y+i,r.width-i-i,r.height-i-i).
+<P>
+A rectangle can be centered within another rectangle using the <B>center_rect</B> function: <B>center_rect</B>(r1,r2) will return a rectangle with the same size as r1, but centered within r2, even if r2 is smaller than r1.
+<P>
+The <B>rects_equal</B> function compares two rectangles, returning non-zero if they are equal, zero otherwise.
+<P>
+Calling <B>rect_in_rect</B>(r1, r2) returns non-zero only if r1 is wholly contained within r2. By contrast, <B>rect_intersects_rect</B>(r1, r2) returns non-zero if any part of r1 intersects with r2.
+<P>
+The <B>clip_rect</B> function clips a rectangle so that it is within another: <B>clip_rect</B>(r1, r2) will clip r1 to be within r2 and return r1, unless r1 does not overlap r2 at all, in which case it will return r1 unchanged.
+<P>
+The <B>rect_abs</B> function converts the supplied rectangle to canonical form; the width and height of the returned rectangle will be positive, and the area and location of the rectangle will remain unchanged.
+<P>
+</BODY>
+</HTML>

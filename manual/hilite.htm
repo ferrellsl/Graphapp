@@ -1,0 +1,26 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Highlighting Controls</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="hilite">Hilighting Controls</A></H2>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  void  highlight(Control *c);
+  void  unhighlight(Control *c);
+  int   is_highlighted(Control *c);
+
+  void  flash_control(Control *c);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+Push buttons, check boxes, radio buttons, etc are highlighted when the user holds down a mouse button inside the control's boundary, and become unhighlighted when the mouse button is released. The <B>highlight</B> function makes a control appear highlighted, and <B>unhighlight</B> returns a control to its normal appearance. Whether or not a control is currently highlighted is reported by <B>is_highlighted</B>.
+<P>
+The function <B>flash_control</B> simulates a mouse button click in a button, check box or radio button. The control will become highlighted and after a short period of time will be unhighlighted. This function does nothing more than change the appearance of the control for a brief period of time.
+<P>
+</BODY>
+</HTML>

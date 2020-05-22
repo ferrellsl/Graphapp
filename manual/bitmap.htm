@@ -1,0 +1,48 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Bitmaps</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="bitmap">Bitmaps</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef struct Bitmap  Bitmap;
+
+  struct Bitmap {
+    Window *        win;
+    Rect            area;
+    void *          extra;
+  };
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Bitmap * new_bitmap(Window *win, int width, int height);
+  void     del_bitmap(Bitmap *b);
+  Rect     get_bitmap_area(Bitmap *b);
+
+  Bitmap * image_to_bitmap(Window *win, Image *img);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+A <I>Bitmap</I> holds a rectangular pixel-image in offscreen memory.
+Bitmaps are very fast to copy to a window or to another bitmap,
+and are used to store prepared images for quick display.
+A bitmap can be drawn into, and also used as a source of pixels.
+Bitmaps can have only one level of transparency, so that pixels are either fully opaque or fully transparent within the bitmap. Drawing into a bitmap renders modified pixels opaque.
+<P>
+The <B>new_bitmap</B> function creates and returns an initially transparent bitmap with the specified pixel width and height. The arrangement of data within the bitmap is guaranteed to be the same as the supplied window, so that pixels may be copied from the bitmap to that window and they will represent the same colours. A bitmap always has a zero origin in its top-left corner. The function returns NULL if it runs out of memory.
+<P>
+The <B>del_bitmap</B> function releases the memory used by a bitmap.
+<P>
+The <B>get_bitmap_area</B> function returns a rectangle containing the dimensions of the bitmap. The top and left co-ordinates of this rectangle will always both be zero.
+<P>
+The <B>image_to_bitmap</I> function creates a new bitmap which contains the data from the image. It uses the window's colour data arrangement when deciding how to map the image's colours onto pixel values in the bitmap. This function is efficient, but does no dithering. Opaque pixels in the source image overwrite pixels in the bitmap, and cause those pixels to become opaque. Transparent pixels in the source image are not copied into the bitmap; hence, portions of the produced bitmap may be transparent.
+<P>
+</BODY>
+</HTML>

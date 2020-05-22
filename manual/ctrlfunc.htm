@@ -1,0 +1,94 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Controls Summary</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="ctrlfunc">Summary of Control Functions</A></H2>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Control *new_control(Window *parent, Rect r);
+  Control *add_control(Control *parent, Rect r);
+  void     del_control(Control *c);
+
+  int     attach_to_window(Window *parent, Control *c);
+  int     attach_to_control(Control *parent, Control *c);
+  int     remove_control(Control *c);
+  int     bring_control_to_front(Control *c);
+  int     send_control_to_back(Control *c);
+
+  Window *parent_window(Control *c);
+
+  void    draw_control(Control *c);
+  void    redraw_control(Control *c);
+  void    redraw_control_rect(Control *c, Rect r);
+
+  Rect    get_control_area(Control *c);
+  void    move_control(Control *c, Rect r);
+  void    size_control(Control *c, Rect r);
+
+  int     is_visible(Control *c);
+  void    show_control(Control *c);
+  void    hide_control(Control *c);
+
+  void    set_control_background(Control *c, Colour col);
+  Colour  get_control_background(Control *c);
+
+  void    set_control_foreground(Control *c, Colour col);
+  Colour  get_control_foreground(Control *c);
+
+  void    set_control_text(Control *c, char *text);
+  char *  get_control_text(Control *c);
+
+  void    set_control_data(Control *c, void *data);
+  void *  get_control_data(Control *c);
+
+  void    set_control_value(Control *c, long value);
+  long    get_control_value(Control *c);
+
+  void    set_control_image(Control *c, Image *img);
+  Image * get_control_image(Control *c);
+
+  void    set_control_font(Control *c, Font *f);
+  Font *  get_control_font(Control *c);
+
+  int   is_enabled(Control *c);
+  void  enable(Control *c);
+  void  disable(Control *c);
+
+  int   is_checked(Control *c);
+  void  check(Control *c);
+  void  uncheck(Control *c);
+
+  int   is_highlighted(Control *c);
+  void  highlight(Control *c);
+  void  unhighlight(Control *c);
+
+  int   is_armed(Control *c);
+  void  arm(Control *c);
+  void  disarm(Control *c);
+
+  int   has_focus(Control *c);
+  void  set_focus(Control *c);
+
+  void  flash_control(Control *c);
+  void  activate_control(Control *c);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+The above is a list of the functions which will work on many different
+kinds of controls and windows.
+See the individual sections for details on each function.
+<P>
+Most of the above functions cause a control's update call-back to be
+called. If no update call-back has been set, the control is redrawn
+by default.
+<P>
+When a control is deleted, its deletion call-back is called just
+prior to deletion, if one exists. This function typically tidies up
+and released any memory stored in the control's extra pointer.
+</BODY>
+</HTML>

@@ -1,0 +1,52 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Password Fields</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="passfld">Password Fields</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef void (*ControlFunc)  (Control *c);
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Control *new_password_field(Window *w, Rect r, char *text);
+  Control *add_password_field(Control *c, Rect r, char *text);
+
+  void     set_control_text(Control *c, char *newtext);
+  char *   get_control_text(Control *c);
+
+  void     set_focus(Control *c);
+
+  void     set_field_allowed_width(Control *c, int width);
+  void     set_field_allowed_chars(Control *c, char *allowed);
+  void     set_field_disallowed_chars(Control *c, char *disallowed);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+The <B>new_password_field</B> function creates an editable password text <I>field</I>, with the specified text string displayed in a secretive fashion to prevent observers from discovering the password contained within. The text field will be displayed on one line only and will scroll horizontally if the user enters more text into it than will fit within the rectangle.
+<P>
+The <B>add_password_field</B> function works in the same way as <B>new_password_field</B>, except that it attaches the field to a control rather than directly to a window.
+<P>
+The text inside a field can be changed using the <B>set_control_text</B> function. This function makes a copy of the string and stores it into the text field.
+<P>
+Use <B>get_control_text</B> to find the actual text inside the field.
+The string returned from <B>get_control_text</B> is a read-only string, so care must be taken to avoid modifying or deleting it.
+<P>
+The cut and copy text operations will not reveal the password text. Instead the clipboard will only contain what is visible in the password field. This prevents a user from copying the password text to clear text elsewhere. The paste operation works normally and can be used to paste a password into the field.
+<P>
+Note that keyboard events will not be sent to a field unless it currently has keyboard focus. The <B>set_focus</B> function can be used to set a window's key focus to a given control. Setting focus will remove the focus from whichever control previously had it, if any.
+<P>
+The maximum number of characters which can be typed into a password field can be controlled with the <B>set_field_allowed_width</B> function. The <TT>width</TT> parameter controls the number of Unicode characters which can be typed. If the value is zero, the field is unrestricted in width, which is the default. Since there is no feedback if the user types more characters than the maximum (except that the insertion bar will stop moving), it is suggested to leave this unrestricted, and display a dialog if necessary, explaining the number of significant characters in the password.
+<P>
+A password field can be restricted with <B>set_field_allowed_chars</B>, so that only a set of allowed characters can be typed into the field by the user. All other characters will be passed to the parent control or window. Setting the allowed string to NULL removes all restrictions, which is the default situation. Again, since there is no visual feedback, this could be confusing for a user, so it is suggested that no such restriction be used.
+<P>
+A password field can also be instructed to ignore certain characters, and instead pass them up to its parent control or window, using the <B>set_field_disallowed_chars</B> function. By default, the tab, newline and escape keys are disallowed for password fields. It is suggested to leave this default in place, since other characters could be part of a password, so ignoring them could confuse the user.
+</BODY>
+</HTML>

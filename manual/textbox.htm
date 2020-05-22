@@ -1,0 +1,52 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Text Boxes</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="textbox">Text Boxes</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef void (*ControlFunc)  (Control *c);
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Control *new_text_box(Window *w, Rect r, char *text);
+  Control *add_text_box(Control *c, Rect r, char *text);
+
+  void     set_control_text(Control *c, char *newtext);
+  char *   get_control_text(Control *c);
+
+  void     set_focus(Control *c);
+
+  void     set_field_allowed_width(Control *c, int width);
+  void     set_field_allowed_chars(Control *c, char *allowed);
+  void     set_field_disallowed_chars(Control *c, char *disallowed);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+To create a text field which can contain multiple lines of text use the <B>new_text_box</B> function. A <I>text box</I> has a vertical scrollbar which allows the user to move the text up and down. If a word will not fit on one line of text, that word will 'wrap' onto the next line of text.
+<P>
+The text inside a text box can be changed using the <B>set_control_text</B> function. This function makes a copy of the string and stores it into the text box.
+<P>
+The <B>add_text_box</B> function works in the same way as <B>new_text_box</B>, except that it attaches the text box to a control rather than directly to a window.
+<P>
+Use <B>get_control_text</B> to find the current text inside a text box.
+The string returned is a read-only string, so care must be taken not to free or modify the string.
+<P>
+Text can be cut to the clipboard using Ctrl-X, copied using Ctrl-C, and pasted using Ctrl-V. Arrow keys, mouse and shift-arrow selection, and the delete, home, end, page up and page down keys will all work as expected.
+<P>
+Note that keyboard events will not be sent to a text box unless it currently has keyboard focus. The <B>set_focus</B> function can be used to set a window's key focus to a given control. Setting focus will remove the focus from whichever control previously had it, if any.
+<P>
+The maximum number of characters which can be typed into a text box can be controlled with the <B>set_field_allowed_width</B> function. The <TT>width</TT> parameter controls the number of Unicode characters which can be typed. If the value is zero, the text box is unrestricted in width, which is the default.
+<P>
+A text box can be restricted with <B>set_field_allowed_chars</B>, so that only a set of allowed characters can be typed into it by the user. All other characters will be passed to the parent control or window. Setting the <TT>allowed</TT> characters to the UTF-8 encoded string "0123456789", for example, restricts a field so it only accepts digits, while setting the allowed string to "0123456789.$" additionally allows the decimal point and dollar sign. Setting the allowed string to NULL removes all restrictions, which is the default situation.
+<P>
+A text box can also be instructed to ignore certain characters, and instead pass them up to its parent control or window, using the <B>set_field_disallowed_chars</B> function. For example, if the <TT>disallowed</TT> string was set to "\n\t", the enter and tab keys could not be typed into a text box, and could thus propagate to the window, where a key handler function could decide to shift focus, or perform some other action as a result. By default, the escape key is disallowed for text boxes, but the tab and newline keys are allowed, so this function is particularly useful for controlling multi-line text boxes.
+</BODY>
+</HTML>

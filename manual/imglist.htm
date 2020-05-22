@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Image Lists</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="imglist">Image Lists</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef struct ImageList  ImageList;
+
+  struct ImageList {
+    int             num_images;         /* list of images */
+    Image **        images;
+  };
+
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  ImageList * new_image_list(void);
+  void  del_image_list(ImageList *imglist);
+  void  append_to_image_list(ImageList *imglist, Image *img);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+An <I>ImageList</I> is simply a dynamically allocated array of image. It grows as <I>Images</I> are appended to it.
+<P>
+The <B>new_image_list</B> function allocates memory for an empty image list. The function returns NULL if there is insufficient memory to create the structure.
+<P>
+The <B>del_image_list</B> function is used to deallocate the image list structure and all the images which have been added to the list. Therefore, images should only be added to the list if they will not be deleted elsewhere.
+<P>
+The <B>append_to_image_list</B> function appends an image to the list, after first reallocating the list to be large enough.
+</BODY>
+</HTML>

@@ -1,0 +1,45 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Points</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="point">Points</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef struct Point  Point;
+
+  struct Point {
+    int x;	/* horizontal co-ordinate */
+    int y;	/* vertical co-ordinate */
+  };
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Point pt(int x, int y);
+  Point new_point(int x, int y);
+
+  int   points_equal(Point p1, Point p2);
+  int   point_in_rect(Point p, Rect r);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+A <I>Point</I> refers to a location in a drawing, which is a bitmap, window or control, using x and y coordinates.
+<P>
+The coordinate system has x increasing to the right and y increasing down. The top-left point of a drawing is always the point (0,0). The pixel corresponding to a point is below and to the right of its coordinates.
+<P>
+Important note: Points, when passed as function parameters, are generally passed by value on the stack. This means that modifying a point within a function will not change its co-ordinates outside that function. Points can thus be treated as numeric objects, like integers. (Were they to be passed by pointer, this would not be the case.) This differs somewhat from the way Java implicitly passes all objects by pointer, except for numbers.
+<P>
+To create a new point, call the function <B>pt</B>(x,y). This is a macro which actually calls <B>new_point</B>, but has a shorter name, for convenience.
+<P>
+The <B>points_equal</B> function compares two points and returns non-zero if they are equal, zero if they are not.
+<P>
+The <B>point_in_rect</B> function returns non-zero if the given point is within the given rectangle, zero otherwise.
+<P>
+</BODY>
+</HTML>

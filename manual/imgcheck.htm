@@ -1,0 +1,41 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Image Check Boxes</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="imgcheck">Image Check Boxes</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef void (*ControlFunc)  (Control *c);
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Control *new_image_check_box(Window *w, Rect r, Image *img,
+                             ControlFunc fn);
+  Control *add_image_check_box(Control *c, Rect r, Image *img,
+                             ControlFunc fn);
+
+  int      is_checked(Control *c);  /* is it checked? */
+  void     check(Control *c);       /* check the check box */
+  void     uncheck(Control *c);     /* uncheck the check box */
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+The <B>new_image_check_box</B> function creates a <I>check box</I> which displays an image. This is similar to an image button, except that clicking in the button with a mouse will swap its state between unchecked (normal button appearance) and checked (pressed in appearance). If the control is disabled, a greyed version of the image will be displayed instead.
+<P>
+Each time the control changes between a checked and unchecked state, the call-back function <TT>fn</TT> is called after the event and the image check box is passed to the function as its parameter.
+This call-back function can be set to NULL, which means no function will be called in response to checking or unchecking the image check box.
+<P>
+The <B>add_image_check_box</B> function works in the same way as <B>new_image_check_box</B>, except that it attaches the image check box to a control rather than directly to a window.
+<P>
+The function <B>is_checked</B> can be used to determine if the image check box is currently checked. The function <B>check</B> can be used to change the state to checked, and <B>uncheck</B> can be used to restore an unchecked state.
+<P>
+To implement mutually exclusive sets of image check boxes (like radio button groups), the call-back function must uncheck the other image check boxes in each set whenever a new image check box becomes checked.
+</BODY>
+</HTML>

@@ -1,0 +1,42 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Scroll Bars</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="scroll">Scroll Bars</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef void (*ControlFunc)  (Control *c);
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Control * new_scroll_bar(Window *w, Rect r, int max,
+                           int size_shown, ControlFunc fn);
+  Control * add_scroll_bar(Control *c, Rect r, int max,
+                           int size_shown, ControlFunc fn);
+  void   change_scroll_bar(Control *c, int pos, int max,
+                           int size_shown);
+  int    get_control_value(Control *c);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+The <B>new_scroll_bar</B> function creates a <I>scroll bar</I> which can be used to scroll through text or to change some value within the program. The scroll bar will fill the given rectangle, and will scroll vertically if the rectangle is taller than it is wide, or horizontally otherwise. Manipulating the scrollbar with the mouse changes the scroll position, which has a minimum value of zero (at the left or top of the scroll bar), and a maximum value given by <TT>max</TT>.
+<P>
+The amount of some value which is displayed by the scrollbar can be set with the <TT>size_shown</TT> argument. When the user clicks in the scroll bar to make the scroll 'thumb' position jump, it will jump by this amount. For instance, in a text window which scrolls vertically, if 24 lines out of an 84 line document is visible at any one time, <TT>size_shown</TT> would be set to 24 and max to 84-24, since the top-most line of text on the screen at any time can only range from zero at the start of the document, to 60 at the end. When the user clicks in the scroll bar (other than on the 'thumb') the scroll position will increase or decrease by 24.
+<P>
+Every time the scroll bar position changes, the call-back function <TT>fn</TT> is called. This function is passed the scroll bar control as a parameter.
+<P>
+The <B>add_scroll_bar</B> function works in the same way as <B>new_scroll_bar</B>, except that it attaches the scroll bar to a control rather than directly to a window.
+<P>
+The <B>change_scroll_bar</B> function changes the values used by the scroll bar. It will reset the scroll bar's position <TT>pos</TT>, its maximum value <TT>max</TT> and the <TT>size_shown</TT> value, and re-draw the control if it is currently visible.
+<P>
+The <B>get_control_value</B> function returns the scroll bar's current position value.
+<P>
+</BODY>
+</HTML>

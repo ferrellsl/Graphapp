@@ -1,0 +1,121 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Menus</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="menu">MenuBars, Menus and MenuItems</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef struct MenuBar     MenuBar;
+  typedef struct Menu        Menu;
+  typedef struct MenuItem    MenuItem;
+
+  typedef void (*MenuAction)(MenuItem *mi);
+
+  struct MenuBar {
+    Control *   ctrl;           /* associated control */
+    Font *      font;           /* for displaying all text */
+    int         align;          /* text alignment,direction */
+    int         num_menus;      /* list of menus */
+    Menu **     menus;
+  };
+
+  struct Menu {
+    MenuBar *   parent;         /* enclosing menubar */
+    char *      text;           /* name of the menu */
+    int         num_items;      /* list of menu items */
+    MenuItem ** items;
+    int         lasthit;        /* which item was chosen */
+    Font *      font;           /* for displaying items */
+  };
+
+  struct MenuItem {
+    Menu *      parent;         /* enclosing menu */
+    char *      text;           /* menu item name */
+    int         shortcut;       /* shortcut key */
+    int         state;          /* enabled? checked? */
+    Menu *      submenu;        /* pop-up menu */
+    MenuAction  action;         /* user-defined action */
+    void *      data;           /* user-defined data */
+    int         value;          /* user-defined value */
+    Font *      font;           /* for displaying this item */
+    Colour      fg;             /* for displaying text */
+  };
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  MenuBar * new_menu_bar(Window *win);
+  void      del_menu_bar(MenuBar *mb);
+
+  Menu *    new_menu(MenuBar *mb, char *name);
+  Menu *    new_sub_menu(Menu *parent, char *name);
+  void      del_menu(Menu *m);
+
+  MenuItem *new_menu_item(Menu *m, char *name, int key,
+                              MenuAction fn);
+  void      del_menu_item(MenuItem *mi);
+
+  void      check_menu_item(MenuItem *mi);
+  void      uncheck_menu_item(MenuItem *mi);
+  int       menu_item_is_checked(MenuItem *mi);
+
+  void      enable_menu_item(MenuItem *mi);
+  void      disable_menu_item(MenuItem *mi);
+  int       menu_item_is_enabled(MenuItem *mi);
+
+  void      set_menu_item_value(MenuItem *mi, int value);
+  int       get_menu_item_value(MenuItem *mi);
+
+  void      set_menu_item_foreground(MenuItem *mi, Colour col);
+  Colour    get_menu_item_foreground(MenuItem *mi);
+
+  void      set_menu_item_font(MenuItem *mi, Font *font);
+  Font *    get_menu_item_font(MenuItem *mi);
+
+  void      set_menu_foreground(Menu *m, Colour col);
+  Colour    get_menu_foreground(Menu *m);
+
+  void      set_menu_font(Menu *m, Font *font);
+  Font *    get_menu_font(Menu *m);
+
+  void      set_menu_bar_font(MenuBar *mb, Font *font);
+  Font *    get_menu_bar_font(MenuBar *mb);
+
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+A <I>MenuBar</I> is a horizontal bar in which the names of menus appear. A <I>Menu</I> refers to a pull-down menu which contains <I>MenuItems</I>.
+<P>
+A menu bar can be associated with a window by calling <B>new_menu_bar</B> after that window has been created. This function will return NULL if it fails for some reason. Calling <B>del_menu_bar</B> will destroy the menu bar and all associated menus and menu items, also removing the menu bar from the window. Destroying a window will automatically call this function.
+<P>
+After creating a menubar, the <B>new_menu</B> function is used to create menus, which are attached to the menubar. Each menu has a <TT>name</TT> which is displayed in the menubar, for example "File" might be the name of the menu which controls file operations.
+<P>
+The <B>new_sub_menu</B> function can also be used to create menus. The <TT>parent</TT> parameter specifies a menu to which the new sub-menu will be added. The <TT>name</TT> of the sub-menu will appear in the <TT>parent</TT> menu, and selecting this name will make the sub-menu appear. The <B>del_menu</B> function can be used to delete a menu from a menu bar, and destroy all of its menu items.
+<P>
+After the creation of a menu, menu items can be added to it using <B>new_menu_item</B>. The <TT>name</TT> of the item is a string which is displayed in the menu. Next to that name a short-cut key can be displayed. If <TT>key</TT> is non-zero it specifies an ASCII character which can be typed in combination with some other keyboard key to activate this menu item. For instance, if the key were given as 'Q', on a Windows platform the menu item would appear with "Ctrl+Q" next to its name, signifying that pressing the control key and the letter 'Q' together would trigger this menu item. Other platforms would display their own normal menu key-combinations.
+<P>
+A menuitem created with a name which is a hyphen "-" will cause a 'separator' line to appear in the pull-down menu. This can be used to logically group items in a menu.
+<P>
+The function pointer <TT>fn</TT> given as a parameter to <B>new_menu_item</B> is called when that menu item is selected by the user. When this call-back function is called, a pointer to the menu item is passed as a parameter to <TT>fn</TT>.
+<P>
+Use <B>del_menu_item</B> to delete one menu item and remove it from its menu.
+<P>
+The <B>check_menu_item</B> function places a check-mark beside a menu item within its menu, while the <B>uncheck_menu_item</B> function removes any such check-mark. The <B>menu_item_is_checked</B> function returns non-zero if the menu item has a check-mark next to it, zero if it does not. Menu items initially have no check-mark.
+<P>
+Menu items are enabled for mouse selection by default. They can be disabled using <B>disabled_menu_item</B>, and re-enabled using <B>enable_menu_item</B>. Whether a menu item is currently enabled can be determined using <B>menu_item_is_enabled</B>. Separator menu items are disabled when created.
+<P>
+Each menu item can have an integer value associated with it, by <B>set_menu_item_value</B>. The value can be retrieved using <B>get_menu_item_value</B>.
+<P>
+A menu item can also have its own font and foreground colour, which are used when the font's text is to be displayed. The functions <B>set_menu_item_foreground</B> and <B>get_menu_item_foreground</B> access the text colour.
+<P>
+The functions <B>set_menu_item_font</B> and <B>get_menu_item_font</B> are used to access a menu item's text font. By default, a menu item does not have its own font, in which case the menu bar's font is used for displaying text, which is Unifont by default. Setting the menu bar's font using <B>set_menu_bar_font</B> is all that is needed to change all menu items' displayed text to a single font.
+<P>
+Menus can also have a text font, accessed with <B>set_menu_font</B> and <B>get_menu_font</B>. A menu's font is only used when displaying its name in a menu bar or as a submenu name within another menu. If it has no font, the menu bar's font is used. Similarly, its text colour is accessed with <B>set_menu_foreground</B> and <B>get_menu_foreground</B>, and is only used for displaying the menu's name.
+</BODY>
+</HTML>

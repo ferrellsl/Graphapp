@@ -1,0 +1,44 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Adding Data to Controls</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="setdata">Adding Data to Controls</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef void (*ControlFunc)  (Control *c);
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  void  set_control_value(Control *c, long value);
+  long  get_control_value(Control *c);
+
+  void  set_control_data(Control *c, void *data);
+  void *get_control_data(Control *c);
+
+  void  on_control_action(Control *c, ControlFunc action);
+
+  void  activate_control(Control *c);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+Every control can have a long integer value associated with it. Some controls, such as scrollbars and listboxes use this integer value to represent the current state of the control.
+<P>
+For programmer-defined controls, the <B>set_control_value</B> and <B>get_control_value</B> functions exist to allow setting this value, or finding the value.
+<P>
+If a control's state is more complex than an integer, more data must be stored with a control. The <B>set_control_data</B> function can store a pointer with a control, which could point to a data structure in memory. To find the value of this data pointer, use <B>get_control_data</B>. Note, this function returns the pointer as a void pointer so it is necessary to store this to the appropriate pointer type before use.
+<P>
+A control can have a call-back function associated with it for normal uses. This call-back is usually called by controls (such as buttons) whenever the user clicks on the control.
+<P>
+The function to be called can be set using the <B>on_control_action</B> function. This can be used to set or change a button's response to events.
+<P>
+The <B>activate_control</B> function will call a control's call-back (if the function pointer is not NULL, which it is by default).
+<P>
+</BODY>
+</HTML>

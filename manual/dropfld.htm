@@ -1,0 +1,50 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Drop-Fields</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="dropfld">Drop-Fields</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef void (*ControlFunc)  (Control *c);
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Control *new_drop_field(Window *w, Rect r, char **lines);
+  Control *add_drop_field(Control *c, Rect r, char **lines);
+
+  char *   get_control_text(Control *c);
+
+  void     set_field_allowed_width(Control *c, int width);
+  void     set_field_allowed_chars(Control *c, char *allowed);
+  void     set_field_disallowed_chars(Control *c, char *disallowed);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+A <I>drop field</I> is a one-line text field with an associated push-button which, when clicked, displays a drop-down menu list of selectable names. The control is created using <B>new_drop_field</B> on the specified window, within the given rectangle. The <TT>lines</TT> parameter is a NULL-terminated list of strings, to be displayed in the menu.
+<P>
+Text can be typed as normal into the text field, or an item can be selected from the drop-down menu, which will then set the text field's text to be the selected item.
+<P>
+The <B>add_drop_field</B> function works in the same way as <B>new_drop_field</B>, except that it attaches the drop field to a control rather than directly to a window.
+<P>
+The <B>get_control_text</B> function can be used to discover what text was typed or selected.
+<P>
+The maximum number of characters which can be typed into a drop field can be controlled with the <B>set_field_allowed_width</B> function. The <TT>width</TT> parameter controls the number of Unicode characters which can be typed. If the value is zero, the field is unrestricted in width, which is the default. Lines chosen via drop-down menu may be able to violate this constraint.
+<P>
+A drop field can be restricted with <B>set_field_allowed_chars</B>, so that only a set of allowed characters can be typed into the field by the user. All other characters will be passed to the parent control or window. Setting the allowed string to NULL removes all restrictions, which is the default situation.
+<P>
+A drop field can also be instructed to ignore certain characters, and instead pass them up to its parent control or window, using the <B>set_field_disallowed_chars</B> function. By default, the tab, newline and escape keys are disallowed for drop fields, and are thus sent to the window.
+<P>
+<H3>EXAMPLES</H3>
+<P>
+<UL>
+	<LI><A HREF="../examples/alldemo.c">alldemo.c</A></LI>
+</UL>
+</BODY>
+</HTML>

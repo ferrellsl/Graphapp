@@ -1,0 +1,44 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Changing a Control's Appearance</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="appear">Changing the Appearance of Controls</A></H2>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  void   set_control_background(Control *c, Colour col);
+  Colour get_control_background(Control *c);
+
+  void   set_control_foreground(Control *c, Colour col);
+  Colour get_control_foreground(Control *c);
+
+  void    set_control_image(Control *c, Image *img);
+  Image * get_control_image(Control *c);
+
+  void    set_control_font(Control *c, Font *f);
+  Font *  get_control_font(Control *c);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+When a control or window is drawn on the screen, its rectangle is first automatically cleared by filling it with its background colour (unless it is set to be the special value <B>CLEAR</B>).
+<P>
+The <B>set_control_background</B> function takes a <I>Colour</I> value as a parameter and sets the background colour of the control to that value.
+The background colour is returned by <B>get_control_background</B>.
+<P>
+After the background is drawn, the foreground colour is used in some places to draw text and other features of a control.
+The <B>set_control_foreground</B> and <B>get_control_foreground</B> functions access this foreground colour. It is not guaranteed that the foreground colour will be used by all controls (for example, image labels draw images and don't need to use a foreground colour, while buttons do use the foreground colour when drawing text).
+<P>
+For controls which display an image, the <B>set_control_image</B> can be used to change the image displayed, and <B>get_control_image</B> returns the current image used.
+<P>
+For controls which display text, the <B>set_control_font</B> can be used to change the font used, and <B>get_control_font</B> returns the current font used.
+<H3>EXAMPLES</H3>
+<P>
+<UL>
+	<LI><A HREF="../examples/tester.c">tester.c</A></LI>
+</UL>
+</BODY>
+</HTML>

@@ -1,0 +1,29 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Image Labels</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="imglabel">Image Labels</A></H2>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Control *new_image_label(Window *w, Rect r, Image *img, int align);
+  Control *add_image_label(Control *c, Rect r, Image *img, int align);
+
+  void     set_control_image(Control *c, Image *img);
+  Image *  get_control_image(Control *c);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+The <B>new_image_label</B> function creates a control, which has the specified <I>Image</I> drawn within it. The control will appear on the specified window, at the rectangle given in window co-ordinates. The image is not copied by this function, so the image should not be released from memory or modified while it is being used by the control.
+<P>
+The image label control does not respond to user clicks or key events. It merely draws the specified image within its boundaries. The alignment of the image within the rectangle follows the alignment flags described in the entry for labels, except that the image will be scaled to fit the rectangle if an alignment of ALIGN_JUSTIFY or VALIGN_JUSTIFY is given.
+<P>
+The <B>add_image_label</B> function works in the same way as <B>new_image_label</B>, except that it attaches the image label to a control rather than directly to a window.
+<P>
+To change the image used by a control, call <B>set_control_image</B>, and to retrieve a pointer to the currently displayed image, use <B>get_control_image</B>.
+</BODY>
+</HTML>

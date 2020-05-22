@@ -1,0 +1,30 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Disabling Controls</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="disable">Disabling Controls</A></H2>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  void  enable(Control *c);
+  void  disable(Control *c);
+  int   is_enabled(Control *c);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+A control can be enabled so it can receive user input and mouse clicks, or disabled so that it cannot.
+<P>
+To enable a control to receive user input and mouse clicks, call the <B>enable</B> function. By default, when a control is created, it is always enabled. However, this function can re-enable a control which has been disabled.
+<P>
+To disable a control, and make it ignore user input, use <B>disable</B>.
+A disabled control will usually have grey text, and will not respond to the user.
+An exception to this is a disabled textbox or field, which will appear normal, but cannot be edited or modified by the user.
+<P>
+The <B>is_enabled</B> function will return zero if the control is disabled, and one if it is enabled.
+<P>
+</BODY>
+</HTML>

@@ -1,0 +1,50 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Copying Pixels</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="copypix">Copying Pixels</A></H2>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  int     copy_rect(Graphics *g, Point dp, Graphics *src, Rect sr);
+  void    texture_rect(Graphics *g, Rect dr, Graphics *src, Rect sr);
+  void    draw_image(Graphics *g, Rect dr, Image *img, Rect sr);
+  Bitmap *image_to_bitmap(Window *win, Image *img);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+The <B>copy_rect</B> operation copies pixels from the source rectangle <TT>sr</TT> in the source graphics object <TT>src</TT>, to the destination point <TT>dp</TT> in the destination graphics object <TT>g</TT>. There are some restrictions on this function:
+<UL>
+<LI>Copying pixels from bitmaps into images will not work. Bitmaps are output devices.</LI>
+<LI>Copying pixels from windows into images will not work. Windows are output devices.</LI>
+<LI>Copying from bitmaps to windows is only guaranteed to work if the bitmap has the same arrangement of colour data as the window (i.e. that window was passed as a parameter to <B>new_bitmap</B> when creating the bitmap).</LI>
+<LI>Copying bitmaps to other bitmaps is only guaranteed to work if the two bitmaps share the same colour data arrangement.</LI>
+<LI>Copying from a window to a bitmap shares the same restriction, but additionally might produce incorrect pixels if portions of the source window are obscured by another window.</LI>
+<LI>Copying from a window to another window shares the same restrictions, for the same reasons.</LI>
+<LI>Copying from a window to itself is an exception; this is guaranteed to work because any portions which are obscured while copying will be refreshed automatically by calling the window's redraw call-back during the next event-handling cycle. Hence, this function can be used to perform window scrolling.</LI>
+</UL>
+<P>
+For these reasons, it is best to think of bitmaps and windows as output devices only, with copying going from images to bitmaps to windows, but never in the other direction:
+<P>
+<CENTER>
+<img src="drawing.png"><BR>
+<I>Valid drawing destinations.</I>
+</CENTER>
+<P>
+The <B>texture_rect</B> function overlays the entire destination rectangle <TT>dr</TT> with copies of the source rectangle <TT>sr</TT> from the pixel source <TT>src</TT>, starting in the top-left point of <TT>dr</TT> and proceeding to the left and down. This produces a wall-paper effect.
+<P>
+The <B>draw_image</B> function specialises in drawing a scaled version of an image. It copies pixels from the source rectangle <TT>sr</TT> of the image <TT>img</TT> into the destination rectangle <TT>dr</TT>, scaling between the two rectangles as required. When drawing an image many times, it is sometimes more efficient to scale the image first then use <B>copy_rect</B> instead of <B>draw_image</B>, since the scaling is only performed once.
+<P>
+Drawing an image to a bitmap or window is implemented by creating a temporary bitmap, copying the image data into the bitmap, copying the bitmap to the window, then destroying the temporary bitmap. For this reason, when drawing an image many times, it is sometimes more efficient to create a bitmap from the image using <B>image_to_bitmap</B>, and then draw from that bitmap instead.
+<P>
+<H3>EXAMPLES</H3>
+<P>
+<UL>
+	<LI><A HREF="../examples/imgtest.c">imgtest.c</A></LI>
+</UL>
+</BODY>
+</HTML>

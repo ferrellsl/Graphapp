@@ -1,0 +1,47 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Text Editing</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="textedit">Text Editing Functions</A></H2>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  void  cut_text(Control *c);   /* cut selection to clipboard */
+  void  copy_text(Control *c);  /* copy selection to clipboard */
+  void  clear_text(Control *c); /* clear selection */
+  void  paste_text(Control *c); /* paste over selection */
+
+  void  insert_text(Control *c, char *text);
+  void  select_text(Control *c, long start, long end);
+  void  text_selection(Control *c, long *start, long *end);
+
+  void  set_control_text(Control *c, char *newtext);
+  char *get_control_text(Control *c);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+The following text editing functions will work with any <I>textbox</I> or <I>field</I>:
+<P>
+The <B>cut_text</B> function cuts whatever text is currently selected from the specified textbox, and places the text into the clipboard, while <B>copy_text</B> copies the text to the clipboard without deleting the text.
+To delete the currently selected text without transferring it to the clipboard, <B>clear_text</B> can be used.
+<P>
+The <B>paste_text</B> function pastes the text in the clipboard into the specified textbox, deleting any currently selected text in the process.
+<P>
+The <B>insert_text</B> function inserts a specified text string after the insertion point in a textbox.
+The insertion point is then moved to be after the newly inserted text.
+Repeated use of this function will thus behave the same as if the user had typed text into the textbox.
+<P>
+The current text selection can be changed by use of <B>select_text</B>.
+The start and end locations are measured from zero being before the first character in the textbox. The number negative one has special meaning: it refers to the location after the last character in the textbox. Hence <B>select_text(-1,-1)</B> moves the insertion point to the end of the textbox, <B>select_text(0,0)</B> moves the insertion point to the start, and <B>select_text(0,-1)</B> selects all the text.
+<P>
+What text is currently selected can be found by use of the <B>text_selection</B> function. It returns the start and end-points of any selected text in the supplied long integer pointers.
+<P>
+Many controls have associated with them a text string, (e.g. <I>buttons, text fields, labels, windows</I>).
+This text string can be changed using <B>set_control_text</B> and can be found using <B>get_control_text</B>.
+The string returned from <B>get_control_text</B> is a read-only string! Do not modify it or free it.
+</BODY>
+</HTML>

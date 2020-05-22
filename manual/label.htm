@@ -1,0 +1,65 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Labels</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="label">Labels</A></H2>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Control * new_label(Window *w, Rect r, char *text, int alignment);
+  Control * add_label(Control *c, Rect r, char *text, int alignment);
+</PRE>
+<P>
+<H3>CONSTANTS</H3>
+<P>
+<PRE>
+  enum {
+    ALIGN_LEFT     = 1,
+    ALIGN_RIGHT    = 2,
+    ALIGN_JUSTIFY  = 3,
+    ALIGN_CENTER   = 4,
+    ALIGN_CENTRE   = 4,
+    VALIGN_TOP     = 8,
+    VALIGN_BOTTOM  = 16,
+    VALIGN_JUSTIFY = 24,
+    VALIGN_CENTER  = 32,
+    VALIGN_CENTRE  = 32
+  };
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+The <B>new_label</B> function creates on the specified window a text label which cannot be edited by the user. The text string is aligned within the rectangle according to the value of the alignment parameter. Values such as <B>ALIGN_LEFT</B>, <B>ALIGN_RIGHT</B> or <B>ALIGN_CENTER</B> can be specified. A value of zero corresponds to <B>ALIGN_LEFT</B>+<B>VALIGN_TOP</B>.
+<P>
+The <B>add_label</B> function works in the same way as <B>new_label</B>, except that it attaches the label to a control rather than directly to a window.
+<P>
+A label does not respond to mouse or keyboard events; in fact, these events pass straight through a label to the underlying parent control or window. The initial background colour of a label is transparent, so that only the text of the label is drawn against the background of the window.
+<P>
+It can be seen from the list of possible text alignments above, both American and British spellings of the the word 'centre' are legal.
+<P>
+The horizontal alignments are:
+<UL>
+<LI><B>ALIGN_LEFT</B> (the default) makes the text start at the left hand edge of the rectangle.
+<LI><B>ALIGN_RIGHT</B> causes the text to appear at the rightmost edge of the rectangle. This is useful in fill-in forms.
+<LI><B>ALIGN_JUSTIFY</B> is similar to ALIGN_LEFT, except if the text spans more than one line, in which case the spaces between words will be enlarged so each line fills the rectangle horizontally.
+<LI><B>ALIGN_CENTER</B> or <B>ALIGN_CENTRE</B> have the effect of horizontally centering the text within the rectangle.
+</UL>
+The vertical alignments are explained below:
+<UL>
+<LI><B>VALIGN_TOP</B> (the default) means the label's text will be drawn starting from the top of the label's rectangle.
+<LI><B>VALIGN_BOTTOM</B> draws the text so that it fills the label from the bottom of its rectangle.
+<LI><B>VALIGN_JUSTIFY</B> vertically justifies the text, so the inter-line spacing will be large enough for the text to fill the label's rectangle.
+<LI><B>VALIGN_CENTER</B> or <B>VALIGN_CENTRE</B> vertically centers the text within the label's rectangle.
+</UL>
+Either a vertical, or a horizontal alignment can be specified, or a combination of the two, using the plus or bitwise-or operators to combine the alignments.
+<P>
+<H3>EXAMPLES</H3>
+<P>
+<UL>
+	<LI><A HREF="../examples/scribble.c">scribble.c</A></LI>
+</UL>
+</BODY>
+</HTML>

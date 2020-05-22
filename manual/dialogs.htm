@@ -1,0 +1,58 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Dialog Boxes</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="dialogs">Dialog Boxes</A></H2>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  void  error(App *app, char *message);
+
+  void  ask_ok(App *app, char *title, char *message);
+  int   ask_ok_cancel(App *app, char *title, char *question);
+  int   ask_yes_no(App *app, char *title, char *question);
+  int   ask_yes_no_cancel(App *app, char *title, char *question);
+
+  char *ask_string(App *app, char *title, char *question,
+                       char *default_answer);
+  char *ask_file_open(App *app, char *title, char *message,
+                          char *path);
+  char *ask_file_save(App *app, char *title, char *message,
+                          char *path);
+</PRE>
+<P>
+<H3>CONSTANTS</H3>
+<P>
+<PRE>
+  enum {
+    CANCEL = -1,
+    NO     =  0,
+    YES    =  1
+  };
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+The <B>error</B> function displays the <TT>message</TT> string in a modal message window before terminating the application.
+<P>
+The rest of the functions which accept a <TT>title</TT> string parameter, display a modal dialog box with the given <TT>title</TT> string showing in the title bar.
+<P>
+The <B>ask_ok</B> function displays the <TT>message</TT> string in a modal window with an "OK" button which the user can select to dismiss the window.
+<P>
+The <B>ask_ok_cancel</B> function displays a modal window with a <TT>question</TT>, and returns YES if the user clicks the "OK" button, and CANCEL if the "Cancel" button is used to dismiss the window.
+<P>
+The <B>ask_yes_no</B> function displays the <TT>question</TT> string in a modal window with two buttons, "Yes" and "No". The user may select either one to dismiss the window. If the user selects "Yes", the function returns YES; if the user selects "No" the function returns NO.
+<P>
+The <B>ask_yes_no_cancel</B> function operates the same way except it has another button "Cancel" which, if selected, will cause the function to return CANCEL.
+<P>
+The <B>ask_string</B> function displays the <TT>question</TT> string in a modal window with the specified <TT>title</TT>, which also has a text field into which the user can type a string. The text field is initially loaded with the <TT>default_answer</TT>. Space is allocated for the string using <B>alloc</B> and then returned to the programmer by the function (use <B>free</B> to free the returned string). If the user selects the "Cancel" button in this window, the function will instead return NULL.
+<P>
+The <B>ask_file_open</B> function displays a modal window which can be used to select a file from the file system. The <TT>path</TT> string is loaded into the filename text field if this is available. The function returns the complete file pathname as a string, or NULL if the user cancels the operation. The returned string should be freed using <B>free</B> when it is no longer needed.
+<P>
+The <B>ask_file_save</B> function is similar, except that it is used when saving a file, and the window may appear differently to signal that fact. It will warn the user if a selected file already exists to confirm overwriting the file is allowed. The returned file path string should be freed using <B>free</B> when it is no longer needed.
+<P>
+</BODY>
+</HTML>

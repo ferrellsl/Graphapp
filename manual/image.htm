@@ -1,0 +1,89 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Images</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="image">Images</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef struct Image  Image;
+
+  struct Image {
+    int       depth;      /* depth will be 8 or 32 */
+    int       width;      /* image width in pixels */
+    int       height;     /* image height in pixels */
+    int       cmap_size;  /* size of colour map, may be zero */
+    Colour *  cmap;       /* indexed colour map, may be null */
+    byte **   data8;      /* array of scanlines, indexed */
+    Colour ** data32;     /* array of scanlines, direct colour */
+  };
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Image * new_image(int width, int height, int depth);
+  void    del_image(Image *img);
+
+  Rect    get_image_area(Image *img);
+
+  Image * copy_image(Image *img);
+  void	  set_image_cmap(Image *img, int cmap_size, Colour *cmap);
+
+  Image * image_convert_32_to_8(Image *img);
+  Image * image_convert_8_to_32(Image *img);
+  void    image_sort_palette(Image *img);
+  Image * scale_image(Image *src, Rect dr, Rect sr);
+
+  void  draw_image(Graphics *g, Rect dr, Image *i, Rect sr);
+  void  draw_image_monochrome(Graphics *g, Rect dr, Image *i, Rect sr);
+  void  draw_image_greyscale(Graphics *g, Rect dr, Image *i, Rect sr);
+  void  draw_image_darker(Graphics *g, Rect dr, Image *i, Rect sr);
+  void  draw_image_brighter(Graphics *g, Rect dr, Image *i, Rect sr);
+
+  Bitmap *image_to_bitmap(Window *win, Image *img);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+An <I>Image</I> is a platform-independent representation of a picture.
+It is a more general representation than a bitmap, but a bitmap is much faster to copy onto the screen. For this reason, images and bitmaps are often used in conjunction to produce good effects.
+<P>
+The <B>new_image</B> function allocates memory for an image of the given width, height and depth. The depth parameter can only be 8 or 32. All other image depths are deliberately not supported.
+The function returns NULL if there is insufficient memory to create the array of pixel scanlines.
+<P>
+An image of depth 8 uses the cmap array to store a colour palette. The data8 pointer will be an array of <I>height</I> lines, each line being an array of <I>width</I> bytes, each byte an index into the colour palette.
+By contrast, an image of depth 32 will have no cmap table, cmap_size will be zero and the data32 array will be an array of <I>height</I> lines, each line being an array of <I>width</I> colour values.
+<P>
+An image can store transparency information, either using a CLEAR entry in the colour palette of an 8-bit image, or by having CLEAR pixels in a 32-bit image.
+<P>
+The <B>del_image</B> function deallocates an image from memory. Images can occupy a lot of memory, particularly if they have a large area or are in 32-bit direct-colour format.
+<P>
+The <B>get_image_area</B> function returns a rectangle representing the size of an image. The x and y co-ordinates will contain zero, and the width and height co-ordinates will contain the width and height of the image.
+<P>
+The <B>copy_image</B> function will make a completely separate copy of an image, or return NULL if there is insufficient memory.
+<P>
+The <B>set_image_cmap</B> function releases from memory any existing colour map on the image, and creates a new one filled with the supplied data. This essentially changes the meaning of the existing pixel values in the data8 array.
+<P>
+The <B>image_convert_32_to_8</B> function creates a new 8-bit image from a 32-bit image, or returns NULL if there is insufficient memory. It tries a fast conversion algorithm first (which assumes there are less than 256 colours in the 32-bit image), and resorts to a slower algorithm if that doesn't work.
+<P>
+The <B>image_convert_8_to_32</B> function creates a new 32-bit image from an 8-bit image, or returns NULL if there is not enough memory. It uses a very fast, simple algorithm.
+<P>
+The <B>image_sort_palette</B> function modifies an existing 8-bit image to optimise its colour palette so that redundant entries are discarded, and the most common colours are placed at the top of the palette. The data8 pixel values will be modified so they represent the same colours. This may also change the cmap_size and cmap fields in the image. This function has no effect on 32-bit images.
+<P>
+The <B>scale_image</B> function produces a new image which is cropped and/or scaled. The pixels from the source image which correspond to the source rectangle <B>sr</B> are scaled to fit the destination rectangle <B>dr</B>. The resultant image will have the same width and height as the destination rectangle. The x and y values from the destination rectangle are ignored. If the source rectangle lies partially or wholly outside the image's rectangle, the corresponding pixels in the new image will be CLEAR, unless the image has a palette and that palette has no transparent entries, in which case those pixels will have the value zero.
+<P>
+Use <B>draw_image</B> to draw an image into the given rectangle to the destination specified by the graphics object. If the destination rectangle is smaller or larger than the source rectangle, the source pixels will be scaled to fit.
+<P>
+The <B>draw_image_monochrome</B> function draws an image so that it appears black and white.
+<P>
+The <B>draw_image_greyscale</B> function draws an image in five levels of grey (a synonym for this function is <B>draw_image_grayscale</B>). This can be used to provide a 'disabled button' effect.
+<P>
+By contrast, <B>draw_image_darker</B> draws an image so that it looks darkened, as if seen through dark glass. This can be used to provided a 'clicked button' effect. The <B>draw_image_brighter</B> function draws a lighter image.
+<P>
+The <B>image_to_bitmap</B> function copies the pixels from an image into a new bitmap. The bitmap will have the same arrangement of colour data as the supplied window, so that copying the bitmap to that window will produce a picture with very similar colours to the original image. Bitmaps may store one level of transparency, so transparent pixels in the image will be transparent in the bitmap.
+</BODY>
+</HTML>

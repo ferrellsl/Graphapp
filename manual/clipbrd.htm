@@ -1,0 +1,37 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Clipboard Functions</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="sound">Clipboard Functions</A></H2>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  int    set_clipboard_text(App *app, char *text);
+  char * get_clipboard_text(App *app);
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+The <B>set_clipboard_text</B> function causes the system clipboard
+to contain the specified zero-terminated text string. It returns
+zero if it fails for some reason, or non-zero if it succeeds.
+<P>
+The <B>get_clipboard_text</B> function retrieves the text string
+from the system clipboard (if it contains a text string). If the
+clipboard does not contain text, or it is empty, this function
+will return NULL.
+<P>
+Text may be modified in the process of saving it to the clipboard.
+It is not guaranteed that non-ASCII characters, or control characters
+other than tab and newline, can be transferred using this mechanism.
+<P>
+<H3>EXAMPLES</H3>
+<P>
+<UL>
+	<LI><A HREF="../examples/char.c">char.c</A></LI>
+</UL>
+</BODY>
+</HTML>

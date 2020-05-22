@@ -1,0 +1,48 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Check Boxes</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="checkbox">Check Boxes</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef void (*ControlFunc)  (Control *c);
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Control *new_check_box(Window *w, Rect r, char *text,
+                             ControlFunc fn);
+  Control *add_check_box(Control *c, Rect r, char *text,
+                             ControlFunc fn);
+
+  int      is_checked(Control *c);  /* is it checked? */
+  void     check(Control *c);       /* check the check box */
+  void     uncheck(Control *c);     /* uncheck the check box */
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+The <B>new_check_box</B> function creates a <I>check box</I> (a square box with text displayed to its right).
+Clicking on the box causes an <TT>X</TT> to appear within the box, and clicking on it again causes the <TT>X</TT> to vanish.
+<P>
+Each time the state changes between checked and unchecked, the call-back function <TT>fn</TT> is called after the event and the check box is passed to the function as its parameter.
+This call-back function can be set to NULL, which means no function should be called in response to checking or unchecking the check box.
+<P>
+The <B>add_check_box</B> function works in the same way as <B>new_check_box</B>, except that it attaches the check box to a control rather than directly to a window.
+<P>
+The function <B>is_checked</B> can be used to determine if the check box is currently checked. The function <B>check</B> can be used to check a check box, and <B>uncheck</B> can be used to remove a check-mark from the check box.
+<P>
+A check box can be freely switched on or off by the user, unlike radio buttons, which are part of mutually exclusive sets. See the section on radio buttons for more details.
+<P>
+<H3>EXAMPLES</H3>
+<P>
+<UL>
+	<LI><A HREF="../examples/tester.c">tester.c</A></LI>
+</UL>
+</BODY>
+</HTML>

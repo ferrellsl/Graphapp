@@ -1,0 +1,84 @@
+<HTML>
+<HEAD>
+ <TITLE>GraphApp Reference Manual: Cursors</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><A NAME="cursor">Cursors</A></H2>
+<P>
+<H3>OBJECTS</H3>
+<P>
+<PRE>
+  typedef struct Cursor  Cursor;
+
+  struct Cursor {
+	App *  app;                     /* associated App */
+	void * extra;                   /* platform-specific data */
+  };
+</PRE>
+<P>
+<H3>FUNCTIONS</H3>
+<P>
+<PRE>
+  Cursor *new_cursor(App *app, Image *img, Point hotspot);
+  Cursor *get_standard_cursor(App *app, int shape);
+  void    del_cursor(Cursor *c);
+  void    find_best_cursor_size(App *app, int *width, int *height,
+                                    int *depth);
+  void    set_window_cursor(Window *win, Cursor *c);
+  Point   get_cursor_position(App *app);
+  void    set_cursor_position(App *app, Point p);
+</PRE>
+<P>
+<H3>CONSTANTS</H3>
+<P>
+<PRE>
+  enum StandardCursors {
+	BLANK_CURSOR,
+	ARROW_CURSOR,
+	WAIT_CURSOR,
+	CARET_CURSOR,
+	CROSS_CURSOR,
+	HAND_CURSOR,
+	GRAB_CURSOR,
+	POINTING_CURSOR,
+	PENCIL_CURSOR,
+	LASSO_CURSOR,
+	DROPPER_CURSOR,
+	MAGNIFY_CURSOR,
+	MAGPLUS_CURSOR,
+	MAGMINUS_CURSOR,
+	TEXT_CURSOR      = CARET_CURSOR
+  };
+</PRE>
+<P>
+<H3>NOTES</H3>
+<P>
+A <I>Cursor</I> represents a mouse pointer on the screen.
+<P>
+New cursors can be created using the <B>new_cursor</B> function. The hotspot point is where the 'tip' of the mouse pointer should be, and the image defines the shape of the cursor.
+The image can have transparent regions, and is allowed to use BLACK, WHITE and CLEAR colours, and can be at least 16 by 16 pixels in size. Other colours and larger cursors sizes may be possible, depending on the window manager.
+<P>
+A number of standard cursors can be obtained using the <B>get_standard_cursor</B> function and supplying one of the constants:
+<UL>
+<LI>The <B>BLANK_CURSOR</B> produces an invisible cursor.</LI>
+<LI>The <B>ARROW_CURSOR</B> is the normal mouse pointer.</LI>
+<LI>The <B>WAIT_CURSOR</B> indicates the user must wait for a short time, for example when loading a large file.</LI>
+<LI>The <B>CARET_CURSOR</B> is used when typing text, and is the same as the <B>TEXT_CURSOR</B>.</LI>
+<LI>The <B>CROSS_CURSOR</B> is used when dragging a rectangular region.</LI>
+<LI>The <B>HAND_CURSOR</B> and <B>GRAB_CURSOR</B> can be used when dragging a page around.</LI>
+<LI>The <B>POINTING_CURSOR</B> can be used when selecting an item from a list, or clicking on a hyperlink.</LI>
+<LI>The <B>PENCIL_CURSOR</B>, <B>LASSO_CURSOR</B> and <B>DROPPER_CURSOR</B> can be used during interactive drawing operations, to draw dots or freehand lines, to select a freehand region, or to select a colour from an image, respectively.</LI>
+<LI>The <B>MAGNIFY_CURSOR</B> can be used when increasing or decreasing the magnification of a document. The <B>MAGPLUS_CURSOR</B> includes a '+' within the magnifying glass shape, indicating increasing magnification, while the <B>MAGMINUS_CURSOR</B> includes a '-' and indicates decreasing magnification.</LI>
+</UL>
+<P>
+The memory used by a cursor can be reclaimed by calling <B>del_cursor</B>. Normally this is not necessary, since all used cursors are released when the App is deleted.
+<P>
+The <B>find_best_cursor_size</B> function asks the window manager what other colours and sizes can be used by a cursor. Pointers to integers are passed, and filled with appropriate values. The width and height will be the maximum size of a cursor. Often these will be 32 or 64, although a cursor might only look good at a width and height of 16, so beware of using all the available space. The depth may be 1, indicating BLACK and WHITE and CLEAR are the only colours to be used, or it may be 32, indicating the cursor may use any colours. The window manager may or may not allow alpha-blending effects to produce shadows around the cursor.
+<P>
+To change a window's cursor, use <B>set_window_cursor</B>. This sets the cursor for the entire window. It is valid to call this repeatedly within mouse event handlers.
+<P>
+The <B>get_cursor_position</B> returns the current location of the mouse cursor's hotspot in screen co-ordinates. To move the cursor to another location on the screen, use <B>set_cursor_position</B> and pass the new position in screen co-ordinates.
+<P>
+</BODY>
+</HTML>
