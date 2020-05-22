@@ -1,0 +1,84 @@
+App Operating System Platform Requirements
+
+  Linux Platform
+
+	The Linux version has been used and tested with
+	gcc, X11 release 6, on Intel hardware.
+	Use the code in x11/ not the win32/ code.
+
+
+  Sun Solaris Platform
+
+	The software has been known to compile on Sun
+	Solaris hardware using the default cc compiler
+	as well as the gcc compiler, using X11.
+	Use the code in x11/ not the win32/ code.
+
+
+  Macintosh Platform
+
+	There is currently no Macintosh version, and no plans
+	to produce one, since I have no access to a Macintosh
+	computer. Sorry.
+	The x11/ version may work on Macintosh, or maybe not.
+
+
+  Windows Platforms
+
+	The software has been compiled for a variety of
+	platforms, including Windows 95, 98, ME, NT,
+	Windows 2000 and XP, using Borland C++ 3.11, 4, 5.5,
+	Microsoft C++ and also Ming and CygWin.
+	Use the code in win32/ not the x11/ code.
+
+
+  Windows CE Platform
+
+	As I understand it, the Windows CE platform does
+	not support the standard C library, in particular,
+	the C file operations fopen, fread, etc.
+	This means the file operations of App will fail,
+	which includes loading portable fonts from disk.
+	I have no access to this operating system and so
+	cannot address these problems effectively.
+
+
+  Windows 3.1 Platform
+
+	The Windows 32-bit version code will work if compiled
+	for 16-bit, with a few problems:
+
+	 -	GetTextExtentPoint32 needs to be renamed to
+		GetTextExtentPoint in the files win32/font.c
+		win32/drawbmap.c and win32/drawwin.c
+
+	 -	The Sleep function might not be implemented
+		for 16-bit versions of Windows. If you have
+		Win32s installed this should not be a problem.
+		Otherwise, edit win32/timer.c and comment out
+		the calls to "Sleep". You'll lose timer
+		functionality, but at least it'll compile.
+		You might be able to substitute the Linux/C
+		function sleep (lower case).
+
+	The only other problem you're likely to encounter is that
+	16-bit versions of Windows have limited memory, which
+	makes loading of images likely to fail.
+
+	The main area where this will be a problem is in the
+	display of text, since fonts are loaded from PNG images.
+	Large PNG images are known to fail to load on 16-bit
+	versions of Windows.
+
+	To solve this problem, convert the font image files
+	over to GIF format using an image editor program.
+	Then edit the utility/fontutil.c file and change the
+	default subfont extension from ".png" to ".gif". As
+	long as the GIF files are present in the same directories
+	as the corresponding PNG font files, text should then
+	be able to load and display correctly.
+
+	Or, you can use the native font support in the library
+	to avoid the problem, by editing the fontutil.c file
+	and changing the default font name from "unifont" to
+	"Arial" or "Times".

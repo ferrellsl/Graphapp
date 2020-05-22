@@ -1,0 +1,41 @@
+GraphApp "To Do" List
+
+Controls
+  - scroll_bar      needs access to internal ints
+  - menus           needs scrolling, dynamic font update, keyboard control
+  - text_field      needs timer scrolling
+  - text_box        needs more testing, and faster scrolling
+  - all controls which display text need extra code to handle
+    different text directions
+
+Dialogs
+  - all dialogs:   need to remember user's last positioning of dialogs
+  - add text equivalents for all dialogs in case GUI is uninitialised
+
+Drawing
+  - text drawing direction TOP_TO_BOTTOM needs to be implemented
+
+App object
+  - default text drawing direction?
+  - default text alignment?
+  - 'skin' settings?
+
+Windows
+  - need a way to obtain MS-Windows this_instance and prev_instance
+	outside the WinMain - can this be done???
+  - implement DISABLED windows
+
+Fonts
+  - ability to set font search path
+  - ability to set default font name
+  - add native font support (done for ISO Latin-1 text so far)
+	- to draw to bitmaps and windows
+		- detect Unicode support in the font (tricky)
+		- drawing RIGHT_TO_LEFT (tricky)
+	- to draw to images (tricky)
+	- to generate a clipmask (tricky)
+  - add scaling of portable Subfont Image (how to match best resolution?)
+  - nearest match on font names? (helvetica => arial?)
+  - add more bitmapped fonts (ongoing)
+  - improve default font in case unifont isn't available!!!!
+

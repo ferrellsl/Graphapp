@@ -1,0 +1,36 @@
+Contributors to GraphApp code
+
+Here is a probably incomplete list of people who have
+contributed ideas (and possibly code) to GraphApp.
+
+Version 3 contributors:
+
+Alex (portable unified make system, see src/builds/)
+Jean-Pierre Dumas (LCC, Watcom, DigitalMars, Borland 5.5 makefiles: jeanpierre.dumas@freesbee.fr)
+Fabrizio Impagnatiello (CygWin, fast line drawing feedback, DLLs)
+Laszlo Menczel (trackbar control implementation)
+Salvador Bosch Pérez (bug fixes and suggestions, MingW makefile fixes)
+Steve Ferrell (compiled MS-VC6 binaries)
+Alvin Brinson (compiled BCC5.5 binaries)
+Scott Bowyer (various fixes)
+Ken Roger (LCC-Win32 compilation)
+Charles Littlefield (MingW compilation)
+M Alvarez (MingW makefile: http://www.terra.es/personal/malfer/graphapp.htm)
+Joel Carlbark (widget sets)
+Matt (widget sets)
+Gary (LCC compiler feedback)
+Ric Bouchar (LCC feedback)
+Leah (MS Visual C++)
+Dennis
+
+Version 2 contributors:
+
+Krish Singh (OpenGL feedback in version 2.4X)
+Angus North (event and rectangle arithmetic bugfixes in version 2.40 and 2.41)
+Ed Phillips (palette bugfix in version 2.35)
+Jim McDonald (memory improvements in version 2.35)
+Jesper Juhl (convert .img to .h: http://jesper.staff.groundcontrol.dk/img2c/)
+
+Version 1 contributors:
+
+Loki Patrick (project originator)

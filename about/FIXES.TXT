@@ -1,0 +1,617 @@
+Major and minor changes and bug fixes to GraphApp:
+
+This file documents all changes and fixes to bugs within GraphApp.
+As such, it's a fairly boring read, but it exists so you can check
+the details of small changes. This file is a superset of the CHANGES.TXT
+file (which just summarises the major changes and improvements).
+
+TO DO
+
+	* Integrate with tnodir's new stuff (tool tips etc).
+	* Integrate with Fabrizio's stuff.
+	* Fix Alt_Gr problem.
+	* Double window refresh?
+	* Lack of refresh in some versions of X11?
+	* Need to test on X.org instead of only XFree86.
+
+	* Undo/redo!
+	* Proper state-machine for menus (to fix timer bugs).
+	* Double/triple mouse-click in text boxes.
+	* Progress indicators.
+	* Tachimeters.
+	* Disabling of list box - might not want grey text.
+	* List box - forcing the selected line to become visible.
+	* Menubar flag should reserve space for the menu bar!
+	* Printf-like function to form a string or put it into a textbox?
+
+	* Make Alex's portable makefile system the default.
+
+	* Rename main to app_main in makefiles using -Dmain=app_main
+	* x11/init.c will contain a main function which calls app_main?
+
+	* Add APP_FONT_PATH into App string table.
+	* Make GraphApp a *program* which dynamically loads other code??
+
+	* Enable: saving of 8-bit PNGs with transparency (32-bit done).
+	* Enable: loading of JPEG files to 8-bit depth.
+	* Allow people to pull out PNG, JPEG or GIF support easily.
+
+	* Fix text edit: be more careful of Paste + maxwidth/disallowed.
+	* Fix: text boxes don't scroll to last line when mouse scrolling.
+	* Fix: text boxes are too slow when typing.
+	* Fix: text box bugs.
+	* Speed up text box typing/scrolling (avoid unneeded redrawing).
+	* Implement Undo/Redo in all text boxes and fields.
+	* Factor and unify common text editing code?
+
+	* Fix: Win32 copying bitmaps (XOR mode) to a window can fail???
+	* Fix: X11 timer bug: mouse-ups sometimes ignored by scrollbars.
+	* Fix: X11 timer bug: closing windows between timer events hangs?
+	* Fix: X11 window frame area must be subtracted in new_window.
+	* Implement X11 floating windows for all window managers.
+	* Prevent Win32 modal floating windows from being reordered.
+
+	* Multi-line drawing, line styles, etc.
+	* Implement font underlining.
+	* RL_TB still seems dodgy, TB_RL and TB_LR are unimplemented.
+	* Fix right-to-left text (RL_TB).
+	* Support Unicode bi-directional text, in display and editing.
+	* Add background colour to Graphics to allow faster text drawing?
+
+	* Incorporate tool bar into imagedit.c.
+	* Release fontedit.c source code.
+
+	* Add default tab-key focus handler?
+	* Must make Bitmaps store App also, reduce dependencies on ->win.
+	* Window palette = NULL => created Bitmap is on DefaultRootWindow.
+	* Only if Window has palette does Bitmap remember Window.
+
+	* Allow Controls to set the cursor when mouse is within its area.
+	* Move portable event dispatch / unicode lookup into dispatch.c
+	* Support Control cursors in mouse motion dispatchers
+	* Add mouse_over event and/or mouse_enter/mouse_leave events.
+	* Allow programs to see if the ALT, CTRL or SHIFT keys swap state.
+
+	* Scrollable menus (use controls and state machine).
+	* Fix: pop-up menu automatically fires if near edge of window.
+	* Fix: edge of listbox has a focus drawing gap problem.
+
+	* Scrollable drop-down lists etc.
+	* Make the open/save dialogs display file size/modification times.
+	* Make the open/save dialogs use double-clicking to navigate.
+	* Centralise widget settings and appearance variables.
+	* Support more Windows compilers (create generic compiler GUI ?)
+	* Make a Window contain one Control which contains all others ?
+
+Version 3.64	2010/11/25
+	* Reading images from memory supported again.
+	* make.py is a bit more general, supports Windows/MinGW and Linux/gcc.
+
+Version 3.63	2010/11/21
+	* Added const to several Image parameters and one Window parameter.
+	* Changed 'static' in utility/image.c to APP_PRIVATE for flexibility.
+	* Added APP_PRIVATE definition to utility/apputils.h
+	* Added app_get_window_rect (deprecates app_get_window_area).
+	* Added app_get_image_rect (deprecates app_get_image_area).
+	* Improved make.py (can be used instead of Makefile).
+
+Version 3.62	2010/06/29
+	* Wide glyph support in Windows native font drawing.
+	* Support for glyphs with alpha improved.
+	* Fixed a bug in read_utf8_until.
+	* Several bug fixes.
+	* Some improvements in listboxes.
+
+Version 3.60	2007/06/06
+	* Upgraded to libPNG 1.2.18 (fixes several security bugs).
+	* Many fixes in the gui/ controls. Some use docking layout.
+	* New cursor functions.
+	* Tooltips added: gui/tip.c
+	* Timers improved.
+	* MS-Windows instance handle and window classes used better.
+	* App and Subfont have void pointers which could support FreeType.
+	* Font search order changed (the EXE is now searched last).
+	* New font search order allows user customisation (old one didn't).
+	* Added examples/fontedit.c to show how font editing could work.
+	* Fixed a memory leak in app_del_gif.
+
+Version 3.59	2005/10/12
+
+	* Allows font glyphs to be centered within the glyph box.
+	* This allows fonts to overhang the edges of the glyph box.
+	* The new examples/fontdraw.c generates such fonts.
+
+Version 3.58	2005/09/27
+
+	* The APP_FONT_PATH environment variable specifies font location.
+	* Supports anti-aliased bitmapped fonts (use ANTI_ALIAS flag).
+	* Sub-font images can be PNG or GIF format (.png searched first).
+	* Sub-font images can now be colourful (not just black and white).
+	* Greys in greyscale sub-font images become translucent.
+	* Greyscale sub-fonts can thus produce anti-aliasing effects.
+	* examples/fontdraw.c saves native fonts as portable sub-fonts.
+	* NB: Currently greyscale sub-fonts can only be drawn into Images.
+	* Added a better font selection fall-back mechanism for X11.
+	* Fixed some bugs in app_image_to_bitmap (only paletted screens).
+	* Added app_bitmap_to_image conversion.
+	* Added app_scale_down_32bit_image for better image scaling.
+	* Added examples/img2gif.c to demonstrate palette conversion.
+
+Version 3.57	2005/08/16
+
+	* Added note_button, separator and splitter controls.
+	* Added gui/notebtn.* gui/separat.* gui/splitter.* to Makefiles.
+	* Added SIZELR_CURSOR and SIZETB_CURSOR as standard cursors.
+	* Saving of PNG images is now supported (about time!).
+	* Added imgfmt/writepng.* to Makefiles (needs a LibPNG bug fix!).
+	* Fixed a bug in LibPNG-1.2.8 libpng/pngwtran.c to allow PNG saving.
+	* Added imgfmt/writejpg.* to Makefiles to prepare for JPEG support.
+	* Fixed Image alpha blending bug (alpha was being averaged not OR'd).
+	* Fixed 2 memory leaks in gui/dialogs.c (now deletes graphics properly).
+	* CTRL+INS now means copy, SHIFT+INS means paste, SHIFT+DEL means cut.
+	* Added POPUP windows.
+	* Droplists now use POPUP windows by default.
+	* Added app_set_control_border for control automatic border drawing.
+	* Added app_set_control_layout for DOCK, FILL etc.
+	* Added app_set_control_autosize, app_set_control_gap.
+	* Added app_process_events event handler.
+	* Added utility/array.c and utility/border.c to Makefiles.
+	* Published missing app_reset_list_box prototype in app.h.
+	* The App structure has a new socket_fd var (X11 ConnectionNumber).
+	* Control state flags are now long, not int (accommodates layout flags).
+	* Auto-tabstop handling activated if control flags use TABSTOP flag.
+
+Version 3.56	2005/08/09
+
+	* Silenced many type conversion warnings (most from strlen() to int).
+	* Right clicking on a scrollbar now reverses the travel direction.
+
+Version 3.55	2005/08/02
+
+	* Upgraded from zLib-1.1.4 to zLib-1.2.3 (fixes some security issues).
+	* Upgraded from LibPNG-1.2.0 to LibPNG-1.2.8.
+
+Version 3.54    2005/07/21
+
+	* Several controls now pass unhandled chars up the event handler chain.
+	* This allows windows to implement tab focus shifting.
+	* See the new pizza2.c example for details.
+
+Version 3.53	2004/05/08
+
+	* Fixed some bugs in folders.c on both platforms.
+	* New files in win32/ are clut.c and keys2ucs.c
+	* Alex's unified makefile system is now in src/builds/ - try it!
+	* The unifont was updated to Unifont 2.0 with Braille fixes.
+
+Version 3.52	2004/03/30
+
+	* Now uses type-safe private extra data types in app.h, appint.h.
+	* Fixed a typo in the win32/folder.c code.
+
+Version 3.51	2004/03/28
+
+	* Modified several structs, so ensure you rebuild everything!
+	* Moved common definitions from */appint.h into utility/apputils.h
+	* Updated the makefiles to also look in utility/ for headers.
+	* Renamed gui/gui.h as gui/appgui.h and adjusted makefiles.
+	* Added delayed deletion pass in event loop.
+	* Added utility/deleting.c for delayed deletion mechanism.
+	* Some minor fixes to the folder code.
+
+Version 3.50	2004/01/18
+
+	* A lot of char * parameters are now const; many files changed.
+	* Both / and \ are now valid folder separators in file operations.
+	* Renamed graphics/ to utility/ to reflect its actual usage.
+	* Menus now always appear below the menubar even in small windows.
+	* Many events may now be observed by multiple call-backs.
+
+Version 3.49	2003/09/09
+
+	* Fixed field/dropfield/passfield selection and over-typing bug.
+	* Fixed listbox visual bug: text fragments were appearing at edge.
+	* Fixed sub-menu gap (sub-menus vanished if mouse moved too slow).
+	* Fixed display of menu item shortcut keys (Delete, Tab, etc).
+	* Fixed an off-by-one crash in app_forget_window in win.c
+
+Version 3.48	2003/06/08
+
+	* Textboxes + fields keep text length, often replacing strlen.
+	* This fixes some bugs in select_text introduced in 3.47.
+	* Textbox bugs were fixed, drawing and editing are now faster.
+	* LEFT_TO_RIGHT becomes LR_TB and RIGHT_TO_LEFT becomes RL_TB.
+	* Added TB_RL (top-bottom right-left text e.g. Chinese) and TB_LR.
+	* Fixed some memory leaks in x11 and win32 drawbmap.c (draw_utf8).
+	* Fixed a bug when deleting the App if the GUI was unavailable.
+	* Updated the manual to fix some omissions and errors.
+
+Version 3.47	2003/05/28
+
+	* Reduced much flicker in textboxes, but it's still too slow.
+	* Reduced flicker in all fields during add, backspace or delete.
+	* Added app_redraw_control_rect to help with selective redrawing.
+	* MenuItems see control-key events first, and can use pass_event.
+
+Version 3.46	2003/05/22
+
+	* Added image check boxes.
+	* Added a pale grey border at the lower right of radio buttons.
+	* Updated zlib to version 1.1.4 to fix a security bug.
+	* Fixed some bugs in win32/folders.c
+	* Added many makefiles in src/rules/ (thanks to Jean-Pierre Dumas)
+
+Version 3.45	2003/05/12
+
+	* Finally fixed the Win32 menu control-key shortcut bug.
+	* CONTROL key combos cause key actions as upper case, not lower.
+	* Modified text fields to support uppercase Control key method.
+	* Included stdlib.h in utility/drawing.c so abs() is defined.
+	* Supported some more graphics card pixel formats in x11/bmapimg.c
+	* Changed DropLists so they look like Menus.
+	* Removed some almost-empty folders from the distribution.
+	* Added a CygWin for Win32 makefile as src/rules/cygwin32.mak
+	* Renamed the Cygwin for X11 makefile to src/rules/cygwinx.mak
+
+	* Support added for X-Windows style mouse-based copy and paste.
+	* Thus, selecting text immediately copies it to the clipboard,
+	* and the mouse middle button pastes clipboard text into fields.
+	* The App structure changed to support this feature, so recompile!
+	* Set app->use_X_copy_paste = 1 to use this feature in Windows.
+
+	* Added app_set_win32_instance(HINSTANCE inst) for Win32 DLLs
+	* and also app_set_app_instance(App *app, HINSTANCE inst)
+	* Use app_set_win32_instance before creating an App, or else
+	* use app_set_app_instance after creating an App. Only for DLLs.
+
+	* Changed DropFields so they use the Control's value field.
+	* Thus get_control_value finds last chosen DropField's menu item.
+
+	* When creating menu shortcuts:
+	*  Uppercase and lowercase ASCII shortcuts become uppercase.
+	*  The CONTROL key is always needed to activate a menu item.
+	*  Thus, 'b' or 'B' or CONTROL+'b' or CONTROL+'B' mean CONTROL B
+	*  and SHIFT+'b' or SHIFT+'B' or CONTROL+SHIFT+'b' or
+	*      CONTROL+SHIFT+'B' mean CONTROL SHIFT B activates the item.
+
+Version 3.44	2003/04/29
+
+	* Added "menufont" - a default font for displaying menus.
+	* Modified menus to better support different looks.
+	* Modified GraphApp look, and added XP look, see gui/gui.h
+	* The Win98 look used incorrect colours, but is now fixed.
+	* For a new look #define USE_WINDOWS_XP_LOOK and recompile gui/*.c
+	* Or #define USE_WINDOWS_98_LOOK and recompile gui/*.c
+
+Version 3.43	2003/04/25
+
+	* Cursors are now implemented, including 14 common cursors.
+	* Window icons now work (Win32 in full colour, X11 black+white).
+	* Each Win32 Window has own WNDCLASS, thus own icon and cursor.
+	* Fixed bug in Win32 with menu control-key shortcuts (failed!).
+	* Modal windows use a stack in the App structure.
+	* Window creation order as kept in the window list is invariant.
+	* Images saved in the GraphApp .h format can now be more compact.
+	* Images in .h format export fewer symbols (use static keyword).
+	* Slight speed-up in x11/clut.c colour look-up code.
+	* New cursor support files are located in gui/ x11/ win32/.
+	* New app.h, new Makefiles, new App struct: so rebuild everything!
+
+Version 3.42	2003/04/09
+
+	* Added ability to set window icons (X11,black+white only so far).
+	* DropLists use their control value for item display, not lasthit.
+	* Thus, set_control_item sets a DropList's selected item.
+	* Timer events within Win32 menus are now ignored.
+	* Mouse capture bug in Win32 menus now fixed.
+	* Fixed some serious bugs with the .h image format.
+	* Modal now implies a window is also Floating, as per the manual.
+	* Updated the reference manual.
+
+Version 3.41	2003/03/20
+
+	* Modal windows now implemented!
+	* Win32 mouse capture: drags outside now go to window clicked in.
+	* Reduced scrollbar thumb flicker even more (yay for regions!)
+	* Properly centered the scrollbar arrows.
+	* Added focus-change (refocus) event + callback to reduce flicker.
+	* Added refocus callbacks to fields, listbox, textbox.
+	* Fixed Menus + DropLists so poll loop ends on non-mouse event.
+	* Fixed a small typo in apputil.c
+	* Modal dialogs are now also floating.
+	* Updated win16/README.TXT
+	* Updated the reference manual.
+
+Version 3.40	2003/03/07
+
+	* All widgets now look more like Windows widgets.
+	* Added gui.h (provides centralised widget colour settings).
+	* Adjusted all widgets in gui/ to use centralised gui.h colours.
+
+Version 3.39	2003/03/05
+
+	* Added Microsoft Code Page 1252 as a subfont in "cp1252".
+	* Fixed right-scrolling in fields, password fields and dropfields.
+	* Added Shift-Home and Shift-End ability to field/passfld/dropfld.
+	* Now using IS_UTF8_EXTRA_BYTE macro in textedit code for clarity.
+	* Less flicker in fields, password fields, dropfields, scrollbars.
+	* Replaced X11/ in appint.h #inclusions to correct a new bug.
+	* Fixed the X11/ #include bug by modifying the configure script.
+
+Version 3.38	2003/02/12
+
+	* Removed some redundant variables in the Windows version.
+	* Added some parentheses to avoid compiler warnings.
+	* Changed all // comments into /* ... */ to fix warnings.
+	* Vowed to only use /* */ from now on.
+	* Removed X11/ from appint.h #inclusions to correct a bug.
+	* Added this file (FIXES.TXT) to keep the details of bugfixes.
+
+Version 3.37	2002/12/31
+
+	* Added CONTROL and SHIFT bit-fields, replacing SHIFTLEFT etc.
+	* Fixed CONTROL/SHIFT signalling in menus (Tab != Ctrl-I)
+
+Version 3.36	2002/12/30
+
+	* Fixed many typos in the manual and added set/get_string entry.
+	* Fixed a bug in get_string.
+
+Version 3.35	2002/12/23
+
+	* Many files changed, including app.h, so configure and compile.
+	* Added a StringTable to App structure for localisation.
+	* Added utility/strtable.c and utility/apputil.c
+	* Dialogs can be multi-lingual (by adding translations to App):
+		app_set_string(app, "Yes", "Oui");
+	* See utility/apputil.c for the various strings which can be set.
+	* Moved common portable font code into utility/fontutil.c
+	* Renamed winlist_size to num_windows and winlist to windows.
+	* Renamed fonts_loaded to num_fonts.
+	* Renamed subfonts_loaded to num_subfonts.
+	* Renamed image_count to num_images.
+
+Version 3.34	2002/12/18
+
+	* Fixed some timer problems (instant timeouts, mouse interrupts).
+	* Changed app_delay to return the milliseconds actually delayed.
+	* Changed #if 0 to #ifdef DO_NOT_COMPILE (more portable).
+
+Version 3.33	2002/11/22
+
+	* Added tabpane.c example.
+	* Added tab buttons (gui/tabbtn.c).
+	* Added bring_control_to_front and send_control_to_back functions.
+	* Fixed text edit: if max=3 and "abc" selected, couldn't overtype.
+
+Version 3.32	2002/09/04
+
+	* The annoying, loud check for A: drive on Windows is now silent.
+	* Improved ISO Latin 1 support in utf8.c (error correction).
+	* Set_clipboard_text now pastes ISO Latin 1 text, if possible.
+	* Get_clipboard_text error-corrects ISO Latin 1 text into UTF-8.
+	* Miscellaneous cosmetic changes to menu.c and scroll.c.
+	* Added new, more logical composition for the pound sign: ALT - L
+	* Added documentation for compositions, resources, to ref manual.
+
+Version 3.31	2002/08/26
+
+	* Fixed some timer problems in X11 and Win32 (which was broken).
+
+Version 3.30	2002/08/25
+
+	* Improved scrollbars by reducing redundant redrawing.
+	* Added timer-based scrolling to scrollbars as a (still buggy) test.
+	* Made menus 3 dimensional (more like the Win32 GUI) as a trial.
+	* Dialogs have a grey background now (more like Win32).
+
+Version 3.29	2002/08/22
+
+	* Fixed bugs in utf8.c, affecting ISO Latin-1 text and native fonts.
+
+Version 3.28	2002/08/16
+
+	* Win32 version now uses proper Windows timers.
+	* Added data pointer to App structure.
+
+Version 3.27	2002/08/14
+
+	* Added "fake root" to Win32 to allow drive letter navigation.
+	* Faster rendering of black/white text for portable fonts (X11 bitmaps).
+
+Version 3.26	2002/07/31
+
+	* Implemented window movement call-back.
+	* Used that to make open/save dialog windows remember their positions.
+	* Incorporated Cyrillic Unicode compositions into utility/compose.c
+	* Disabled drop fields now disallow changes to the selection.
+	* Disabled text boxes now appear enabled, but editing is disallowed.
+	* Labels now update text correctly, even with transparent backgrounds.
+	* Released Monty version 3 source code in examples/monty/.
+
+Version 3.25	2002/07/07
+
+	* Faster rendering of black/white text for portable fonts (X11 windows).
+	* The open/save dialogs now remember their directory location.
+
+Version 3.24	2002/06/26
+
+	* Renamed TRANSPARENT to CLEAR to reduce windows.h inclusion problems.
+	* Improved scrolling of list boxes to avoid some redundant redraws.
+
+Version 3.23	2002/04/23
+
+	* Improved addres resource adder program.
+
+Version 3.22	2002/04/10
+
+	* Added version 3 ".h" image format into image load/save functions.
+	* Fixed XOR mode rendering of bitmaps in X11.
+
+Version 3.21	2002/04/04
+
+	* Fixed some memory leaks in font and drawing ops for X11 and Windows.
+	* Fixed XOR mode rendering of fonts and bitmaps in Windows.
+
+Version 3.20	2002/04/02
+
+	* Renamed app_start to app_new_app, app_stop to app_del_app.
+	* Now bundling the tutorial with the package.
+	* Added -l option to addres.c to supply a file listing resource files.
+
+Version 3.19	2002/02/15
+
+	* Added compose key (ALT key) combinations to input Unicode chars
+	  (read src/utility/compose.c for details of how to do it).
+
+Version 3.18	2002/01/15
+
+	* Added ga2.c and ga2.h for partial GraphApp version 2 support.
+	* Added cut/copy/clear/paste/insert/select_text funcs (textbox.c).
+	* Now owns X11 CLIPBOARD selection as well as PRIMARY (clipbrd.c).
+
+Version 3.17	2002/01/08
+
+	* Added basic timer mechanism.
+
+Version 3.16	2002/01/06
+
+	* Avoids XOR drawing of inverted menu items, to improve colour.
+
+Version 3.15	2002/01/05
+
+	* Drop-down lists and fields don't need the mouse to be held down.
+	* Menu items can be disabled, use their own font or colour.
+	* Menu separators are now thin and disabled by default.
+
+Version 3.14	2001/12/17
+
+	* Fixed another bug in win32/events.c
+
+Version 3.13	2001/12/17
+
+	* Fixed a bug in win32/events.c
+	* Added <ctype.h> to inclusions of gui/menu.c
+
+Version 3.12	2001/12/13
+
+	* Added field "restrictions" (control what chars a field accepts).
+
+Version 3.11	2001/12/12
+
+	* Added graphapp.h header file.
+	* Changed examples and reference manual to use graphapp.h.
+	* Menu shortcuts are now displayed and they work.
+	* Updated all text field controls to handle menu shortcuts.
+	* Menus can now persist without holding down the mouse button.
+	* Bitmaps can now be safely created having a zero area.
+	* Added unicode_char_to_utf8 and utf8_char_to_unicode functions.
+	* Removed app_sleep function in favour of app_delay.
+
+Version 3.10	2001/12/01
+
+	* The old app_add_control is renamed app_attach_to_window.
+	* The old app_add_sub_control is renamed app_attach_to_control.
+	* app_new_control has a Window parameter and auto-attaches to it.
+	* app_add_control is introduced which auto-attaches to a Control.
+	* Added app_add_widget for each widget; allows recursive nesting.
+	* Control 'updates' now only occur when user data has changed.
+	* win32/folder.c now uses native Windows code for many operations.
+	* x11/folder.c now uses <unistd.h> for some definitions.
+	* Added simple regular expression parsing, see utility/utf8regx.c
+	* Added resources to allow embedded fonts, see utility/resource.c
+	* Added the tools/ directory, containing some resource tools.
+	* Improved font.c to allow fonts to be read from resources.
+	* Improved imgread.c to allow reading images from resources.
+	* Fixed a bug in reading GIF image transparency info.
+
+Version 3.09	2001/11/13
+
+	* Password fields.
+	* Disabled text_box/field/drop-fields are now simply uneditable.
+	* Disabled controls now receive and handle events themselves.
+	* Improved numeric keypad support.
+
+Version 3.08	2001/11/11
+
+	* Expanded native text drawing to ISO Latin-1 not just ASCII.
+
+Version 3.07	2001/11/03
+
+	* Added "update" handler call-back to Controls.
+	* Added update handlers to text_box, field and drop_field.
+
+Version 3.06	2001/10/30
+
+	* Added native text drawing to X-Windows bitmaps.
+
+Version 3.05	2001/10/28
+
+	* Fixed text_box tab problem, faster selecting and scrolling text.
+	* Added a new text_width function which counts tabs properly.
+	* Fixed a memory bug in text_boxes, fields and drop_fields.
+	* Fixed text clipping in draw_text function.
+
+Version 3.04	2001/10/26
+
+	* Added MingW rule file to rules/ sub-directory.
+	* Fixed some bugs in text_box.
+
+Version 3.03	2001/10/20
+
+	* Added a CygWin makefile in rules/ sub-directory.
+	* Updated Win32 event handling to allow shift-arrow-selection also.
+	* Text boxes added. Speed could be faster. Flicker could be reduced.
+	* Various fixes to controls such as listbox, scrollbar, dropfield.
+	* Added a new text measurement function to drawtext.c.
+
+Version 3.02	2001/10/10
+
+	* Clipboard functions allow text fields to transfer text portably.
+	* X11 windows now use the MWM protocol so the decorations work.
+	* Speed of scrolling list boxes was improved using copy_rect.
+	* Added shift-arrow-selection in text fields and drop-fields.
+
+Version 3.01	2001/05 to 2001/10
+
+	* New XOR drawing mode.
+	* Controls include: buttons, dialogs, menus, text fields, lists.
+	* Portable drawing using copy_rect, fill_rect, and draw_utf8.
+	* Portable unicode font mechanism allows drawing to client-side Images.
+	* Native font interface handles ASCII.
+	* Portable client-side clipping using Regions and Graphics objects.
+	* Fast image to bitmap conversion.
+	* Fast native line drawing added, in a 99% portable manner.
+
+Version 3.00	1998-2001
+
+	* Complete rewrite of internal methods. Now much more portable.
+	* Moved to Linux and Win32 as primary development environments.
+	* Solaris version regularly ported, works fine.
+	* Active development up to 2001.
+	* New web site and better documentation.
+
+Version 2.48	1998
+
+	* Final edition which used the 2.x "thin layer" approach.
+	* Win16, Solaris (Motif and Athena) were the three primary platforms.
+
+Version 2.4	1998
+
+	* New image manipulation abilities.
+	* A few new controls.
+
+Version 2.2	1997
+
+	* Many new controls and capabilities.
+	* Experimental Macintosh 68k versions. Many features missing.
+
+Version 2.0	1996
+
+	* First released version used at Sydney University.
+	* Experimental Windows and Solaris versions.
+
+Version 1.0	1995
+
+	* Unreleased experimental Windows/Solaris version.
+

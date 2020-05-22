@@ -1,0 +1,194 @@
+Major changes to GraphApp functionality:
+
+This file documents the major changes to GraphApp features.
+Minor changes (such as the addition of a function or a small
+feature, or a bug fix) are documented in the file FIXES.TXT.
+If a particular version is not documented here, it is likely
+that release was only a 'bug fix' release.
+
+Version 3.60	2007/06/06
+	* Upgraded to libPNG 1.2.18 (fixes several security bugs).
+	* Many fixes in the gui/ controls. Some use docking layout.
+	* Tooltips added: gui/tip.c
+	* Font search order changed (the EXE is now searched last).
+
+Version 3.57	2005/08/16
+
+	* Added note_button, separator and splitter controls.
+	* Added SIZELR_CURSOR and SIZETB_CURSOR as standard cursors.
+	* Saving of PNG images is now supported (about time!).
+	* CTRL+INS now means copy, SHIFT+INS means paste, SHIFT+DEL means cut.
+	* Added POPUP windows.
+	* Droplists now use POPUP windows by default.
+	* Added app_set_control_border for control automatic border drawing.
+	* Added app_set_control_layout for DOCK, FILL etc.
+	* Added app_set_control_autosize, app_set_control_gap.
+	* Added app_process_events event handler.
+	* The App structure has a new socket_fd var (X11 ConnectionNumber).
+	* Control state flags are now long, not int (accommodates layout flags).
+	* Auto-tabstop handling activated if control flags use TABSTOP flag.
+
+Version 3.54	2005/07/21
+
+	* Several controls now pass unhandled chars up the event handler chain.
+	* This allows windows to implement tab focus shifting.
+	* See the new pizza2.c example for details.
+
+Version 3.53	2004/05/08
+
+	* Updated the unifont portable font to Unifont version 2.0.
+	* Added a unified makefile system, see src/builds/ for details.
+
+Version 3.50	2004/01/18
+
+	* Using const keyword with some parameters.
+	* Many events may now be observed by multiple call-backs.
+
+Version 3.46	2003/05/22
+
+	* Added image check boxes.
+
+Version 3.45	2003/05/12
+
+	* Support added for X-Windows style mouse-based copy and paste.
+
+Version 3.44	2003/04/29
+
+	* New menufont added, and menus have a new look.
+
+Version 3.43	2003/04/25
+
+	* Cursors now implemented.
+	* Window icons now implemented.
+
+Version 3.41	2003/03/20
+
+	* Modal windows now implemented!
+
+Version 3.40	2003/03/07
+
+	* All widgets now look more like Windows widgets.
+
+Version 3.35	2002/12/23
+
+	* Multi-lingual dialogs! (Set translations on App, see apputil.c):
+		app_set_string(app, "Yes", "Oui");
+
+Version 3.33	2002/11/22
+
+	* Added tab buttons (gui/tabbtn.c) and an example (tabpane.c)
+
+Version 3.32	2002/09/04
+
+	* Set_clipboard_text now pastes ISO Latin 1 text, if possible.
+	* Get_clipboard_text error-corrects ISO Latin 1 text into UTF-8.
+
+Version 3.30	2002/08/25
+
+	* Added timer-based scrolling to scrollbars as a (still buggy) test.
+
+Version 3.26	2002/07/31
+
+	* Added window movement call-back.
+	* Incorporated Cyrillic Unicode compositions into utility/compose.c
+
+Version 3.22	2002/04/10
+
+	* Added version 3 ".h" image format into image load/save functions.
+
+Version 3.19	2002/02/15
+
+	* Added compose key (ALT key) combinations to input Unicode chars
+	  (read src/utility/compose.c for details of how to do it).
+
+Version 3.18	2002/01/15
+
+	* Added ga2.c and ga2.h for partial GraphApp version 2 support.
+	* Added cut/copy/clear/paste/insert/select_text funcs (textbox.c).
+
+Version 3.17	2002/01/08
+
+	* Added basic timer mechanism.
+
+Version 3.12	2001/12/13
+
+	* Added field "restrictions" (control what chars a field accepts).
+
+Version 3.11	2001/12/12
+
+	* Added graphapp.h header file, which builds on the app.h file.
+
+Version 3.10	2001/12/01
+
+	* Added app_add_widget for each widget; allows recursive nesting.
+	* Added simple regular expression parsing, see utility/utf8regx.c
+	* Added resources to allow embedded fonts, see utility/resource.c
+	* Added the tools/ directory, containing some resource tools.
+	* Improved font.c to allow fonts to be read from resources.
+	* Improved imgread.c to allow reading images from resources.
+
+Version 3.09	2001/11/13
+
+	* Added password fields.
+
+Version 3.08	2001/11/11
+
+	* Expanded native text drawing to ISO Latin-1 not just ASCII.
+
+Version 3.07	2001/11/03
+
+	* Added "update" handler call-back to Controls.
+
+Version 3.06	2001/10/30
+
+	* Added native text drawing to X-Windows bitmaps.
+
+Version 3.03	2001/10/20
+
+	* Added text boxes.
+
+Version 3.02	2001/10/10
+
+	* Clipboard functions allow text fields to transfer text portably.
+
+Version 3.01	2001/05 to 2001/10
+
+	* Controls include: buttons, dialogs, menus, text fields, lists.
+	* Portable drawing using copy_rect, fill_rect, and draw_utf8.
+	* Portable unicode font mechanism allows drawing to client-side Images.
+	* Native font interface handles ASCII.
+	* Portable client-side clipping using Regions and Graphics objects.
+	* Fast image to bitmap conversion.
+	* Fast native line drawing added, in a 99% portable manner.
+
+Version 3.00	1998-2001
+
+	* Moved to Linux and Win32 as primary development environments.
+	* Solaris version regularly ported, works fine.
+	* Active development up to 2001.
+	* New web site and better documentation.
+
+Version 2.48	1998
+
+	* Final edition which used the 2.x "thin layer" approach.
+	* Win16, Solaris (Motif and Athena) were the three primary platforms.
+
+Version 2.4	1998
+
+	* New image manipulation abilities.
+	* A few new controls.
+
+Version 2.2	1997
+
+	* Many new controls and capabilities.
+	* Experimental Macintosh 68k versions. Many features missing.
+
+Version 2.0	1996
+
+	* First released version used at Sydney University.
+	* Experimental Windows and Solaris versions.
+
+Version 1.0	1995
+
+	* Unreleased experimental Windows/Solaris version.
+
