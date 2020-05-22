@@ -1,0 +1,59 @@
+<html>
+<head>
+ <title>GraphApp - Pizza Example</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p>
+<H1>Ordering Pizza ... 2</H1>
+<p>
+<font size=+1>
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+
+Control *name, *phone;
+Control *address;
+Control *ham, *mushrooms, *olives, *capsicum;
+Control *tomato, *barbeque;
+
+void place_order(Control *b)
+{
+  printf("Name = %s\n", get_control_text(name));
+  printf("Phone = %s\n", get_control_text(phone));
+  printf("Address = %s\n", get_control_text(address));
+
+  printf("Sauce:\n");
+  if (is_checked(tomato))     printf("  Tomato\n");
+  if (is_checked(barbeque))   printf("  Barbeque\n");
+
+  printf("Toppings:\n");
+  if (is_checked(ham))        printf("  Ham\n");
+  if (is_checked(mushrooms))  printf("  Mushrooms\n");
+  if (is_checked(olives))     printf("  Olives\n");
+  if (is_checked(capsicum))   printf("  Capsicum\n");
+
+  exit(0);
+}
+
+void reset_form(Control *b)
+{
+  set_control_text(name, "");
+  set_control_text(phone, "");
+  set_control_text(address, "");
+
+  check(tomato);
+  uncheck(barbeque);
+  uncheck(ham);
+  uncheck(mushrooms);
+  uncheck(olives);
+  uncheck(capsicum);
+
+  set_focus(name);
+}
+</pre>
+</font>
+
+</body>
+</html>

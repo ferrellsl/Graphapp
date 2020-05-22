@@ -1,0 +1,40 @@
+<html>
+<head>
+ <title>GraphApp - Sound</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p>
+<H1>Sound Functions</H1>
+<p>
+<font size=+1>
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+
+App *app;
+
+void do_it(Control *b)
+{
+  <b>beep</b>(app);
+}
+
+int main(int argc, char *argv[])
+{
+  Window *w;
+  Control *b;
+
+  app = new_app(argc, argv);
+  w = new_window(app, rect(20,20,400,300),
+                 "Listen...", STANDARD_WINDOW);
+  b = new_button(w, rect(10,10,80,30), "Press", do_it);
+  show_window(w);
+  main_loop(app);
+  return 0;
+}
+</pre>
+</font>
+
+</body>
+</html>

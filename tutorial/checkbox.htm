@@ -1,0 +1,61 @@
+<html>
+<head>
+ <title>GraphApp - Checkboxes</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p>
+<H1>Checkboxes</H1>
+<p>
+<font size=+1>
+<p>
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+
+void <B>choose</B>(Control *c)
+{
+  if (<B>is_checked</B>(c))
+    printf("Oh, you want %s do you?\n", get_control_text(c));
+  else
+    printf("Don't want %s now, I see.\n", get_control_text(c));
+}
+<img src="checkbox.png" align="right">
+void quit(Control *b)
+{
+  exit(0);
+}
+
+int main(int argc, char *argv[])
+{
+  App *app;
+  Window *w;
+  Control *c1, *c2;
+  Control *b;
+
+  app = new_app(argc, argv);
+  w  = new_window(app, rect(0,0,200,150),
+                  "Pizza", STANDARD_WINDOW);
+  c1 = <b>new_check_box</b>(w, rect(10,10,160,25), "Ham", <B>choose</B>);
+  c2 = <b>new_check_box</b>(w, rect(10,40,160,25), "Mushrooms", <B>choose</B>);
+  b  = new_button(w, rect(10,80,80,30), "Quit", quit);
+  show_window(w);
+  main_loop(app);
+  return 0;
+}
+</pre>
+</font>
+<p>
+<font size=+2><i>Notes:</i></font>
+<font size=+1>
+<p>
+<ul>
+ <li>Use <tt>new_check_box</tt> to create check boxes.</li>
+ <li>The checkbox call-back function lets you see state changes.</li>
+ <li>Use <tt>is_checked</tt> to see if a check box is currently checked.</li>
+</ul>
+</font>
+
+</body>
+</html>

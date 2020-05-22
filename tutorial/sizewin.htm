@@ -1,0 +1,56 @@
+<html>
+<head>
+ <title>GraphApp - Resizing Windows</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p>
+<H1>Resizing Windows</H1>
+<p>
+<font size=+1>
+<img src="sizewin.png" align="right">
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+
+Window *w;
+
+void bigger(Control *b)
+{
+  <B>size_window</B>(w, rect(100,100,400,300));
+}
+
+void smaller(Control *b)
+{
+  <B>size_window</B>(w, rect(100,100,200,150));
+}
+
+int main(int argc, char *argv[])
+{
+  App *app;
+
+  app = new_app(argc, argv);
+  w = new_window(app, rect(100,100,300,250),
+                 "Special Window", TITLEBAR + CLOSEBOX + MINIMIZE);
+  new_button(w, rect(10,10,80,30), "Bigger", bigger);
+  new_button(w, rect(10,50,80,30), "Smaller", smaller);
+  show_window(w);
+  main_loop(app);
+  return 0;
+}
+</pre>
+</font>
+
+<p>
+<font size=+2><i>Notes:</i></font>
+<font size=+1>
+<p>
+<ul>
+ <li>If some window decorations are not needed, a custom list can be used when calling <TT>new_window</TT>.</li>
+ <li>Windows can be resized without moving them using the <TT>size_window</TT> function.</li>
+</ul>
+</font>
+
+</body>
+</html>

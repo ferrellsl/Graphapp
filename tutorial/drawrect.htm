@@ -1,0 +1,56 @@
+<html>
+<head>
+ <title>GraphApp - Drawing Operations</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p>
+<H1>Drawing Rectangles</H1>
+<p>
+<font size=+1>
+<p>
+<img src="drawrect.png" align=right>
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+
+void redraw_it(Window *w, Graphics *g)
+{
+  Rect r = <B>rect</B>(10,10,80,10);
+
+  <B>set_colour</B>(g, RED);
+  <B>draw_rect</B>(g, r);
+
+  <B>set_colour</B>(g, BLUE);
+  <B>fill_rect</B>(g, rect(10,40,80,10));
+}
+
+int main(int argc, char *argv[])
+{
+  App *app = new_app(argc, argv);
+  Window *w = new_window(app, rect(0,0,174,100),
+                         "Graphics", STANDARD_WINDOW);
+  on_window_redraw(w, redraw_it);
+  show_window(w);
+  main_loop(app);
+  return 0;
+}
+</pre>
+</font>
+
+<p>
+<font size=+2><i>Notes:</i></font>
+<font size=+1>
+<p>
+<ul>
+ <li>Use <tt>rect(x,y,width,height)</tt> to specify mathematical rectangles.</li>
+ <li>Use <tt>draw_rect</tt> draws outlines of rectangles.</li>
+ <li>Use <tt>fill_rect</tt> fills the rectangle with colour.</li>
+ <li>Use <tt>set_colour</tt> to change the drawing colour.</li>
+ <li><tt>Rects</tt> are automatic (they are created on the stack) so there is no need to delete them.</li>
+</ul>
+</font>
+
+</body>
+</html>

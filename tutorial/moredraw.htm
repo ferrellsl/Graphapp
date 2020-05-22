@@ -1,0 +1,68 @@
+<html>
+<head>
+ <title>GraphApp - More Drawing</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<H1>More Drawing</H1>
+
+<img src="moredraw.png" align="right">
+
+<font size=+1>
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+
+void <b>draw_shapes</b>(Control *c, Graphics *g)
+{
+  Rect r = get_control_area(c);
+
+  set_colour(g, RED);
+  <b>fill_rect</b>(g, r);
+
+  set_colour(g, BLUE);
+  <b>fill_ellipse</b>(g, <b>inset_rect</b>(r,4));
+
+  set_colour(g, GREEN);
+  <b>draw_line</b>(g, pt(r.x,r.y),
+           pt(r.x+r.width,r.y+r.height));
+  <b>draw_line</b>(g, pt(r.x,r.y+r.height),
+           pt(r.x+r.width,r.y));
+}
+
+int main(int argc, char *argv[])
+{
+  App *app;
+  Window *w;
+  Control *c;
+  Rect r;
+
+  app = new_app(argc, argv);
+  w = new_window(app, rect(50,50,150,200),
+                 "Rectangles", STANDARD_WINDOW);
+  set_window_background(w, LIGHT_GREY);
+  r = rect(10,10,100,100);
+  c = new_control(w, r);
+  on_control_redraw(c, <b>draw_shapes</b>);
+  show_window(w);
+  main_loop(app);
+  return 0;
+}
+</pre>
+</font>
+<p>
+<font size=+2><i>Notes:</i></font>
+<font size=+1>
+<p>
+<ul>
+ <li><tt>fill_ellipse</tt> uses the supplied rectangle as a
+	<i>bounding rectangle</i>.</li>
+ <li><tt>draw_line</tt> draws a line from one point to another.</li>
+ <li>There are a number of predefined colours, including <tt>RED</tt>,
+	<tt>BLUE</tt>, <tt>BLACK</tt>, <tt>WHITE</tt> etc.</li>
+</ul>
+</font>
+
+</body>
+</html>

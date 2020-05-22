@@ -1,0 +1,64 @@
+<html>
+<head>
+ <title>GraphApp - Window Events</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p>
+<H1>Resizing and Closing Windows</H1>
+<p>
+<font size=+1>
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+
+void resize_it(Window w)
+{
+  Rect r = get_window_area(w);
+  printf("Resize event! New rectangle=(%d,%d,%d,%d)\n",
+          r.x, r.y, r.width, r.height);
+}
+
+void redraw_it(Window w, Graphics *g)
+{
+  printf("Draw event!\n);
+}
+
+void close_it(window w)
+{
+  printf("Close event!\n");
+  <B>hide_window</B>(w);
+}
+
+int main(int argc, char *argv[])
+{
+  App *app;
+  Window *w;
+
+  app = new_app(argc, argv);
+  w = newwindow(app, rect(0,0,200,150),
+                "Watch stdout", STANDARD_WINDOW);
+  <B>on_window_resize</B>(w, resize_it);
+  <B>on_window_redraw</B>(w, redraw_it);
+  <B>on_window_close</B>(w, close_it);
+  show_window(w);
+  main_loop(app);
+  return 0;
+}
+</pre>
+</font>
+
+<p>
+<font size=+2><i>Notes:</i></font>
+<font size=+1>
+<p>
+<ul>
+ <li>Windows can be resized and closed, as well as redrawn.</li>
+ <li>These events can be intercepted and acted upon.</li>
+ <li>If the close event is intercepted, the window will no longer be hidden automatically; you must do it yourself using <tt>hide_window</tt>. This is so you can ask the user if they want to save data, or cancel the operation, for example.</li>
+</ul>
+</font>
+
+</body>
+</html>

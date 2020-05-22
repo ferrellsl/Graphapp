@@ -1,0 +1,50 @@
+<html>
+<head>
+ <title>GraphApp - Hello World</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p>
+<H1>Programming with GraphApp</H1>
+<p>
+<img src="hello.png" align="right">
+<font size=+2><i>Hello World:</i></font>
+<p>
+<font size=+1>
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+
+int main(int argc, char *argv[])
+{
+  App *app = <B>new_app</B>(argc, argv);
+  Window *w = <B>new_window</B>(app,
+                         <B>rect</B>(0,0,240,160),
+                         "Graphics",
+                         STANDARD_WINDOW);
+  <B>new_label</B>(w, rect(0,0,100,30),
+            "Hello world", ALIGN_LEFT);
+  <B>show_window</B>(w);
+  <B>main_loop</B>(app);
+  return 0;
+}
+</pre>
+</font>
+<p>
+<font size=+2><i>Notes:</i></font>
+<font size=+1>
+<p>
+<ul>
+ <li>You need an <tt>App</tt> and a <tt>Window</tt> to begin.</li>
+ <li>Use <tt>new_app</tt> to make an <tt>App</tt> data structure.</li>
+ <li>Use <tt>new_window</tt> to make a <tt>Window</tt> data structure.</li>
+ <li>The <tt>rect</tt> function is used to specify a rectangle in pixels.</li>
+ <li>A label is some text stuck to the window's surface.</li>
+ <li>Windows are invisible at first. Make them visible with <tt>show_window</tt>.</li>
+ <li>The <tt>main_loop</tt> function handles events for you.</li>
+</ul>
+</font>
+
+</body>
+</html>

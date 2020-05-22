@@ -1,0 +1,65 @@
+<html>
+<head>
+ <title>GraphApp - Text Fields</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p>
+<H1>Text Fields and Labels</H1>
+<p>
+<font size=+1>
+<img src="field.png">
+<p>
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+
+Control *name, *phone;
+
+void place_order(Control *b)
+{
+  printf("Name = %s\n", <b>get_control_text</b>(name));
+  printf("Phone = %s\n", <b>get_control_text</b>(phone));
+  exit(0);
+}
+
+int main(int argc, char *argv[])
+{
+  App *app;
+  Window *w;
+  Rect r;
+
+  app = new_app(argc, argv);
+  w = new_window(app, rect(0,0,400,180), "Pizza", STANDARD_WINDOW);
+
+  r = rect(10,10,60,25);
+  <b>new_label</b>(w, r, "Name:", ALIGN_RIGHT);           r.y += 30;
+  <b>new_label</b>(w, r, "Phone:", ALIGN_RIGHT);          r.y += 30;
+
+  r = rect(80,10,150,25);
+  name  = <b>new_field</b>(w, r, "Type your name here");  r.y += 30;
+  phone = <b>new_field</b>(w, r, NULL);                   r.y += 30;
+
+  new_button(w, rect(50,80,100,30), "Order Pizza", place_order);
+  show_window(w);
+  main_loop(app);
+  return 0;
+}
+</pre>
+</font>
+
+<p>
+<font size=+2><i>Notes:</i></font>
+<font size=+1>
+<p>
+<ul>
+ <li>One-line text fields are created with the <tt>new_field</tt> function.</li>
+ <li>Some initial text can be placed into the field, at the time it is created.</li>
+ <li>Use <tt>get_control_text</tt> to discover what the user has typed into a field.</li>
+ <li>Fields can display Unicode text if the default font is used.</li>
+</ul>
+</font>
+
+</body>
+</html>

@@ -1,0 +1,48 @@
+<html>
+<head>
+ <title>GraphApp - Making a Window</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p><H1>Making a Window</H1>
+<img src="makewin.png" align="right">
+
+<font size=+1>
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+
+int main(int argc, char *argv[])
+{
+  App *app;
+  Window *w;
+
+  app = new_app(argc,argv);
+  w = <b>new_window</b>(app,
+                rect(50,50,150,200),
+                "A Window",
+                STANDARD_WINDOW);
+  /* create your controls here */
+  <b>show_window</b>(w);
+  <b>main_loop</b>(app);
+  /* close files and tidy up here */
+  return 0;
+}
+</pre>
+</font>
+
+<p>
+<font size=+2><i>Notes:</i></font>
+<font size=+1>
+<p>
+<ul>
+ <li>Use <tt>new_window</tt> to create windows.</li>
+ <li>Use <tt>rect(x,y,width,height)</tt> to specify a rectangle.</li>
+ <li>Use <tt>show_window</tt> to display the window.</li>
+ <li>Use <tt>main_loop</tt> to handle events.</li>
+</ul>
+</font>
+
+</body>
+</html>

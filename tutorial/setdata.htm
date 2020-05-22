@@ -1,0 +1,76 @@
+<html>
+<head>
+ <title>GraphApp - Associating Data with Windows</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p><H1>Associating Data with Windows</H1>
+<img src="sizectrl.png" align="right">
+
+<font size=+1>
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+
+void <b>draw_shapes</b>(Control *c, Graphics *g)
+{
+  Rect r = get_control_area(c);
+
+  set_colour(g, RED);
+  fill_rect(g, r);
+
+  set_colour(g, BLUE);
+  fill_ellipse(g, insetr(r,4));
+
+  set_colour(g, GREEN);
+  draw_line(g, pt(r.x,r.y),
+            pt(r.x+r.width,r.y+r.height));
+  draw_line(g, pt(r.x,r.y+r.height),
+            pt(r.x+r.width,r.y));
+}
+
+void <b>resize_control</b>(Window *w)
+{
+  /* retrieve stored pointer */
+  Rect r = get_window_area(w);
+  <b>Control *c</b> = <b>get_window_data</b>(w);
+  set_control_area(c, inset_rect(r,10));
+}
+
+int main(int argc, char *argv[])
+{
+  App *app;
+  Window *w;
+  <b>Control *c;</b> /* local */
+  Rect r;
+
+  app = new_app(argc, argv);
+  w = new_window(app, rect(50,50,150,200),
+                 "Rectangles", STANDARD_WINDOW);
+  set_window_background(w, LIGHT_GREY);
+  r = rect(10,10,100,100);
+  <b>c</b> = new_control(w, r);
+  on_control_redraw(c, <b>draw_shapes</b>);
+  <b>set_window_data</b>(w, c); /* store pointer */
+  on_window_resize(w, <b>resize_control</b>);
+  show_window(w);
+  main_loop(app);
+  return 0;
+}
+</pre>
+</font>
+<p>
+<font size=+2><i>Notes:</i></font>
+<font size=+1>
+<p>
+<ul>
+ <li><tt>set_window_data</tt> stores a <tt>void pointer</tt> with awindow.</li>
+ <li>Many objects are pointers (e.g. windows, controls, menus).</li>
+ <li>Use <tt>get_window_data</tt> to retrieve that pointer later on.</li>
+ <li>Notice we don't need global variables any more.</li>
+</ul>
+</font>
+
+</body>
+</html>

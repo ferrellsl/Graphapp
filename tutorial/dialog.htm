@@ -1,0 +1,71 @@
+<html>
+<head>
+ <title>GraphApp - Dialog Windows</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p>
+<H1>Dialog Windows</H1>
+<p>
+<font size=+1>
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+
+int main(int argc, char *argv[])
+{
+  App *app;
+  char *name;
+  int result;
+
+  app = new_app(argc, argv);
+
+  <B>ask_ok</B>(app, "Information", "Just testing");
+
+  name = <B>ask_string</B>(app, "Question",
+                    "What is your name?", "Type it here");
+  printf("Hello, %s\n", name);
+  free(name);
+
+  result = <B>ask_ok_cancel</B>(app, "Question", "Destroy the world?");
+
+  if (result == OKAY)
+    printf("Destroying the world....\n");
+  else if (result == CANCEL)
+    printf("I'll destroy the world later.\n");
+
+  result = <B>ask_yes_no</B>(app, "Question",
+                      "Would you like to play a game?");
+
+  if (result == YES)
+    printf("All right!\n");
+  else if (result == NO)
+    printf("Boring person.\n");
+
+  result = <B>ask_yes_no_cancel</B>(app, "Question",
+                             "Would you like to play Thermonuclear War?");
+
+  switch (result) {
+    case YES:    printf("BOOM!\n"); break;
+    case NO:     printf("How about chess?\n"); break;
+    case CANCEL: printf("Cancelled.\n"); break;
+  }
+}
+</pre>
+<p>
+</font>
+
+<p>
+<font size=+2><i>Notes:</i></font>
+<font size=+1>
+<p>
+<ul>
+ <li>Constants such as <TT>OKAY</TT>, <TT>YES</TT>, <TT>NO</TT> and <TT>CANCEL</TT> are returned from dialog windows which ask multiple choice questions.</li>
+ <li>The string returned from <TT>ask_string</TT> should later be freed.</li>
+ <li>All dialog windows accept a pointer to an <TT>App</TT> as their first parameter, and a window title string as the second parameter.</li>
+</ul>
+</font>
+
+</body>
+</html>

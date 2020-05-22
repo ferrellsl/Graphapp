@@ -1,0 +1,60 @@
+<html>
+<head>
+ <title>GraphApp - Timer</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p>
+<H1>The Timer</H1>
+<p>
+<img src="timer.png" align="right">
+<font size=+1>
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+ 
+Rect r;
+Window *w;
+ 
+void draw_something(Timer *t)
+{
+  Graphics *g = <B>get_window_graphics</B>(w);
+  draw_ellipse(g, r);
+  r.x += 10;
+  r.y += 10;
+  <B>del_graphics</B>(g);
+}
+ 
+int main(int argc, char *argv[])
+{
+  App *app;
+  <B>Timer *t;</B>
+
+  app = new_app(argc, argv);
+  w = new_window(app, rect(20,20,400,300), "Timer", STANDARD_WINDOW);
+  show_window(w);
+ 
+  r = rect(10,10,30,15);
+ 
+  t = <B>new_timer</B>(app, draw_something, 2000);
+  draw_something(t);
+  main_loop(app);
+  return 0;
+}
+</pre>
+</font>
+<p>
+<font size=+2><i>Notes:</i></font>
+<font size=+1>
+<p>
+<ul>
+ <li>Use <TT>new_timer</TT> to create a timer.</li>
+ <li>The last parameter is a time interval in milliseconds. In the example, the timer will activate every 2 seconds (2000 milliseconds).</li>
+ <li>The timer's call-back function is passed a pointer to the timer.</li>
+ <li>To draw to a window or control, you must first obtain a <TT>Graphics</TT> object. In the example, the <TT>get_window_graphics</TT> function is used, and the object is later destroyed by <TT>del_graphics</TT>. Normally this is not necessary, since a window or control's redraw call-back is passed a <TT>Graphics</TT> object.</li>
+</ul>
+</font>
+
+</body>
+</html>

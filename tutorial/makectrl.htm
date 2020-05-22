@@ -1,0 +1,64 @@
+<html>
+<head>
+ <title>GraphApp - Making a Control</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p><H1>Controls</H1>
+<img src="makectrl.png" align="right">
+
+<font size=+1>
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+
+void <b>draw_shapes</b>(Control *c, Graphics *g)
+{
+  Rect r = <b>get_control_area</b>(c);
+
+  <b>set_colour</b>(g, RED);
+  <b>draw_rect</b>(g, r);
+
+  <b>set_colour</b>(g, BLUE);
+  <b>fill_rect</b>(g, rect(10,40,80,10));
+}
+
+int main(int argc, char *argv[])
+{
+  App *app;
+  Window *w;
+  Control *c;
+  Rect r;
+
+  app = new_app(argc, argv);
+  w = new_window(app, rect(50,50,150,200),
+                "Rectangles", STANDARD_WINDOW);
+  <b>set_window_background</b>(w, LIGHT_GREY);
+  r = rect(10,10,100,100);
+  c = <b>new_control</b>(w, r);
+  on_control_redraw(c, <b>draw_shapes</b>);
+  show_window(w);
+  main_loop(app);
+  return 0;
+}
+</pre>
+</font>
+<p>
+<font size=+2><i>Notes:</i></font>
+<font size=+1>
+<p>
+<ul>
+ <li>Use <tt>new_control</tt> to create a control on a window's surface.</li>
+ <li>Use <tt>on_control_redraw</tt> to associate a redraw call-back function to it.</li>
+ <li>Whenever the control needs to be redrawn, that callback is used.</li>
+ <li>Use <tt>set_window_background</tt> to change a window's background colour.</li>
+ <li>Use <tt>set_colour</tt> to change the drawing colour.</li>
+ <li><tt>get_control_area</tt> returns the rectangle which outlines the control, it its own co-ordinate system.</li>
+ <li><tt>draw_rect</tt> draws a border inside a rectangle.</li>
+ <li><tt>fill_rect</tt> fills the given rectangle.</li>
+</ul>
+</font>
+
+</body>
+</html>

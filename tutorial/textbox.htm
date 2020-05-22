@@ -1,0 +1,71 @@
+<html>
+<head>
+ <title>GraphApp - Text Fields</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p>
+<H1>Textboxes</H1>
+<p>
+<font size=+1>
+<img src="textbox.png" align="right">
+<p>
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+
+Control *name, *phone;
+Control *address;
+
+void place_order(Control *b)
+{
+  printf("Name = %s\n",
+            get_control_text(name));
+  printf("Phone = %s\n",
+            get_control_text(phone));
+  printf("Address = %s\n",
+            <b>get_control_text</b>(address));
+  exit(0);
+}
+
+int main(int argc, char *argv[])
+{
+  App *app;
+  Window *w;
+  Rect r;
+
+  w = new_window(app, rect(0,0,400,180), "Pizza", STANDARD_WINDOW);
+
+  r = rect(10,10,60,25);
+  new_label(w, r, "Name:", ALIGN_RIGHT);           r.y += 30;
+  new_label(w, r, "Phone:", ALIGN_RIGHT);          r.y += 30;
+  new_label(w, r, "Address:", ALIGN_RIGHT);        r.y += 30;
+
+  r = rect(80,10,150,25);
+  name  = new_field(w, r, "Type your name here");  r.y += 30;
+  phone = new_field(w, r, NULL);                   r.y += 30;
+
+  r.height = 75;
+  address = <b>new_text_box</b>(w, r, "Melrose Place\n...");
+
+  new_button(w, rect(50,180,100,30), "Order Pizza", place_order);
+  show_window(w);
+  main_loop(app);
+  return 0;
+}
+</pre>
+</font>
+
+<p>
+<font size=+2><i>Notes:</i></font>
+<font size=+1>
+<p>
+<ul>
+ <li>A text box is a scrollable multi-line text input field.</li>
+ <li>Use <tt>new_text_box</tt> to create a text box.</li>
+</ul>
+</font>
+
+</body>
+</html>

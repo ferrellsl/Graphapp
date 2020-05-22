@@ -1,0 +1,62 @@
+<html>
+<head>
+ <title>GraphApp - Saving Files</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p>
+<H1>Saving Files</H1>
+<p>
+<font size=+1>
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+
+App *app;
+
+void <b>close_it</b>(Window *w)
+{
+  char *filename = NULL;
+  int result = <B>ask_yes_no_cancel</B>(app, "Confirm Save", "Save changes?");
+
+  if (result == YES) {
+    filename = <B>ask_file_save</B>(app, "Save File As",
+                             "Save the file as:", "untitled.txt");
+    /* save the file somehow */
+    <B>ask_ok</B>(app, "File Saved", "The file was sucessfully saved.");
+  }
+  else if (result == CANCEL)
+     return;
+
+  hide_window(w);
+}
+
+int main(int argc, char *argv[])
+{
+  Window *w;
+
+  app = new_app(argc, argv);
+  w = newwindow(app, rect(0,0,300,250),
+                "Text Editor", STANDARD_WINDOW);
+  setclose(w, <b>close_it</b>);
+  show_window(w);
+  main_loop(app);
+  return 0;
+}
+</pre>
+</font>
+
+<p>
+<font size=+2><i>Notes:</i></font>
+<font size=+1>
+<p>
+<ul>
+ <li>Dialog windows can be used to ask the user questions.</li>
+ <li>The dialog functions typically start with <tt>ask_</tt></li>
+ <li>Here, when the window is closed, the call-back is called. It uses some dialog windows to ask if the user wants to save the file, and if so, asks for the file name.</li>
+</ul>
+</font>
+
+</body>
+</html>

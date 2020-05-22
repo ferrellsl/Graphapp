@@ -1,0 +1,73 @@
+<html>
+<head>
+ <title>GraphApp - Resizing Controls</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p><H1>Resizing Controls</H1>
+<img src="sizectrl.png" align="right">
+
+<font size=+1>
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+
+<b>Control *c;</b> /* global */
+
+void <b>draw_shapes</b>(Control *c, Graphics *g)
+{
+  set_colour(g, RED);
+  fill_rect(g, r);
+
+  set_colour(g, BLUE);
+  fill_ellipse(g, inset_rect(r,4));
+
+  set_colour(g, GREEN);
+  draw_line(g, pt(r.x,r.y),
+            pt(r.x+r.width,r.y+r.height));
+  draw_line(g, pt(r.x,r.y+r.height),
+            pt(r.x+r.width,r.y));
+}
+
+void <b>resize_control</b>(Window *w)
+{
+  Rect r = get_window_area(w);
+  <b>set_control_area</b>(c, inset_rect(r,10));
+}
+
+int main(int argc, char *argv[])
+{
+  App *app;
+  Window *w;
+  Rect r;
+
+  app = new_app(argc, argv);
+  w = new_window(app, rect(50,50,150,200),
+                 "Rectangles", STANDARD_WINDOW);
+  set_window_background(w, LIGHT_GREY);
+  r = rect(10,10,100,100);
+  <b>c</b> = new_control(w, r);
+  on_control_redraw(c, <b>draw_shapes</b>);
+  <b>on_window_resize</b>(w, <b>resize_control</b>);
+  show_window(w);
+  main_loop(app);
+  return 0;
+}
+</pre>
+</font>
+<p>
+<font size=+2><i>Notes:</i></font>
+<font size=+1>
+<p>
+<ul>
+ <li><tt>on_window_resize</tt> allows the program to do something when
+	a window is resized by the user.</li>
+ <li>The <tt>set_control_area</tt> function can resize a control.</li>
+ <li>Note we made the control a global variable (why?)</li>
+ <li>We need a way of associating a control with a window to avoid globals.</li>
+</ul>
+</font>
+
+</body>
+</html>

@@ -1,0 +1,84 @@
+<html>
+<head>
+ <title>GraphApp - Smiley Example</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p><H1>Smiley Example</H1>
+
+<font size=+1>
+<img src="smiley.png" align="right">
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+
+void <b>draw_smile</b>(Control *c, Graphics *g)
+{
+  Rect r;
+  Rect r1, r2;
+  Point p;
+
+  r = get_control_area(c);
+  r1 = inset_rect(r, 10);      /* inset from edge */
+
+  set_colour(g, LIGHT_BLUE);   /* blue face */
+  fill_ellipse(g, r1);         /* draw face */
+
+  set_colour(g, RED);          /* red lips */
+  <b>set_line_width</b>(g, 2); /* thicker lips */
+  r2 = inset_rect(r1, 30);     /* inset from face */
+  <b>draw_arc</b>(g, r2, 270-60, 270+60); /* smile arc */
+
+  set_colour(g, BROWN);        /* brown eyes */
+  <b>p.x = r1.x + r1.width  * 1/2;</b>
+  <b>p.y = r1.y + r1.height * 1/4;</b>
+
+  r2 = <b>rect</b>(p.x - 30, p.y, 20,20);
+  fill_ellipse(g, r2);         /* draw left eye */
+
+  r2 = <b>rect</b>(p.x + 10, p.y, 20,20);
+  fill_ellipse(g, r2);         /* draw right eye */
+}
+
+void <b>resize_smile</b>(Window w)
+{
+  /* retrieve remembered drawing */
+  Rect r = get_window_area(w);
+  Control *c = get_window_data(w);
+  set_control_area(d, r);
+}
+
+int main(int argc, char *argv[])
+{
+  App *app;
+  Window *w;
+  Control *c;
+
+  app = new_app(argc, argv);
+  w = newwindow(app, rect(50,50,120,120),
+                "Smile!", STANDARD_WINDOW);
+  c = new_control(w, rect(0,0,120,120));
+  on_control_redraw(c, <b>draw_smile</b>);
+  set_window_data(w, d); /* store control pointer */
+  on_window_resize(w, <b>resize_smile</b>);
+  show_window(w);
+  main_loop(app);
+  return 0;
+}
+
+</pre>
+</font>
+<p>
+<font size=+2><i>Notes:</i></font>
+<font size=+1>
+<p>
+<ul>
+ <li><tt>set_line_width</tt> changes the thickness of all lines drawn.</li>
+ <li>The <tt>draw_arc</tt> function draws an arc inside a bounding rectangle, between two angles.</li>
+ <li>Source code: <a href="../examples/smiley.c">smiley.c</a></li>
+</ul>
+</font>
+
+</body>
+</html>

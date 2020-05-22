@@ -1,0 +1,70 @@
+<html>
+<head>
+ <title>GraphApp - Creating Menus</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p>
+<H1>Creating Menus</H1>
+<p>
+<font size=+1>
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+
+void undo(MenuItem *m)  { printf("Undo!\n"); }
+void cut(MenuItem *m)   { printf("Cut!\n"); }
+void copy(MenuItem *m)  { printf("Copy!\n"); }
+void paste(MenuItem *m) { printf("Paste!\n"); }
+  <img src="menutest.png" align="right">
+void quit(MenuItem *m) {
+  printf("Quit!\n");
+  exit(0);
+}
+
+int main(int argc, char *argv[])
+{
+  App *app;
+  Window *w;
+  MenuBar *mb;
+  Menu *m[2];
+  MenuItem *i[10];
+
+  app = new_app(argc, argv);
+  w = new_window(app, rect(100,100,500,400),
+                "Menu Test", STANDARD_WINDOW);
+
+  mb = <B>new_menu_bar</B>(w);
+
+  m[0] = <B>new_menu</B>(mb, "File");
+  i[0] = <B>new_menu_item</B>(m, "Quit",  'Q', quit);
+
+  m[1] = new_menu(mb, "Edit");
+  i[1] = new_menu_item(m, "Undo",  'U', undo);
+  i[2] = new_menu_item(m, "-",      0,  NULL);
+  i[3] = new_menu_item(m, "Cut",   'X', cut);
+  i[4] = new_menu_item(m, "Copy",  'C', copy);
+  i[5] = new_menu_item(m, "Paste", 'V', paste);
+
+  disable_menu_item(i[1]);
+
+  show_window(w);
+  main_loop(app);
+  return 0;
+}
+</pre>
+</font>
+<p>
+<font size=+2><i>Notes:</i></font>
+<font size=+1>
+<p>
+<ul>
+ <li>Menu items exist within menus, which exist within menu bars.</li>
+ <li>A menu item can have some text, a shortcut key, and a call-back function.</li>
+ <li>A menu item's call-back is passed a pointer to the menu item.</li>
+</ul>
+</font>
+
+</body>
+</html>

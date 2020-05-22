@@ -1,0 +1,65 @@
+<html>
+<head>
+ <title>GraphApp - Pizza Example</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p>
+<H1>Ordering Pizza ... 3</H1>
+<p>
+<font size=+1>
+<pre>
+int main(int argc, char *argv[])
+{
+  App *app;
+  Window *w;
+  Rect r;
+
+  app = new_app(argc, argv);
+  w = newwindow(app, rect(0,0,400,400), "Pizza", STANDARD_WINDOW);
+
+  r = rect(10,10,120,25);
+
+  new_label(w, r, "Name:", ALIGN_RIGHT);               r.x += 130;
+  name  = new_field(w, r, NULL);                       r.y += 30;
+  r.x = 10;
+
+  new_label(w, r, "Phone:", ALIGN_RIGHT);              r.x += 130;
+  phone = new_field(w, r, NULL);                       r.y += 30;
+  r.x = 10;
+
+  new_label(w, r, "Address:", ALIGN_RIGHT);            r.x += 130;
+  r.height = 75;
+  address = new_text_box(w, r, NULL);                  r.y += 80;
+  r.height = 25;
+  r.x = 10;
+
+  r.y += 10;
+  new_label(w, r, "Sauce:", ALIGN_RIGHT);              r.x += 130;
+  tomato   = new_radio_button(w, r, "Tomato", choose); r.y += 30;
+  barbeque = new_radio_button(w, r, "BBQ", choose);    r.y += 30;
+  check(tomato);
+  r.x = 10;
+
+  r.y += 10;
+  new_label(w, r, "Toppings:", ALIGN_RIGHT);           r.x += 130;
+  ham       = new_check_box(w, r, "Ham", NULL);        r.y += 30;
+  mushrooms = new_check_box(w, r, "Mushrooms", NULL);  r.y += 30;
+  olives    = new_check_box(w, r, "Olives", NULL);     r.y += 30;
+  capsicum  = new_check_box(w, r, "Capsicum", NULL);   r.y += 30;
+  r.x = 50;
+
+  r.y += 10;
+  new_button(w, r, "Order Pizza", place_order);        r.x += 130;
+  new_button(w, r, "Reset Form", reset_form);
+
+  show_window(w);
+  main_loop(app);
+  return 0;
+}
+</pre>
+</font>
+
+</body>
+</html>

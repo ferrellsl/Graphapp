@@ -1,0 +1,56 @@
+<html>
+<head>
+ <title>GraphApp - Drawing Operations</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p>
+<H1>Drawing Lines</H1>
+<p>
+<font size=+1>
+<p>
+<img src="drawline.png" align="right">
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+
+void redraw_it(Window *w, Graphics *g)
+{
+  Point p1 = <B>pt</B>(10,10);
+  Point p2 = <B>pt</B>(10,40);
+  Point p3 = <B>pt</B>(50,40);
+
+  <B>draw_line</B>(g, p1, p2);
+  <B>draw_line</B>(g, p2, p3);
+  <B>draw_line</B>(g, p3, p1);
+}
+
+int main(int argc, char *argv[])
+{
+  App *app = new_app(argc, argv);
+  Window *w = new_window(app, rect(0,0,174,100),
+                         "Graphics", STANDARD_WINDOW);
+  <B>on_window_redraw</B>(redraw_it);
+  show_window(w);
+  main_loop(app);
+  return 0;
+}
+</pre>
+</font>
+
+<p>
+<font size=+2><i>Notes:</i></font>
+<font size=+1>
+<p>
+<ul>
+ <li>The <tt>pt</tt> function is used to specify mathematical points.</li>
+ <li>The <tt>draw_line</tt> function draws lines between points.</li>
+ <li>Use <tt>on_window_redraw</tt> to specify which function is called whenever the window needs to be redrawn.</li>
+ <li>A <tt>Graphics</tt> object is used in drawing.</li>
+ <li><tt>Points</tt> are automatic (they are created on the stack) so there is no need to delete them.</li>
+</ul>
+</font>
+
+</body>
+</html>

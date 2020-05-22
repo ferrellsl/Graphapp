@@ -1,0 +1,83 @@
+<html>
+<head>
+ <title>GraphApp - Three Windows</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p>
+<H1>Three Windows</H1>
+<p>
+<font size=+1>
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+
+Window *w, *w1, *w2;
+
+void show_win_1 (Control *b)
+{
+  show_window(w1); /* do whatever else is needed to show window 1 */
+}
+
+void show_win_2 (Control *b)
+{
+  show_window(w2); /* do whatever else is needed to show window 2 */
+}
+
+void close_win_1 (Control *b)
+{
+  hide_window(w1); /* do whatever else is needed to hide window 1 */
+}
+
+void close_win_2 (Control *b)
+{
+  hide_window(w2); /* do whatever else is needed to hide window 2 */
+}
+
+void quit(Control *b)
+{
+  /* do whatever is needed when exiting the program */
+  exit(0);
+}
+
+int main(int argc, char *argv[])
+{
+  App *app;
+
+  app = new_app(argc, argv);
+
+  w = <B>new_window</B>(app, rect(10,20,300,130),
+                        "Control Panel", STANDARD_WINDOW);
+  new_button(w, rect(10,10,180,30), "See window 1", show_win_1);
+  new_button(w, rect(10,50,180,30), "See window 2", show_win_2);
+  new_button(w, rect(10,90,180,30), "Quit", quit);
+  <B>show_window</B>(w);
+
+  w1 = <B>new_window</B>("Window 1", rect(330,20,300,250),
+                         STANDARD_WINDOW);
+  new_button(<B>w1</B>, rect(10,10,80,30), "Close", close_win_1);
+
+  w2 = <B>newwindow</B>("Window 2", rect(10,190,300,250),
+                         STANDARD_WINDOW);
+  new_button(<B>w2</B>, rect(10,10,80,30), "Close", close_win_2);
+
+  main_loop(app);
+  return 0;
+}
+</pre>
+</font>
+
+<p>
+<font size=+2><i>Notes:</i></font>
+<font size=+1>
+<p>
+<ul>
+ <li>This example creates a master window which has buttons for showing two secondary windows.</li>
+ <li>Each secondary window can be closed by a button.</li>
+ <li>There is no need to show the secondary windows inside the <tt>main</tt> function, since the button call-backs do that.</li>
+</ul>
+</font>
+
+</body>
+</html>

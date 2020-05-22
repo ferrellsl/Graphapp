@@ -1,0 +1,49 @@
+<html>
+<head>
+ <title>GraphApp - Buttons</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p>
+<H1>Creating Buttons</H1>
+<p>
+<img src="button.png" align="right">
+<font size=+1>
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+
+void <b>quit</b>(Control *c)
+{
+  <b>exit</b>(0);
+}
+
+int main(int argc, char *argv[])
+{
+  App *app;
+  Window *w;
+  Control *b;
+
+  app = new_app(argc, argv);
+  w = new_window(app, rect(0,0,200,150), "Pizza", STANDARD_WINDOW);
+  b = <b>new_button</b>(w, rect(10,10,80,30), "Quit", <b>quit</b>);
+  show_window(w);
+  main_loop(app);
+  return 0;
+}
+</pre>
+</font>
+<p>
+<font size=+2><i>Notes:</i></font>
+<font size=+1>
+<p>
+<ul>
+ <li>Use <tt>new_button</tt> to create push buttons.</li>
+ <li>The button's call-back lets you perform an action.</li>
+ <li>The <tt>exit</tt> function cleanly exits the program.</li>
+</ul>
+</font>
+
+</body>
+</html>

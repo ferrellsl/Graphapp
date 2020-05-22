@@ -1,0 +1,60 @@
+<html>
+<head>
+ <title>GraphApp - Using the Mouse</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p>
+<H1>Using the Mouse</H1>
+<p>
+<font size=+1>
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+
+void <b>mouse_click</b>(Control *c, int buttons, Point p)
+{  <img src="dots.png" align="right">
+  if (buttons & <b>LEFT_BUTTON</b>)
+    set_colour(g, RED);
+  else if (buttons & <b>MIDDLE_BUTTON</b>)
+    set_colour(g, GREEN);
+  else if (buttons & <b>RIGHT_BUTTON</b>)
+    set_colour(g, BLUE);
+
+  <b>draw_point</b>(g, p);
+}
+
+int main(int argc, char *argv[])
+{
+  App *app;
+  Window *w;
+  Control *c;
+
+  app = new_app(argc, argv);
+  w = new_window(app, rect(50,50,200,200),
+                 "Dots", STANDARD_WINDOW);
+  c = new_control(w, rect(10,10,180,180));
+  set_window_background(w, LIGHT_GREY);
+
+  <b>on_control_mouse_down</b>(c, <b>mouse_click</b>);
+  <b>on_control_mouse_drag</b>(c, <b>mouse_click</b>);
+
+  show_window(w);
+  main_loop(app);
+  return 0;
+}
+</pre>
+</font>
+<p>
+<font size=+2><i>Notes:</i></font>
+<font size=+1>
+<p>
+<ul>
+ <li>The control has no resize call-back, so it remains fixed in size and location.</li>
+ <li>Different mouse buttons cause different bits in the <TT>buttons</TT> field to be set. The constants <TT>LEFT_BUTTON</TT>, <TT>RIGHT_BUTTON</TT> and <TT>MIDDLE_BUTTON</TT> can be used to detect which button is pressed down, by a bitwise-and operation.</li>
+</ul>
+</font>
+
+</body>
+</html>

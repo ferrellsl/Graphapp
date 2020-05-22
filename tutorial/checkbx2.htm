@@ -1,0 +1,63 @@
+<html>
+<head>
+ <title>GraphApp - Checkboxes</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p>
+<H1>More Checkboxes</H1>
+<p>
+<font size=+1>
+<img src="checkbx2.png">
+<p>
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+
+Control *ham, *mushrooms, *olives, *capsicum;
+
+void place_order(Control *b)
+{
+  printf("Toppings:\n");
+  if (<b>is_checked</b>(ham))        printf("  Ham\n");
+  if (<b>is_checked</b>(mushrooms))  printf("  Mushrooms\n");
+  if (<b>is_checked</b>(olives))     printf("  Olives\n");
+  if (<b>is_checked</b>(capsicum))   printf("  Capsicum\n");
+  exit(0);
+}
+
+int main(int argc, char *argv[])
+{
+  App *app;
+  Window *w;
+  Rect r;
+
+  app = new_app(argc, argv);
+  w = new_window(app, rect(0,0,200,180), "Pizza", STANDARD_WINDOW);
+  r = rect(10,10,100,25);
+
+  ham       = new_check_box(w, r, "Ham", NULL);        r.y += 30;
+  mushrooms = new_check_box(w, r, "Mushrooms", NULL);  r.y += 30;
+  olives    = new_check_box(w, r, "Olives", NULL);     r.y += 30;
+  capsicum  = new_check_box(w, r, "Capsicum", NULL);   r.y += 30;
+
+  new_button(w, r, "Order Pizza", place_order);
+  show_window(w);
+  main_loop(app);
+  return 0;
+}
+</pre>
+</font>
+<p>
+<font size=+2><i>Notes:</i></font>
+<font size=+1>
+<p>
+<ul>
+ <li>The check box controls are global variables to allow the button's call-back function to access them.</li>
+ <li>The <tt>is_checked</tt> function determines if a check box is currently checked.</li>
+</ul>
+</font>
+
+</body>
+</html>

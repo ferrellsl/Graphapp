@@ -1,0 +1,61 @@
+<html>
+<head>
+ <title>GraphApp - Using Menus</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p>
+<H1>Using Menus</H1>
+<p>
+<font size=+1>
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+
+#define NUM_COLOURS 5
+
+char *colour_name[NUM_COLOURS] = {
+  "White", "Black", "Red", "Green", "Blue"
+};
+Colour colour[NUM_COLOURS] = {
+  WHITE, BLACK, RED, GREEN, BLUE
+};
+MenuItem *item[NUM_COLOURS];
+Colour which_colour;
+Window *w;
+
+void <B>draw_window</B>(Window *w, Graphics *g)
+{
+  Rect r = get_window_area(w);
+  set_colour(g, which_colour);
+  fill_rect(g, r);
+}
+
+void <B>change_colour</B>(MenuItem *m)
+{
+  int i, value;
+
+  value = <B>get_menu_item_value</B>(m);
+
+  /* uncheck all items in the menu */
+  for (i=0; i &lt; NUM_COLOURS; i++)
+    <B>uncheck_menu_item</B>(item[i]);
+
+  /* check this menu item */
+  <B>check_menu_item</B>(m);
+  which_colour = colour[value];
+
+  /* redraw the window */
+  <B>redraw_window</B>(w);
+}
+
+void quit(MenuItem *m)
+{
+  exit(0);
+}
+</pre>
+</font>
+
+</body>
+</html>

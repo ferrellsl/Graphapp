@@ -1,0 +1,68 @@
+<html>
+<head>
+ <title>GraphApp - Vertical Button Layout</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p><H1>Vertical Button Layout</H1>
+
+<font size=+1>
+<img src="vertbtn.png" align="right">
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+
+void <b>quit</b>(Control *c)
+{
+  exit(0);
+}
+
+int main(int argc, char *argv[])
+{
+  App *app;
+  Window *w;
+  Control *c;
+  <b>Control *b[5];</b>
+  <b>Rect r;</b>
+
+  app = new_app(argc, argv);
+  w = new_window(app, rect(50,50,120,145),
+                 "Vertical Layout", STANDARD_WINDOW);
+  <b>r</b> = <b>rect</b>(0,0,80,25);
+
+  <b>b[0]</b> = new_button(w, r, "Quit", <b>quit</b>);
+  r.y = r.y + 30;
+
+  <b>b[1]</b> = new_button(w, r, "Button 1", <b>quit</b>);
+  r.y = r.y + 30;
+
+  <b>b[2]</b> = new_button(w, r, "Button 2", <b>quit</b>);
+  r.y = r.y + 30;
+
+  <b>b[3]</b> = new_button(w, r, "Button 3", <b>quit</b>);
+  r.y = r.y + 30;
+
+  <b>b[4]</b> = new_button(w, r, "Button 4", <b>quit</b>);
+  r.y = r.y + 30;
+
+  show_window(w);
+  main_loop(app);
+  return 0;
+}
+
+</pre>
+</font>
+<p>
+<font size=+2><i>Notes:</i></font>
+<font size=+1>
+<p>
+<ul>
+ <li>An array of buttons is now used.</li>
+ <li>The rectangle r is used to create a vertical alignment of buttons.</li>
+ <li>The rectangle's <TT>y</TT> field is incremented to step the rectangle downwards for each new button's location.</li>
+</ul>
+</font>
+
+</body>
+</html>

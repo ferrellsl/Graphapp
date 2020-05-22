@@ -1,0 +1,69 @@
+<HTML>
+ <HEAD>
+  <TITLE>Instructions for Downloading GraphApp for Windows</TITLE>
+ </HEAD>
+
+ <BODY BGCOLOR="#FFFFFF">
+
+  <H1>Dowloading GraphApp for Windows</H1>
+  <HR>
+  <B>Instructions</B>
+  <P>
+  If you are using Borland C++ 3.11, you can get by with downloading
+  just the file graphlib.zip. It contains a Readme file which has all
+  the info you need to get going.</P>
+  <P>
+  If you are using any other compiler you will need to download graphapp.zip
+  which contains the full source code for the library. You will have to
+  put the .c files into a new project and build it using the Large Memory
+  Model. The output from that project should go into a file called
+  graphapp.lib. There are instructions in a Readme file.</P>
+  <P>
+  <B>If you are using Borland C version 3.11,</B> installation should be easy.
+  Dowload the file graphlib.zip and take it home. Do the following:</P>
+  <PRE>
+   mkdir c:\graphapp
+   copy a:\graphlib.zip c:\graphapp
+   cd c:\graphapp
+   unzip graphlib.zip
+   copy graphapp.h c:\borlandc\include
+  </PRE>
+  That sequence of instructions will copy the file onto your C: drive,
+  unzip it and copy the graphapp.h header file into your
+  compiler's include directory. The instructions for Microsoft C or
+  later versions of Borland C should be similar.
+  <P>
+  The lib file is a static library object file, not a DLL. Do not
+  place it into your Windows\System directory, it won't do anything there.
+  Instead, each program you make should include the graphapp.lib file
+  in itself. Copy the lib file into c:\borlandc\lib or into every
+  directory where you want to compile. Then include it in your
+  projects as if it is a C file.</P>
+  <P>
+  <B>If you are using Microsoft C,</B>
+  you should add the source code files into a project and build it to
+  produce a statically linking library (not a DLL). You will have to
+  consult your compiler's manuals to find out how to do this. Having
+  created a library you can then use it in projects as you would any
+  other library.</P>
+  <P>
+  Or, you can directly include the source code files in a project
+  together with your C files, and link them all straight into a exe file.
+  This will save you having to create a lib file.</P>
+  <P>
+  <B>If you are using Turbo C,</B> or some other compiler which dates
+  from the pre-Windows era, you will probably not be able to use this
+  library at all. Microsoft changed the format of executable files when
+  it released Windows 3 and hence older compilers cannot produce
+  Windows programs.</P>
+  <HR>
+  <B>Questions</B>
+  <P>
+  Forward any questions you have to Loki.</P>
+  <P>
+  I would be interested to find out the installation instructions for
+  Microsoft C.</P>
+  <HR>
+
+ </BODY>
+</HTML>

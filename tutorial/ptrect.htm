@@ -1,0 +1,36 @@
+<html>
+<head>
+ <title>GraphApp - Points and Rectangles</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p>
+<H1>Points and Rectangles</H1>
+<p>
+<font size=+2><i>The Co-ordinate System:</i></font>
+<font size=+1>
+<UL>
+ <LI>Specify points with <TT>pt(x,y)</TT></LI>
+ <LI>Specify rectangles with <TT>rect(x,y,width,height)</TT></LI>
+ <LI>The co-ordinate (0,0) is at the top left of the window or drawing area:</LI>
+</UL>
+	<P><center><img src="coord.png"></center>
+</font>
+
+<p>
+<font size=+2><i>Using Points and Rectangles:</i></font>
+<font size=+1>
+<UL>
+ <LI>Find the rectangle of a control with <TT>r = get_control_area(c)</TT></LI>
+ <LI>Find the rectangle of a window with <TT>r = get_window_area(w)</TT></LI>
+ <LI>Inset a rectangle with <TT>r2 = inset_rect(r,1)</TT></LI>
+ <LI>Center a rectangle on another with <TT>r3 = center_rect(r1,r2)</TT></LI>
+ <LI>Are two rectangles equal? <TT>rects_equal(r1,r2)</TT></LI>
+ <LI>Are two points equal? <TT>points_equal(p1,p2)</TT></LI>
+ <LI>Is a point inside a rect? <TT>point_in_rect(p,r)</TT></LI>
+</UL>
+</font>
+
+</body>
+</html>

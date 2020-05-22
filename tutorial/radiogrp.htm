@@ -1,0 +1,84 @@
+<html>
+<head>
+ <title>GraphApp - Radio Buttons</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p>
+<H1>Radio Buttons</H1>
+<p>
+<font size=+1>
+<img src="radiogrp.png" align="right">
+<p>
+<pre>
+#include &lt;stdio.h&gt;
+#include "graphapp.h"
+
+Control *tomato, *barbeque;
+Control *cash, *credit;
+
+void place_order(Control *b)
+{
+  printf("Sauce:\n");
+  if (is_checked(tomato))
+    printf("  Tomato\n");
+  if (is_checked(barbeque))
+    printf("  Barbeque\n");
+
+  printf("Payment:\n");
+  if (is_checked(cash))
+    printf("  Cash\n");
+  if (is_checked(credit))
+    printf("  Credit\n");
+
+  exit(0);
+}
+
+int main(int argc, char *argv[])
+{
+  App *app;
+  Window *w;
+  Rect r;
+
+  app = new_app(argc, argv);
+  w = new_window(app, rect(0,0,200,350),
+                 "Pizza", STANDARD_WINDOW);
+  r = rect(10,10,100,30);
+
+  new_label(w, r, "Sauce:", ALIGN_LEFT);             r.y += 35;
+
+  tomato   = new_radio_button(w, r, "Tomato", NULL); r.y += 35;
+  barbeque = new_radio_button(w, r, "BBQ", NULL);    r.y += 35;
+  check(tomato);
+
+  <B>new_radio_group</B>();
+
+  new_label(w, r, "Payment:", ALIGN_LEFT);           r.y += 35;
+
+  cash     = new_radio_button(w, r, "Cash", NULL);   r.y += 35;
+  credit   = new_radio_button(w, r, "Credit", NULL); r.y += 35;
+  check(cash);
+
+  new_button(w, r, "Order Pizza", place_order);
+
+  show_window(w);
+  main_loop(app);
+  return 0;
+}
+</pre>
+</font>
+
+<p>
+<font size=+2><i>Notes:</i></font>
+<font size=+1>
+<p>
+<ul>
+ <li>Radio buttons are mutually exclusive.</li>
+ <li>Normally, all radio buttons on a window belong to one group, so only one can be active at any one time.</li>
+ <li>The <tt>new_radio_group</tt> function creates a new group, which subsequently created radio buttons will belong to. This allows different sets of radio buttons.</li>
+</ul>
+</font>
+
+</body>
+</html>

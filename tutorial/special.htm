@@ -1,0 +1,61 @@
+<html>
+<head>
+ <title>GraphApp - Special Windows</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p>
+<H1>Special Windows</H1>
+<p>
+<font size=+1>
+<pre>
+/*
+ *  Window cannot be resized.
+ */
+#include "graphapp.h"
+
+int main(int argc, char *argv[])
+{
+  App *app;
+  Window *w;
+
+  app = new_app(argc, argv);
+  w = new_window(app, rect(0,0,300,250),
+                 "Special Window",
+                 <B>TITLEBAR + CLOSEBOX + MINIMIZE + MAXIMIZE</B>);
+  show_window(w);
+  main_loop(app);
+  return 0;
+}
+
+
+/*
+ *  Window has no maximize or minimize buttons.
+ */
+#include "graphapp.h"
+
+int main(int argc, char *argv[])
+{
+  App *app;
+  Window *w;
+
+  app = new_app(argc, argv);
+  w = new_window(app, rect(0,0,300,250),
+                 "Special Window",
+                 <B>TITLEBAR + CLOSEBOX + RESIZE</B>);
+  show_window(w);
+  main_loop(app);
+  return 0;
+}
+
+</pre>
+</font>
+
+<table border="0" cellspacing="0" cellpadding="0" width="100%"><tr>
+  <td><img src="special.png" align="left"></td>
+  <td><img src="special2.png" align="right"></td>
+</tr></table>
+
+</body>
+</html>

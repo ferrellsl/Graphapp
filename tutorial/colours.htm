@@ -1,0 +1,74 @@
+<html>
+<head>
+ <title>GraphApp - Colours</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p>
+<H1>Colours</H1>
+<p>
+<font size=+2><i>The Colour object:</i></font>
+<font size=+1>
+<UL>
+ <LI>A <tt>Colour</tt> is a structure:<p>
+<pre>
+	struct Colour {
+		byte alpha;
+		byte red;
+		byte green;
+		byte blue;
+	};
+</pre></LI>
+ <LI>The maximum value of any byte is 0xFF (decimal 255) and minimum value is 0.</LI>
+ <LI>The first byte stores the <I>alpha channel</I> transparency information.
+	0 means opaque, FF means fully transparent.</LI>
+ <LI>The next three bytes give the intensity of red, green and blue light.</LI>
+ <LI>So {0,0xFF,0,0} is bright red, and {0,0x7F,0,0x7F} is dark purple.</LI>
+ <LI>Colours can be constructed with the <TT>rgb</TT> function.</LI>
+</UL>
+</font>
+
+<p>
+<font size=+2><i>Predefined colours:</i></font>
+<font size=+1>
+<DL>
+ <DD><PRE>
+#define TRANSPARENT     argb(0xFF,0xFF,0xFF,0xFF)
+
+#define BLACK           rgb(0x00,0x00,0x00)
+#define WHITE           rgb(0xFF,0xFF,0xFF)
+#define BLUE            rgb(0x00,0x00,0xFF)
+#define YELLOW          rgb(0xFF,0xFF,0x00)
+#define GREEN           rgb(0x00,0xFF,0x00)
+#define MAGENTA         rgb(0xFF,0x00,0xFF)
+#define RED             rgb(0xFF,0x00,0x00)
+#define CYAN            rgb(0x00,0xFF,0xFF)
+
+#define GREY            rgb(0x80,0x80,0x80)
+#define GRAY            rgb(0x80,0x80,0x80)
+#define LIGHT_GREY      rgb(0xC0,0xC0,0xC0)
+#define LIGHT_GRAY      rgb(0xC0,0xC0,0xC0)
+#define PALE_GREY       rgb(0xE0,0xE0,0xE0)
+#define PALE_GRAY       rgb(0xE0,0xE0,0xE0)
+#define DARK_GREY       rgb(0x40,0x40,0x40)
+#define DARK_GRAY       rgb(0x40,0x40,0x40)
+
+#define DARK_BLUE       rgb(0x00,0x00,0x80)
+#define DARK_GREEN      rgb(0x00,0x80,0x00)
+#define DARK_RED        rgb(0x80,0x00,0x00)
+#define LIGHT_BLUE      rgb(0x80,0xC0,0xFF)
+#define LIGHT_GREEN     rgb(0x80,0xFF,0x80)
+#define LIGHT_RED       rgb(0xFF,0xC0,0xFF)
+#define PINK            rgb(0xFF,0xAF,0xAF)
+#define BROWN           rgb(0x60,0x30,0x00)
+#define ORANGE          rgb(0xFF,0x80,0x00)
+#define PURPLE          rgb(0xC0,0x00,0xFF)
+#define LIME            rgb(0x80,0xFF,0x00)
+</PRE>
+</DD>
+</DL>
+</font>
+
+</body>
+</html>

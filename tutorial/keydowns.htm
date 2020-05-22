@@ -1,0 +1,74 @@
+<html>
+<head>
+ <title>GraphApp - Using the Keyboard</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<img src="keydowns.png" align="right">
+<p>
+<H1>Using the Keyboard</H1>
+<p>
+<font size=+1>
+<pre>
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include "graphapp.h"
+
+Font *f = NULL;
+Point location = {0,0};
+
+void <B>key_down</B>(Control *c, unsigned long key)
+{
+  char utf8[8];
+  int width, max_width;
+
+  max_width = get_control_area(c).width;
+
+  <B>unicode_char_to_utf8</B>(key, utf8);
+  width = <B>font_width</B>(f, utf8, strlen(utf8));
+  if (location.x + width > max_width) {
+    location.x = 0;
+    location.y += <B>font_height</B>(f);
+  }
+  <B>draw_utf8</B>(g, location, utf8, strlen(utf8));
+  location.x += width;
+}
+
+int main(int argc, char *argv[])
+{
+  App *app;
+  Window *w;
+  Control *c;
+
+  app = new_app(argc, argv);
+  f = <B>find_default_font</B>(app);
+
+  w = newwindow(app, rect(50,50,200,200),
+                "Press a Key", STANDARD_WINDOW);
+  set_window_background(w, LIGHT_GREY);
+
+  c = new_control(w, rect(10,10,180,180));
+  <B>on_control_key_down</B>(c, <B>key_down</B>);
+
+  show_window(w);
+  main_loop(app);
+  return 0;
+}
+</pre>
+</font>
+<p>
+<font size=+2><i>Notes:</i></font>
+<font size=+1>
+<p>
+<ul>
+ <li>Keyboard call-back functions are sent an <TT>unsigned long</TT> Unicode character value.</li>
+ <li>Various functions exist to translate Unicode to and from the UTF-8 encoding.</li>
+ <li>UTF-8 strings are used when drawing text.</li>
+ <li>There is a default font, which can be found using <TT>find_default_font</TT>.</li>
+ <li>Fonts can be used to find the pixel size of strings drawn using that font.</li>
+</ul>
+</font>
+
+</body>
+</html>

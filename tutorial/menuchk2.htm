@@ -1,0 +1,57 @@
+<html>
+<head>
+ <title>GraphApp - Using Menus</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p>
+<H1>Using Menus (cont)</H1>
+<p>
+<img src="menuchk.png">
+<font size=+1>
+<pre>
+int main(int argc, char *argv[])
+{
+  App *app;
+  MenuBar *mb;
+  Menu *m;
+  int i;
+
+  app = new_app(argc, argv);
+  w = new_window(app, rect(100,100,500,400),
+                "Try the Menu", STANDARD_WINDOW);
+  <B>on_window_redraw</B>(w, <B>draw_window</B>);
+
+  mb = new_menu_bar(w);
+
+  m = new_menu(mb, "File");
+  new_menu_item(m, "Quit",  'Q', quit);
+
+  m = <B>new_menu</B>(mb, "Colour");
+  for (i=0; i &lt; NUM_COLOURS; i++) {
+    item[i] = <B>new_menu_item</B>(m, colour_name[i],  0, <B>change_colour</B>);
+    <B>set_menu_item_value</B>(item[i], i);
+  }
+
+  change_colour(item[NUM_COLOURS-1]);
+
+  show_window(w);
+  main_loop(app);
+  return 0;
+}
+</pre>
+</font>
+<p>
+<font size=+2><i>Notes:</i></font>
+<font size=+1>
+<p>
+<ul>
+ <li><tt>redraw_window</tt> forces a window's redraw call-back to be called.</li>
+ <li>Menu items can have an integer value associated with them.</li>
+ <li>Use <tt>set_menu_item_value</tt> and <tt>get_menu_item_value</tt> to access this integer.</li>
+</ul>
+</font>
+
+</body>
+</html>

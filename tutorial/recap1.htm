@@ -1,0 +1,37 @@
+<html>
+<head>
+ <title>GraphApp - Recap 1</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<p>
+<H1>Summary</H1>
+<p>
+<font size=+2><i>Drawing:</i></font>
+<font size=+1>
+<UL>
+ <LI>Specify points with <TT>pt(x,y)</TT></LI>
+ <LI>Specify rectangles with <TT>rect(x,y,width,height)</TT></LI>
+ <LI>Draw using <TT>draw_line, draw_rect, fill_rect</TT> etc.</LI>
+ <LI>Change drawing colour, e.g. <TT>set_colour(g, GREEN);</TT></LI>
+ <LI>You need a <TT>Graphics</TT> object to draw</LI>
+</UL>
+</font>
+
+<p>
+<font size=+2><i>Windows:</i></font>
+<font size=+1>
+<UL>
+ <LI>Create windows with <TT>new_window</TT></LI>
+ <LI>You need an <TT>App</TT> object, e.g. <TT>App *app = new_app(argc, argv);</TT></LI>
+ <LI>E.g. <TT>new_window(app, rect(0,0,400,300), "Name", STANDARD_WINDOW);</TT></LI>
+ <LI>Add a redraw call-back using <TT>on_window_redraw(w, fn);</TT></LI>
+ <LI>Redraw call-backs for windows are defined <TT>void fn(Window *w, Graphics *g);</TT></LI>
+ <LI>Show the window on screen with <TT>show_window(w);</TT></LI>
+ <LI>Handle events by calling <TT>main_loop(app);</TT></LI>
+</UL>
+</font>
+
+</body>
+</html>
