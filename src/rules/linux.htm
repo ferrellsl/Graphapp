@@ -1,0 +1,28 @@
+<html>
+<head><title>Linux/X11R6/gcc Instructions</title></head>
+<body bgcolor="white">
+<pre>
+How to make Graphapp with Linux with X11R6 and gcc
+
+Go to graphapp/src
+Type ./configure
+That should build a makefile for you (after compiling
+and running apptypes.c to produce apptypes.h and then
+adding rules/x11rules.txt to the generated makefile).
+
+If that fails, you could try copying linux.mak to
+graphapp/src and rename it as makefile, then type
+  make static
+or
+  make dynamic
+to produce the static or dynamic library.
+
+If the library has been produced, try typing
+  make demo
+to produce the program demo/imagine which can then
+by run by typing
+  demo/imagine demo/*.jpg
+
+</pre>
+</body>
+</html>

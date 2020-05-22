@@ -1,0 +1,190 @@
+<html>
+<head>
+<title>Intructions for compiling GraphApp for MingW</title>
+</head>
+<body>
+
+These instructions are a little old, but might help someone.
+Look for the mingw.mak file for more modern instructions.
+
+<h3>Compile GraphApp 3.02 with the Mingw compiler:</h3>
+
+<p>1) Unzip the GraphApp package using lowercase filenames ("unzip -L" using the
+InfoZIP unzip)
+
+<p>2) Rename in src/win32/init.c the main call and definition to app_main (lines 125 and 140)
+
+<p>3) Rename in demo/*.c the main routine to app_main
+
+<p>4) Actually, instead of steps 2 and 3, you might be able to define main as app_main by adding -Dmain=app_main to the CFLAGS
+
+<p>5) Copy the makefile provided below to the src subdirectory
+	(it's also available as the file rules/mingw.mak)
+
+<p>6) Go to the source subdir, run "make", them run "make demos"
+
+<p>Next is the makefile (remember to replace spaces by tabs in
+commands if you lost them using copy and paste).
+
+<p>If that doesn't work for you, try moving all .c and .h files
+into one directory, and compiling there without using this Makefile.
+
+<p>A mini-howto to install the Mingw compiler is provided at the end.
+
+<hr>
+<pre>
+# Makefile for App (Mingw version)
+
+CC               = gcc
+AR               = ar
+RANLIB           = ranlib
+LD               = ld
+MAKE_STATIC_LIB  = ar rc
+
+# Makefile rules
+
+CFLAGS       = -O2 -Wall -I. -Iwin32 -Iutility -Igui -Ilibgif -Ilibjpeg -Ilibpng -Ilibz
+
+APP_OBJECTS   = utility/apputil.o  utility/array.o    utility/border.o   \
+		utility/clipline.o utility/compose.o  \
+		utility/control.o  utility/deleting.o utility/dispatch.o \
+		utility/drawimg.o  utility/drawing.o  utility/drawtext.o \
+		utility/image.o    utility/imglist.o  utility/fontutil.o \
+		utility/malloc.o   utility/palette.o  utility/point.o    \
+		utility/rect.o     utility/region.o   utility/resource.o \
+		utility/rgb.o      utility/str.o      utility/strtable.o \
+		utility/utf8.o     utility/utf8regx.o utility/winutil.o  \
+		gui/button.o       gui/checkbox.o     gui/cursors.o   \
+		gui/dialog.o       gui/dropfld.o      gui/droplist.o  \
+		gui/field.o        gui/imagebtn.o     gui/imgcheck.o  \
+		gui/imglabel.o     gui/label.o        gui/listbox.o   \
+		gui/manager.o     \
+		gui/menu.o         gui/notebtn.o      gui/passfld.o   \
+		gui/radiobtn.o     gui/scroll.o       gui/separat.o   \
+		gui/splitter.o     gui/tabbtn.o       gui/textbox.o   \
+		gui/textundo.o     gui/tip.o         \
+		imgfmt/imgread.o   imgfmt/imgwrite.o \
+		imgfmt/readgif.o   imgfmt/writegif.o \
+		imgfmt/readh.o     imgfmt/writeh.o   \
+		imgfmt/readjpg.o   imgfmt/writejpg.o \
+		imgfmt/readpng.o   imgfmt/writepng.o \
+		win32/bmap.o       win32/bmapimg.o    win32/clipbrd.o  \
+		win32/cursor.o     win32/drawbmap.o   win32/drawwin.o  \
+		win32/event.o      win32/folder.o     win32/font.o     \
+		win32/graphics.o   win32/init.o       win32/timer.o    \
+		win32/win.o
+
+GIF_OBJECTS   = libgif/gif.o
+
+JPEG_OBJECTS  = libjpeg/jcapimin.o libjpeg/jcapistd.o libjpeg/jccoefct.o \
+		libjpeg/jccolor.o  libjpeg/jcdctmgr.o libjpeg/jchuff.o   \
+		libjpeg/jcinit.o   libjpeg/jcmainct.o libjpeg/jcmarker.o \
+		libjpeg/jcmaster.o libjpeg/jcomapi.o  libjpeg/jcparam.o  \
+		libjpeg/jcphuff.o  libjpeg/jcprepct.o libjpeg/jcsample.o \
+		libjpeg/jctrans.o  libjpeg/jdapimin.o libjpeg/jdapistd.o \
+		libjpeg/jdatadst.o libjpeg/jdatasrc.o libjpeg/jdcoefct.o \
+		libjpeg/jdcolor.o  libjpeg/jddctmgr.o libjpeg/jdhuff.o   \
+		libjpeg/jdinput.o  libjpeg/jdmainct.o libjpeg/jdmarker.o \
+		libjpeg/jdmaster.o libjpeg/jdmerge.o  libjpeg/jdphuff.o  \
+		libjpeg/jdpostct.o libjpeg/jdsample.o libjpeg/jdtrans.o  \
+		libjpeg/jerror.o   libjpeg/jfdctflt.o libjpeg/jfdctfst.o \
+		libjpeg/jfdctint.o libjpeg/jidctflt.o libjpeg/jidctfst.o \
+		libjpeg/jidctint.o libjpeg/jidctred.o libjpeg/jmemmgr.o  \
+		libjpeg/jmemnobs.o libjpeg/jquant1.o  libjpeg/jquant2.o  \
+		libjpeg/jutils.o
+
+PNG_OBJECTS   = libpng/png.o       libpng/pngerror.o  libpng/pngget.o   \
+		libpng/pngmem.o    libpng/pngpread.o  libpng/pngread.o  \
+		libpng/pngrio.o    libpng/pngrtran.o  libpng/pngrutil.o \
+		libpng/pngset.o    libpng/pngtrans.o  libpng/pngwio.o   \
+		libpng/pngwrite.o  libpng/pngwtran.o  libpng/pngwutil.o
+
+LIBZ_OBJECTS  = libz/adler32.o     libz/compress.o    libz/crc32.o    \
+		libz/deflate.o     libz/infback.o     libz/inffast.o  \
+		libz/inflate.o     libz/inftrees.o    libz/trees.o    \
+		libz/uncompr.o     libz/zutil.o
+
+OBJECTS       = $(APP_OBJECTS) $(GIF_OBJECTS) $(JPEG_OBJECTS) \
+		$(PNG_OBJECTS) $(LIBZ_OBJECTS)
+
+HEADERS       = apptypes.h app.h win32/appint.h utility/apputils.h gui/appgui.h gui/cursors.h
+
+LIB           = libapp.a
+
+WLIBS         = -mwindows
+
+static:	apptypes.h $(LIB)
+
+$(LIB):	$(OBJECTS) $(HEADERS)
+	if exist $(LIB) del $(LIB)
+	$(MAKE_STATIC_LIB) $(LIB) win32/*.o utility/*.o gui/*.o imgfmt/*.o libgif/*.o libjpeg/*.o libpng/*.o libz/*.o
+	$(RANLIB) $(LIB)
+
+apptypes.h: apptypes.o
+	$(CC) $(CFLAGS) -o apptypes.exe apptypes.o
+	./apptypes
+	if exist apptypes.exe del apptypes.exe
+
+demos: demo1 demo2 demo3 demo4 demo5
+
+demo1:	static demo/imagine.o
+	$(CC) $(CFLAGS) -o demo/imagine.exe demo/imagine.o $(LIB) $(WLIBS)
+
+demo2:	static demo/tester.o
+	$(CC) $(CFLAGS) -o demo/tester.exe demo/tester.o $(LIB) $(WLIBS)
+
+demo3:	static demo/viewutf8.o
+	$(CC) $(CFLAGS) -o demo/viewutf8.exe demo/viewutf8.o $(LIB) $(WLIBS)
+
+demo4:	static demo/imgtest.o
+	$(CC) $(CFLAGS) -o demo/imgtest.exe demo/imgtest.o $(LIB) $(WLIBS)
+
+demo5:	static demo/blend.o
+	$(CC) $(CFLAGS) -o demo/blend.exe demo/blend.o $(LIB) $(WLIBS)
+
+tidy:
+	if exist *.o del *.o
+	if exist demo\*.o del demo\*.o
+	if exist utility\*.o del utility\*.o
+	if exist gui\*.o del gui\*.o
+	if exist imgfmt\*.o del imgfmt\*.o
+	if exist libgif\*.o del libgif\*.o
+	if exist libjpeg\*.o del libjpeg\*.o
+	if exist libpng\*.o del libpng\*.o
+	if exist libz\*.o del libz\*.o
+	if exist win32\*.o del win32\*.o
+
+clean:	tidy
+	if exist $(LIB) del $(LIB)
+
+.c.o:
+	$(CC) -c $(CFLAGS) $*.c -o $*.o
+
+</pre>
+<hr>
+<pre>
+    This is a how-to for people who want to make the Win32 version,
+    but don't know about the mingw compiler:
+
+    1.- First, download the mingw distribution:
+
+    ftp://ftp.xraylith.wisc.edu/pub/khan/gnu-win32/mingw32/gcc-2.95.2/
+    gcc-2.95.2-msvcrt.exe
+    ftp://ftp.xraylith.wisc.edu/pub/khan/gnu-win32/mingw32/gcc-2.95.2/
+    mingw32-docs-html.exe
+    ftp://ftp.xraylith.wisc.edu/pub/khan/gnu-win32/mingw32/gcc-2.95.2/fixes/
+    quote-fix-msvcrt.exe
+
+    2.- Create a \MINGW dir and decompress the three files on it (The files
+    are not installers, only auto-decompress files)
+
+    3.- Create a \MINGW\SETVAR.BAT file with the line:
+
+    SET PATH=C:\MINGW\BIN;%PATH%
+
+    4.- Open a DOS window and execute \MINGW\SETVAR
+
+    5.- You are ready
+</pre>
+</body>
+</html>

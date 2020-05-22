@@ -1,0 +1,35 @@
+<html>
+<head><title>Digital Mars / Symantec Instructions</title></head>
+<body bgcolor="white">
+<pre>
+From: Jean-Pierre Dumas
+Date: Sat, 17 May 2003 00:58
+Subject: Kit to make Graphapp, Demos & Examples with DMC
+
+Here are the bits necessary to make Graphapp 3 with
+the free DigitalMars C/C++ compiler in Win32 mode.
+(I currently use the latest DMC 8.33, see <a href="http://www.digitalmars.com/">http://www.digitalmars.com/</a>)
+It is also working with Symantec C/C++ 7.5.
+
+Put the makefile (dmc8.mak) in graphapp\src (rename it to makefile)
+Put the file sc.lst in graphapp\src, with the makefile.
+Go to graphapp\src
+
+make
+will create the static graphapp.lib, in graphapp\src
+
+make demos
+will make all the demo programs in graphapp\src\demo
+
+make examples
+will make all the examples in graphapp\examples
+
+make clean
+will put back the tree in virgin state.
+
+Enjoy,
+
+Jean-Pierre H. Dumas
+</pre>
+</body>
+</html>
