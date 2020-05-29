@@ -1,15 +1,17 @@
 # GraphApp
  Cross-platform GUI Library in C for Windows, Linux and MacOS.  
+ 
 This is a fork of the GraphApp GUI library found at http://enchantia.com/software/graphapp/
 It is a cross-platform GUI Library in C for Windows, Linux and MacOS but is easily adapted to C++.
 See the "Graphapp and C PlusPlus.txt" file for info about using this library with C++.
 This version of GraphApp has been updated to create 64-bit binaries on Windows, Linux and MacOS.
 If you want 32-bit Windows binaries, then download the original archive from Enchantia and build your binaries from
 those sources.  MacOS users will need to ensure that they've installed XQuartz or other X window manager
-on the Mac in order to run the binaries properly.  Pre-compiled Windows binaries and a static library for
+on the Mac in order to build and run the binaries properly.  Pre-compiled Windows binaries and a static library for
 Windows users can be found in the "Windows Binaries" folder of this repository.  This fork has also
-been successfully compiled using cygwin.  A progress-bar indicator has also been added to this fork which
-is not present in the original library.  
+been successfully compiled using cygwin and Visual Studio versions 2010 thru 2019.  Successful builds have also been completed 
+under MacOS using the XCode command line tools and on Ubuntu 20.  A progress-bar indicator has also been added
+to this fork which is not present in the original library.  
 
 A complete reference manual can be found online at:  http://enchantia.com/software/graphapp/doc/manual/index.html
 
