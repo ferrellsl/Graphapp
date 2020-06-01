@@ -14,7 +14,7 @@ under MacOS using the XCode command line tools and on Ubuntu 20.  A progress-bar
 to this fork which is not present in the original library.  
 
 A complete reference manual can be found online at:  http://enchantia.com/software/graphapp/doc/manual/index.html
-or in the graph_app.pdf file in the root of this repository.
+or in the https://github.com/ferrellsl/Graphapp/blob/master/graphapp_manual.pdf file in the root of this repository.
 
 Tutorials can be found here:  http://enchantia.com/software/graphapp/doc/tutorial/index.html
 
