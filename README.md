@@ -38,3 +38,4 @@ folders found in the GraphApp fonts folder to a folder called "graphappfonts" in
 run your binaries.  This location can be changed/customized by editing line number 39 of fontutil.c found in the src/utility folder
 and rebuilding the library.
 
+![alt text](https://github.com/ferrellsl/Graphapp/blob/master/graphapp-demo.png?raw=true)
