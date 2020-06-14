@@ -39,3 +39,4 @@ run your binaries.  This location can be changed/customized by editing line numb
 and rebuilding the library.
 
 ![alt text](https://github.com/ferrellsl/Graphapp/blob/master/graphapp-demo.png?raw=true)
+![alt text](https://github.com/ferrellsl/Graphapp/blob/master/progressbar.png?raw=true)
