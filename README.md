@@ -44,3 +44,4 @@ and rebuilding the library.
 ![alt text](https://github.com/ferrellsl/Graphapp/blob/master/rainbow.png?raw=true)
 ![alt text](https://github.com/ferrellsl/Graphapp/blob/master/tabpane1.png?raw=true)
 ![alt text](https://github.com/ferrellsl/Graphapp/blob/master/tabpane2.png?raw=true)
+![alt text](https://github.com/ferrellsl/Graphapp/blob/master/utf8edit.png?raw=true)
