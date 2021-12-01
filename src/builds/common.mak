@@ -2,7 +2,7 @@
 
 # Path definitions
 
-EXPL=src\examples$(SEP)
+EXPL=src$(SEP)examples$(SEP)
 LOC=.
 SRC=src$(SEP)
 DEMO=$(SRC)demo$(SEP)
