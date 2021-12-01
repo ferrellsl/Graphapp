@@ -130,95 +130,72 @@ demo5:	static demo/blend.o
 	$(CC) $(CFLAGS) -o demo/blend demo/blend.o $(LIB) $(XLIBS)
 
 progress_bar_demo: static examples/progress_bar_demo.o
-
 	$(CC) $(CFLAGS) -o examples/progress_bar_demo examples/progress_bar_demo.o $(LIB) $(XLIBS)
 
 smiley: static examples/smiley.o
-
 	$(CC) $(CFLAGS) -o examples/smiley examples/smiley.o $(LIB) $(XLIBS)
 
 alldemo: static examples/alldemo.o
-
 	$(CC) $(CFLAGS) -o examples/alldemo examples/alldemo.o $(LIB) $(XLIBS)
 
 arcs: static examples/arcs.o
-
 	$(CC) $(CFLAGS) -o examples/arcs examples/arcs.o $(LIB) $(XLIBS)
 	
 trycurs: static examples/trycurs.o
-
 	$(CC) $(CFLAGS) -o examples/trycurs examples/trycurs.o $(LIB) $(XLIBS)
 
 blend: static examples/blend.o
-
 	$(CC) $(CFLAGS) -o examples/blend examples/blend.o $(LIB) $(XLIBS)
 
 calc: static examples/calc.o
-
 	$(CC) $(CFLAGS) -o examples/calc examples/calc.o $(LIB) $(XLIBS)
 
 char: static examples/char.o
-
 	$(CC) $(CFLAGS) -o examples/char examples/char.o $(LIB) $(XLIBS)
 
 clock: static examples/clock.o
-
 	$(CC) $(CFLAGS) -o examples/clock examples/clock.o $(LIB) $(XLIBS)
 
 diffimg: static examples/diffimg.o
-
 	$(CC) $(CFLAGS) -o examples/diffimg examples/diffimg.o $(LIB) $(XLIBS)
 
 editdraw: static examples/editdraw.o
-
 	$(CC) $(CFLAGS) -o examples/editdraw examples/editdraw.o $(LIB) $(XLIBS)
 
 ellipses: static examples/ellipses.o
-
 	$(CC) $(CFLAGS) -o examples/ellipses examples/ellipses.o $(LIB) $(XLIBS)
 
 fakemenu: static examples/fakemenu.o
-
 	$(CC) $(CFLAGS) -o examples/fakemenuexamples/fakemenu.o $(LIB) $(XLIBS)
 
 fastline: static examples/fastline.o
-
 	$(CC) $(CFLAGS) -o examples/fastline examples/fastline.o $(LIB) $(XLIBS)
 
 fields: static examples/fields.o
-
 	$(CC) $(CFLAGS) -o examples/fields examples/fields.o $(LIB) $(XLIBS)
 
 fontdraw: static examples/fontdraw.o
-
 	$(CC) $(CFLAGS) -o examples/fontdraw examples/fontdraw.o $(LIB) $(XLIBS)
 
 imagedit: static examples/imagedit.o
-
 	$(CC) $(CFLAGS) -o examples/imagedit examples/imagedit.o $(LIB) $(XLIBS)
 
 imagine: static examples/imagine.o
-
 	$(CC) $(CFLAGS) -o examples/imagine examples/imagine.o $(LIB) $(XLIBS)
 
 img2gif: static examples/img2gif.o
-
 	$(CC) $(CFLAGS) -o examples/img2gif examples/img2gif.o $(LIB) $(XLIBS)
 
 imgtest: static examples/imgtest.o
-
 	$(CC) $(CFLAGS) -o examples/imgtest examples/imgtest.o $(LIB) $(XLIBS)
 
 listtest: static examples/listtest.o
-
 	$(CC) $(CFLAGS) -o examples/listtest examples/listtest.o $(LIB) $(XLIBS)
 
 moire: static examples/moire.o
-
 	$(CC) $(CFLAGS) -o examples/moire examples/moire.o $(LIB) $(XLIBS)
 
 nativfnt: static examples/nativfnt.o
-
 	$(CC) $(CFLAGS) -o examples/nativfnt examples/nativfnt.o $(LIB) $(XLIBS)
 
 photovi2: static examples/photovi2.o
@@ -226,87 +203,66 @@ photovi2: static examples/photovi2.o
 	$(CC) $(CFLAGS) -o examples/photovi2 examples/photovi2.o $(LIB) $(XLIBS)
 
 photoviz: static examples/photoviz.o
-
 	$(CC) $(CFLAGS) -o examples/photoviz examples/photoviz.o $(LIB) $(XLIBS)
 
 pizza: static examples/pizza.o
-
 	$(CC) $(CFLAGS) -o examples/pizza examples/pizza.o $(LIB) $(XLIBS)
 
 pizza2: static examples/pizza2.o
-
 	$(CC) $(CFLAGS) -o examples/pizza2 examples/pizza2.o $(LIB) $(XLIBS)
 
 polygons: static examples/polygons.o
-
 	$(CC) $(CFLAGS) -o examples/polygons examples/polygons.o $(LIB) $(XLIBS)
 
 rainbow: static examples/rainbow.o
-
 	$(CC) $(CFLAGS) -o examples/rainbow examples/rainbow.o $(LIB) $(XLIBS)
 
 scrolls: static examples/scrolls.o
-
 	$(CC) $(CFLAGS) -o examples/scrolls examples/scrolls.o $(LIB) $(XLIBS)
 
 scribble: static examples/scribble.o
-
 	$(CC) $(CFLAGS) -o examples/scribble examples/scribble.o $(LIB) $(XLIBS)
 
 spectrum: static examples/spectrum.o
-
 	$(CC) $(CFLAGS) -o examples/spectrum examples/spectrum.o $(LIB) $(XLIBS)
 
 utf8edit: static examples/utf8edit.o
-
 	$(CC) $(CFLAGS) -o examples/utf8edit examples/utf8edit.o $(LIB) $(XLIBS)
 
 viewutf8: static examples/viewutf8.o
-
 	$(CC) $(CFLAGS) -o examples/viewutf8 examples/viewutf8.o $(LIB) $(XLIBS)
 
 monty: static examples/monty/monty.o
-
 	$(CC) $(CFLAGS) -o examples/monty/monty examples/monty/monty.o $(LIB) $(XLIBS)
 
 tester: static examples/tester.o
-
 	$(CC) $(CFLAGS) -o examples/tester examples/tester.o $(LIB) $(XLIBS)
 
 xortest: static examples/xortest.o
-
 	$(CC) $(CFLAGS) -o examples/xortest examples/xortest.o $(LIB) $(XLIBS)
 	
 xortest2: static examples/xortest2.o
-
 	$(CC) $(CFLAGS) -o examples/xortest2 examples/xortest2.o $(LIB) $(XLIBS)
 	
 textclr: static examples/textclr.o
-
 	$(CC) $(CFLAGS) -o examples/textclr examples/textclr.o $(LIB) $(XLIBS)
 	
 char: static examples/char.o
-
 	$(CC) $(CFLAGS) -o examples/char examples/char.o $(LIB) $(XLIBS)	
 	
 showutf8: static examples/showutf8.o
-
 	$(CC) $(CFLAGS) -o examples/showutf8 examples/showutf8.o $(LIB) $(XLIBS)
 	
 tabpane: static examples/tabpane.o
-
 	$(CC) $(CFLAGS) -o examples/tabpane examples/tabpane.o $(LIB) $(XLIBS)
 	
 fakemenu: static examples/fakemenu.o
-
 	$(CC) $(CFLAGS) -o examples/fakemenu examples/fakemenu.o $(LIB) $(XLIBS)	
 	
 wintypes: static examples/wintypes.o
-
 	$(CC) $(CFLAGS) -o examples/wintypes examples/wintypes.o $(LIB) $(XLIBS)	
 
 photovi2: static examples/photovi2.o
-
 	$(CC) $(CFLAGS) -o examples/photovi2 examples/photovi2.o $(LIB) $(XLIBS)
 	
 
