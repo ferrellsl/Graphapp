@@ -30,7 +30,7 @@ Do not run the configure script.  Linux users simply need to open a terminal win
 This will build the link library. To build some of the examples, just type make followed by the name of the example you want to build such as the alldemo example:  make alldemo
 or the fastine example by typing: make fastline
 
-Successful builds have been accomplished on Unbuntu 16 thru Ubuntu 20.04.  I have not attempted builds on any other Linux distros.
+Successful builds have been accomplished on Ubuntu 16 thru Ubuntu 20.04.  I have not attempted builds on any other Linux distros.
 
 MacOS Build
 
