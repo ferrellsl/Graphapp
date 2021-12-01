@@ -29,6 +29,8 @@ Do not run the configure script.  Linux users simply need to open a terminal win
 This will build the link library. To build some of the examples, just type make followed by the name of the example you want to build such as the alldemo example:  make alldemo
 or the fastine demo by typing: make fastline
 
+Successful builds have been accomplished on Unbuntu 10 thru Ubuntu 20.04.  I have not attempted builds on any other Linux distros.
+
 MacOS Build
 
 MacOS users will need to install the XCode command line tools prior to compiling.  There is a MacOS makefile
