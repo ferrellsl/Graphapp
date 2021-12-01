@@ -26,7 +26,8 @@ directory and run the Build_MSVC.bat found there.  Successful builds have been t
 Linux Build:
 
 Do not run the configure script.  Linux users simply need to open a terminal window and move to the GraphApp/src folder and type:  make
-
+This will build the link library. To build some of the examples, just type make followed by the name of the example you want to build such as the alldemo example:  make alldemo
+or the fastine demo by typing: make fastline
 
 MacOS Build
 
