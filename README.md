@@ -25,7 +25,7 @@ directory and run the Build_MSVC.bat found there.  Successful builds have been t
 
 Linux Build:
 
-Linux users will need to open a terminal window and move to the GraphApp/src folder and type:  make
+Do not run the configure script.  Linux users simply need to open a terminal window and move to the GraphApp/src folder and type:  make
 
 
 MacOS Build
