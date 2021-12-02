@@ -2,7 +2,7 @@
 TARGET   = imagine
 SRC      = imagine.c
 
-CC       = gcc -g
+CC       = gcc -g -no-pie
 
 APP_PATH = ..
 APP_LIB  = app
