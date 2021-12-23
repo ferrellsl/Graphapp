@@ -37,6 +37,8 @@ MacOS Build
 MacOS users will need to install the XCode command line tools prior to compiling.  There is a MacOS makefile
 located in the src folder.  Delete the Linux makefile and rename makefile.MacOS to makefile and then run make from the src folder.
 
+Custon Soft Fonts and UTF8 Fonts
+
 GraphApp will use your system fonts by default but if you want UTF8 and custom soft fonts you'll want to copy the fonts
 folders found in the GraphApp fonts folder to a folder called "graphappfonts" in the root of the drive where you expect
 run your binaries.  This location can be changed/customized by editing line number 39 of fontutil.c found in the src/utility folder
