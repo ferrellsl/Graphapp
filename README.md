@@ -40,7 +40,7 @@ located in the src folder.  Delete the Linux makefile and rename makefile.MacOS 
 Custom Soft Fonts and UTF8 Fonts
 
 GraphApp will use your system fonts by default but if you want UTF8 and custom soft fonts you'll want to copy the fonts
-folders found in the GraphApp fonts folder to a folder called "graphappfonts" in the root of the drive where you expect
+folders found in the GraphApp fonts folder to a folder called "graphappfonts" in the root of the drive where you expect to
 run your binaries.  This location can be changed/customized by editing line number 39 of fontutil.c found in the src/utility folder
 and rebuilding the library.
 
