@@ -13,6 +13,9 @@ been successfully compiled using cygwin and Visual Studio versions 2010 thru 201
 under MacOS using the XCode command line tools and on Ubuntu 20.  A progress-bar indicator has also been added
 to this fork which is not present in the original library.  
 
+The file dialogs that are part of GraphApp are very rudimentary and very ugly.  I recommend using TinyFileDialogs found
+here:https://sourceforge.net/projects/tinyfiledialogs/files/ which also provide native file dialogs for the target system.
+
 A complete reference manual can be found online at:  http://enchantia.com/software/graphapp/doc/manual/index.html
 or in the https://github.com/ferrellsl/Graphapp/blob/master/graphapp_manual.pdf file in the root of this repository.
 
