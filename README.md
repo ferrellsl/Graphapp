@@ -10,7 +10,7 @@ those sources.  MacOS users will need to ensure that they've installed XQuartz o
 on the Mac in order to build and run the binaries properly.  Pre-compiled Windows binaries and a static library for
 Windows users can be found in the "Windows Binaries" folder of this repository.  This fork has also
 been successfully compiled using cygwin and Visual Studio versions 2010 thru 2019.  Successful builds have also been completed 
-under MacOS using the XCode command line tools and on Ubuntu 20.  A progress-bar indicator has also been added
+under MacOS using the XCode command line tools and on Ubuntu 22.10.  A progress-bar indicator has also been added
 to this fork which is not present in the original library.  
 
 The file dialogs that are part of GraphApp are very rudimentary and very ugly.  I recommend using TinyFileDialogs found
