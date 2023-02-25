@@ -55,7 +55,7 @@ void compute()
 	percent = 1000000;
 	progress_window = new_progress_window(app, "Progress Window", "Progress Meter");
 	for (dummy = 1; dummy < 1000000; dummy++){
-	sprintf(percentage_str,"%.lf",(float)dummy/(float)percent*100.0);
+	sprintf(percentage_str,"%.lf",(float)dummy/(float)percent*99.0);
 	size = atoi(percentage_str);
 	update_progress_window(progress_window, size);
    }
