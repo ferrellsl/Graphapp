@@ -39,6 +39,7 @@ MacOS Build
 
 MacOS users will need to install the XCode command line tools prior to compiling.  There is a MacOS makefile
 located in the src folder.  Delete the Linux makefile and rename makefile.MacOS to makefile and then run make from the src folder.
+MacOS users will also need an XWindows manager such as XQuartz which can be found here:  https://www.xquartz.org/
 
 Custom Soft Fonts and UTF8 Fonts
 
