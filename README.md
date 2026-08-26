@@ -40,10 +40,15 @@ MacOS Build
 MacOS users will need to install the XCode command line tools prior to compiling.  
 
 Go to the Apple Developer More Downloads page. https://developer.apple.com/download/
+
 Sign in with your Apple ID (a paid developer account is not required).
+
 Search for "Command Line Tools" in the left-hand search bar.
+
 Select the version that matches your macOS release and download the .dmg file.
+
 Open the downloaded file and double-click the .pkg installer to run it
+
 
 There is a MacOS makefilelocated in the src folder.  Delete the Linux makefile and rename makefile.MacOS to makefile and then run make from the src folder. MacOS users will also need an XWindows manager such as XQuartz which can be found here:  https://www.xquartz.org/
 
