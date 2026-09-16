@@ -156,13 +156,19 @@ void app_del_graphics(Graphics *g)
 	if (graphics_extra(g)->oldbr)
 		SelectObject(graphics_extra(g)->dc,
 			graphics_extra(g)->oldbr);
-	if (graphics_extra(g)->brush)
-		DeleteObject(graphics_extra(g)->brush);
+	/*
+	 *  brush/pen are now always the shared STOCK DC_BRUSH/DC_PEN
+	 *  objects (see app_set_rgb's own comment) - the same handle
+	 *  every time GetStockObject returns them, used by every Graphics
+	 *  context and window in the whole process. DeleteObject on a
+	 *  stock object is invalid (and would break GDI for the rest of
+	 *  the app) - restoring the DC's previous selection above is all
+	 *  that is needed; there is nothing here to actually delete any
+	 *  more.
+	 */
 	if (graphics_extra(g)->oldpen)
 		SelectObject(graphics_extra(g)->dc,
 			graphics_extra(g)->oldpen);
-	if (graphics_extra(g)->pen)
-		DeleteObject(graphics_extra(g)->pen);
 	if (graphics_extra(g)->oldbm)
 		SelectObject(graphics_extra(g)->dc,
 			graphics_extra(g)->oldbm);
@@ -201,9 +207,8 @@ void app_del_graphics(Graphics *g)
  */
 void app_set_rgb(Graphics *g, Colour c)
 {
-	HBRUSH oldbr, brush;
-	HPEN oldpen, pen;
 	int red, green, blue;
+	COLORREF cref;
 
 	if (g->img) {
 		if (g->img->cmap_size > 0)
@@ -221,22 +226,42 @@ void app_set_rgb(Graphics *g, Colour c)
 			blue  = c.blue;
 		}
 		g->pixval = PALETTERGB(red, green, blue);
-		brush = CreateSolidBrush(g->pixval);
-		oldbr = SelectObject(graphics_extra(g)->dc, brush);
-		pen    = CreatePen(PS_SOLID, 1, g->pixval);
-		oldpen = SelectObject(graphics_extra(g)->dc, pen);
+		cref = (COLORREF) g->pixval;
 
-		if (! graphics_extra(g)->oldbr)
-			graphics_extra(g)->oldbr = oldbr;
-		else
-			DeleteObject(oldbr);
-		graphics_extra(g)->brush = brush;
-
-		if (! graphics_extra(g)->oldpen)
-			graphics_extra(g)->oldpen = oldpen;
-		else
-			DeleteObject(oldpen);
-		graphics_extra(g)->pen = pen;
+		/*
+		 *  Performance: this used to CreateSolidBrush/CreatePen +
+		 *  SelectObject + DeleteObject on EVERY call, unconditionally
+		 *  - real GDI object-table churn, not cheap. A caller that
+		 *  switches to a different colour on every one of a large
+		 *  number of fill calls (e.g. a coloured height-map rendered
+		 *  as thousands of individually-shaded quads, each a distinct
+		 *  RGB value) spent several real seconds in here alone,
+		 *  confirmed by profiling - X11's own app_set_rgb
+		 *  (x11/graphics.c) has no equivalent cost, it just calls
+		 *  XSetForeground on the already-existing GC.
+		 *
+		 *  Fixed by selecting the shared STOCK DC_BRUSH/DC_PEN objects
+		 *  into the DC once (lazily, on this Graphics context's first
+		 *  real colour), then using SetDCBrushColor/SetDCPenColor on
+		 *  every subsequent call instead - a plain DC attribute write,
+		 *  no object creation/selection/deletion at all, the same
+		 *  order of cost as X11's XSetForeground. DC_BRUSH/DC_PEN are
+		 *  process-wide SHARED stock objects (same handle every time
+		 *  GetStockObject returns them) - must never be DeleteObject'd
+		 *  (see app_del_graphics's own updated comment, below).
+		 */
+		if (! graphics_extra(g)->brush) {
+			graphics_extra(g)->oldbr = SelectObject(
+				graphics_extra(g)->dc, GetStockObject(DC_BRUSH));
+			graphics_extra(g)->brush = GetStockObject(DC_BRUSH);
+		}
+		if (! graphics_extra(g)->pen) {
+			graphics_extra(g)->oldpen = SelectObject(
+				graphics_extra(g)->dc, GetStockObject(DC_PEN));
+			graphics_extra(g)->pen = GetStockObject(DC_PEN);
+		}
+		SetDCBrushColor(graphics_extra(g)->dc, cref);
+		SetDCPenColor(graphics_extra(g)->dc, cref);
 	}
 
 	g->colour = c;
