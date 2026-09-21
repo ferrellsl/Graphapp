@@ -94,6 +94,53 @@ static void add_menus(void)
 	[NSApp setMainMenu:bar];
 }
 
+/*
+ *  Smoke-test hook, for any GraphApp program with no cooperation from it:
+ *    GAB_SNAPSHOT=out1.png:1500,out2.png:3000   snapshot the first window
+ *                                               at each time (ms after start)
+ *    GAB_SNAPSHOT_QUIT=1                        then quit, after the last one
+ *  Uses the same in-process rendering as gab_test_snapshot, so it needs no
+ *  screen-recording permission.
+ */
+static void schedule_snapshots(void)
+{
+	const char *spec = getenv("GAB_SNAPSHOT");
+	NSArray<NSString *> *items;
+	NSString *item;
+	BOOL quit = getenv("GAB_SNAPSHOT_QUIT") != NULL;
+	NSUInteger i, n;
+
+	if (spec == NULL)
+		return;
+	items = [[NSString stringWithUTF8String:spec] componentsSeparatedByString:@","];
+	n = [items count];
+	for (i = 0; i < n; i++) {
+		NSRange colon;
+		NSString *path;
+		double ms;
+		BOOL last = (i == n - 1);
+
+		item = [items objectAtIndex:i];
+		colon = [item rangeOfString:@":" options:NSBackwardsSearch];
+		if (colon.location == NSNotFound)
+			continue;
+		path = [item substringToIndex:colon.location];
+		ms = [[item substringFromIndex:colon.location + 1] doubleValue];
+		[NSTimer scheduledTimerWithTimeInterval:ms / 1000.0 repeats:NO
+				block:^(NSTimer *t) {
+			NSWindow *w;
+			for (w in [NSApp windows]) {
+				if ([w isKindOfClass:[GAWindow class]] && [w isVisible]) {
+					gab_test_snapshot((__bridge void *) w, [path UTF8String]);
+					break;
+				}
+			}
+			if (last && quit && gab_callbacks.quit)
+				gab_callbacks.quit();
+		}];
+	}
+}
+
 int gab_init(void)
 {
 	@autoreleasepool {
@@ -103,6 +150,7 @@ int gab_init(void)
 		[NSApp setDelegate:app_delegate];
 		add_menus();
 		[NSApp finishLaunching];
+		schedule_snapshots();
 		if (@available(macOS 14.0, *))
 			[NSApp activate];
 		else

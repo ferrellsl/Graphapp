@@ -54,6 +54,13 @@ window and drives it through the real event loop with synthetic events: button c
 backspace, check box, Cmd-D menu shortcut, pull-down menu tracking, window resize, with
 in-process view snapshots (`gab_test_snapshot`, no screen-recording permission needed).
 
+**Smoke-testing any GraphApp program** without touching it: set
+`GAB_SNAPSHOT=out.png:2000` (comma-separate several, each `path:milliseconds`) and the
+backend writes an in-process snapshot of the first window at that time; add
+`GAB_SNAPSHOT_QUIT=1` to exit after the last one. QuikGrid's
+`porting-notes/graphapp-demo/test_skeleton_app_macos.sh` uses this to load data, switch to
+the coloured 3D view and capture the result.
+
 ## Status
 
 Working: windows (titled, borderless, popup, modal, floating, centred), all portable
