@@ -22,12 +22,12 @@ or in the https://github.com/ferrellsl/Graphapp/blob/master/graphapp_manual.pdf 
 
 Tutorials can be found here:  http://enchantia.com/software/graphapp/doc/tutorial/index.html
 
-__Windows Build__
+##__Windows Build__
 
 To build Windows binaries from source using Visual Studio, open a Visual Studio x64 native tools command prompt.  Go to the GraphApp
 directory and run the Build_MSVC.bat found there.  Successful builds have been tested on Visual Studio 2010 thru 2019.
 
-__Linux Build__
+##__Linux Build__
 
 Linux users simply need to open a terminal window and move to the GraphApp/src folder and type:  make
 
@@ -36,7 +36,7 @@ or the fastline example by typing: make fastline
 
 Successful builds have been accomplished on Ubuntu 16 thru Ubuntu 24.04.  I have not attempted builds on any other Linux distros.
 
-__MacOS Build__
+##__MacOS Build__
 
 MacOS users will need to install the XCode command line tools prior to compiling.  
 
@@ -53,7 +53,7 @@ Open the downloaded file and double-click the .pkg installer to run it
 
 There is a MacOS makefile located in the src folder.  Delete the Linux makefile and rename makefile.MacOS to makefile and then run make from the src folder. MacOS users will also need an XWindows manager such as XQuartz which can be found here:  https://www.xquartz.org/
 
-__MacOS Native (Cocoa) Build__
+##__MacOS Native (Cocoa) Build__
 
 GraphApp also has a native Cocoa backend for macOS (Apple Silicon, arm64) in src/cocoa.  It draws real macOS windows, needs no X server and
 no XQuartz, and needs only the XCode command line tools.  From the src folder:
