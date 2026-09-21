@@ -1,0 +1,126 @@
+# Makefile for App (GraphApp) on macOS, using the native Cocoa backend.
+#
+#   make -f Makefile.cocoa            build build-macos/libapp.a
+#   make -f Makefile.cocoa demo       build the example programs (see EXAMPLES)
+#   make -f Makefile.cocoa clean
+#
+# Everything is built out of tree in build-macos/, so the source directories
+# stay clean.  Apple Silicon (arm64) only; set ARCH to change.
+#
+# The Cocoa backend is in cocoa/.  Its C files include cocoa/appint.h, its
+# Objective-C files include only Cocoa and cocoa/bridge.h (GraphApp's Point
+# and Rect types clash with Apple's), so the two halves compile separately.
+
+CC          = clang
+ARCH        = arm64
+BUILD       = build-macos
+LIB         = $(BUILD)/libapp.a
+
+# cocoa/ first, so that "appint.h" finds the Cocoa version.  cocoa/shim/fp.h
+# stops libpng mistaking macOS for classic Mac OS (which had its own <fp.h>).
+INCLUDES    = -Icocoa -Icocoa/shim -I. -Iutility -Igui -Ilibz -Ilibpng -Ilibjpeg -Ilibgif
+CFLAGS      = -arch $(ARCH) -O2 -Wall -Wno-deprecated-declarations -DPNG_NO_MMX_CODE $(INCLUDES)
+OBJCFLAGS   = $(CFLAGS) -fobjc-arc
+FRAMEWORKS  = -framework Cocoa -framework CoreText -framework CoreGraphics
+LDLIBS      = $(FRAMEWORKS) -lm
+
+APP_OBJECTS = \
+	utility/apputil.o utility/array.o utility/border.o utility/clipline.o \
+	utility/compose.o utility/control.o utility/deleting.o utility/dispatch.o \
+	utility/drawimg.o utility/drawing.o utility/drawtext.o utility/image.o \
+	utility/imglist.o utility/fontutil.o utility/malloc.o utility/palette.o \
+	utility/point.o utility/rect.o utility/region.o utility/resource.o \
+	utility/rgb.o utility/str.o utility/strtable.o utility/utf8.o \
+	utility/utf8regx.o utility/winutil.o gui/button.o gui/checkbox.o \
+	gui/cursors.o gui/dialog.o gui/dropfld.o gui/droplist.o \
+	gui/field.o gui/imagebtn.o gui/imgcheck.o gui/imglabel.o \
+	gui/label.o gui/listbox.o gui/manager.o gui/menu.o \
+	gui/notebtn.o gui/passfld.o gui/radiobtn.o gui/scroll.o \
+	gui/separat.o gui/splitter.o gui/tabbtn.o gui/textbox.o \
+	gui/textundo.o gui/tip.o imgfmt/imgread.o imgfmt/imgwrite.o \
+	imgfmt/readgif.o imgfmt/writegif.o imgfmt/readh.o imgfmt/writeh.o \
+	imgfmt/readjpg.o imgfmt/writejpg.o imgfmt/readpng.o imgfmt/writepng.o
+
+GIF_OBJECTS = \
+	libgif/gif.o
+
+JPEG_OBJECTS = \
+	libjpeg/jcapimin.o libjpeg/jcapistd.o libjpeg/jccoefct.o libjpeg/jccolor.o \
+	libjpeg/jcdctmgr.o libjpeg/jchuff.o libjpeg/jcinit.o libjpeg/jcmainct.o \
+	libjpeg/jcmarker.o libjpeg/jcmaster.o libjpeg/jcomapi.o libjpeg/jcparam.o \
+	libjpeg/jcphuff.o libjpeg/jcprepct.o libjpeg/jcsample.o libjpeg/jctrans.o \
+	libjpeg/jdapimin.o libjpeg/jdapistd.o libjpeg/jdatadst.o libjpeg/jdatasrc.o \
+	libjpeg/jdcoefct.o libjpeg/jdcolor.o libjpeg/jddctmgr.o libjpeg/jdhuff.o \
+	libjpeg/jdinput.o libjpeg/jdmainct.o libjpeg/jdmarker.o libjpeg/jdmaster.o \
+	libjpeg/jdmerge.o libjpeg/jdphuff.o libjpeg/jdpostct.o libjpeg/jdsample.o \
+	libjpeg/jdtrans.o libjpeg/jerror.o libjpeg/jfdctflt.o libjpeg/jfdctfst.o \
+	libjpeg/jfdctint.o libjpeg/jidctflt.o libjpeg/jidctfst.o libjpeg/jidctint.o \
+	libjpeg/jidctred.o libjpeg/jmemmgr.o libjpeg/jmemnobs.o libjpeg/jquant1.o \
+	libjpeg/jquant2.o libjpeg/jutils.o
+
+PNG_OBJECTS = \
+	libpng/png.o libpng/pngerror.o libpng/pngget.o libpng/pngmem.o \
+	libpng/pngpread.o libpng/pngread.o libpng/pngrio.o libpng/pngrtran.o \
+	libpng/pngrutil.o libpng/pngset.o libpng/pngtrans.o libpng/pngwio.o \
+	libpng/pngwrite.o libpng/pngwtran.o libpng/pngwutil.o
+
+LIBZ_OBJECTS = \
+	libz/adler32.o libz/compress.o libz/crc32.o libz/deflate.o \
+	libz/infback.o libz/inffast.o libz/inflate.o libz/inftrees.o \
+	libz/trees.o libz/uncompr.o libz/zutil.o
+
+COCOA_C_OBJECTS = \
+	cocoa/bmap.o cocoa/bmapimg.o cocoa/clipbrd.o cocoa/cursor.o \
+	cocoa/drawops.o cocoa/event.o cocoa/folder.o cocoa/font.o \
+	cocoa/graphics.o cocoa/init.o cocoa/timer.o cocoa/win.o
+
+COCOA_M_OBJECTS = \
+	cocoa/cocoa_app.o cocoa/cocoa_window.o cocoa/cocoa_font.o cocoa/cocoa_misc.o
+
+ALL_OBJECTS = $(APP_OBJECTS) $(GIF_OBJECTS) $(JPEG_OBJECTS) $(PNG_OBJECTS) \
+	$(LIBZ_OBJECTS) $(COCOA_C_OBJECTS) $(COCOA_M_OBJECTS)
+
+OBJECTS     = $(addprefix $(BUILD)/,$(ALL_OBJECTS))
+
+HEADERS     = apptypes.h app.h graphapp.h cocoa/appint.h cocoa/bridge.h \
+	utility/apputils.h gui/appgui.h gui/cursors.h
+
+all: $(LIB)
+
+$(LIB): $(OBJECTS)
+	rm -f $@
+	ar rc $@ $(OBJECTS)
+	ranlib $@
+
+$(BUILD)/%.o: %.c $(HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/%.o: %.m $(HEADERS) cocoa/cocoa_internal.h
+	@mkdir -p $(dir $@)
+	$(CC) $(OBJCFLAGS) -c $< -o $@
+
+# Example programs: make -f Makefile.cocoa examples/<name>  (binary in build-macos/examples/)
+EXAMPLES = examples/smiley examples/arcs examples/alldemo examples/tester examples/editdraw \
+	examples/scribble examples/xortest examples/calc examples/imagine examples/utf8edit
+
+demo: $(EXAMPLES)
+
+$(EXAMPLES): %: $(BUILD)/%.o $(LIB)
+	$(CC) -arch $(ARCH) -o $(BUILD)/$@ $< $(LIB) $(LDLIBS)
+
+# Backend tests (see cocoa/test): pixel engine, then a real window driven by events.
+TESTS = build-macos/test/pixeltest build-macos/test/uitest
+
+build-macos/test/%: cocoa/test/%.c $(LIB)
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $< $(LIB) $(LDLIBS) -o $@
+
+test: $(TESTS)
+	APP_FONT_PATH=$(CURDIR)/../fonts build-macos/test/pixeltest
+	APP_FONT_PATH=$(CURDIR)/../fonts build-macos/test/uitest $(BUILD)/test
+
+clean:
+	rm -rf $(BUILD)
+
+.PHONY: all demo test clean

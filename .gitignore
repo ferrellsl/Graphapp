@@ -1,0 +1,5 @@
+# macOS
+.DS_Store
+
+# Out-of-tree macOS (Cocoa) build
+src/build-macos/
