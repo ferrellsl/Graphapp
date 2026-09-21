@@ -155,5 +155,7 @@ void *gab_window_under_cursor(void);
 int  gab_test_snapshot(void *handle, const char *png_path);
 void gab_test_mouse(void *handle, int kind, int x, int y, int button, int mods);
 void gab_test_key(void *handle, int keycode, const char *chars, int mods);
+/* Same, aimed at the frontmost App window, for programs that hide their window handles. */
+void gab_test_mouse_front(int kind, int x, int y, int button, int mods);
 
 #endif

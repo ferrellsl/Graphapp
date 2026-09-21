@@ -527,3 +527,16 @@ void gab_test_key(void *handle, int keycode, const char *chars, int mods)
 		[NSApp postEvent:e atStart:NO];
 	}
 }
+
+void gab_test_mouse_front(int kind, int x, int y, int button, int mods)
+{
+	@autoreleasepool {
+		NSWindow *w;
+		for (w in [NSApp orderedWindows]) {
+			if ([w isKindOfClass:[GAWindow class]] && [w isVisible]) {
+				gab_test_mouse((__bridge void *) w, kind, x, y, button, mods);
+				return;
+			}
+		}
+	}
+}

@@ -39,6 +39,15 @@ static CTFontRef make_font(NSString *family, CGFloat size, int bold, int italic)
 			}
 		}
 	}
+	if (f == NULL) {
+		/* Unknown family (GraphApp asks for "unifont" by default). Use Arial,
+		   which is (most likely - unverified) what Windows' font mapper substitutes: with the size scaling
+		   below (line height = ascent+descent = the requested pixels) it then
+		   reproduces the Windows metrics that dialog layouts were tuned against.
+		   Helvetica reports a tighter line height, so it comes out ~15% larger;
+		   San Francisco (the system font) is a little wider. Both wrap labels. */
+		f = CTFontCreateWithName(CFSTR("Arial"), size, NULL);
+	}
 	if (f == NULL)
 		f = CTFontCreateUIFontForLanguage(kCTFontUIFontSystem, size, NULL);
 	if (f == NULL)
