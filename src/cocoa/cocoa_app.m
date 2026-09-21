@@ -96,7 +96,7 @@ static void add_menus(void)
 
 /*
  *  Smoke-test hook, for any GraphApp program with no cooperation from it:
- *    GAB_SNAPSHOT=out1.png:1500,out2.png:3000   snapshot the first window
+ *    GAB_SNAPSHOT=out1.png:1500,out2.png:3000   snapshot the frontmost window
  *                                               at each time (ms after start)
  *    GAB_SNAPSHOT_QUIT=1                        then quit, after the last one
  *  Uses the same in-process rendering as gab_test_snapshot, so it needs no
@@ -129,7 +129,8 @@ static void schedule_snapshots(void)
 		[NSTimer scheduledTimerWithTimeInterval:ms / 1000.0 repeats:NO
 				block:^(NSTimer *t) {
 			NSWindow *w;
-			for (w in [NSApp windows]) {
+			/* frontmost visible App window (a dialog if one is open) */
+			for (w in [NSApp orderedWindows]) {
 				if ([w isKindOfClass:[GAWindow class]] && [w isVisible]) {
 					gab_test_snapshot((__bridge void *) w, [path UTF8String]);
 					break;

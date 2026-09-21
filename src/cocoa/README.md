@@ -42,9 +42,12 @@ un-dispatched via `gab_next_event(..., &mouse)`. Timers are the portable kind, d
 the event loop's wait timeout.
 
 **Fonts.** Native fonts are CoreText fonts scaled so ascent+descent = the requested pixel
-height, rendered to a coverage bitmap and blended. The default portable bitmap font
-(`unifont`) needs its `fonts/` directory: set `APP_FONT_PATH`, or ship it as
+height, rendered to a coverage bitmap and blended. If GraphApp's portable bitmap font (`unifont`,
+in `fonts/`) can be found it becomes the default font: set `APP_FONT_PATH`, or ship it as
 `Contents/Resources/fonts` (or `fonts/` beside the executable), which is found automatically.
+If it cannot be found, the default falls through to a native font (the system font). **Layouts
+tuned against the native fallback (QuikGrid's dialogs) break under unifont**, which is much wider,
+so such programs should ship no `fonts/` folder.
 
 ## Testing
 
