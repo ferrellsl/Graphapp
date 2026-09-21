@@ -7,7 +7,8 @@ See the "Graphapp and C PlusPlus.txt" file for info about using this library wit
 This version of GraphApp has been updated to create 64-bit binaries on Windows, Linux and MacOS.
 If you want 32-bit Windows binaries, then download the original archive from Enchantia and build your binaries from
 those sources.  MacOS users will need to ensure that they've installed XQuartz or other X window manager
-on the Mac in order to build and run the binaries properly.  Pre-compiled Windows binaries and a static library for
+on the Mac in order to build and run the binaries properly (or use the native Cocoa backend described under "MacOS Native (Cocoa) Build" below, which
+needs no X server).  Pre-compiled Windows binaries and a static library for
 Windows users can be found in the "Windows Binaries" folder of this repository.  This fork has also
 been successfully compiled using MSYS2/cygwin and Visual Studio versions 2010 thru 2019.  Successful builds have also been completed 
 under MacOS using the XCode command line tools and on Ubuntu 24.04.  A progress-bar indicator has also been added
@@ -52,6 +53,22 @@ Open the downloaded file and double-click the .pkg installer to run it
 
 
 There is a MacOS makefile located in the src folder.  Delete the Linux makefile and rename makefile.MacOS to makefile and then run make from the src folder. MacOS users will also need an XWindows manager such as XQuartz which can be found here:  https://www.xquartz.org/
+
+MacOS Native (Cocoa) Build
+
+GraphApp also has a native Cocoa backend for macOS (Apple Silicon, arm64) in src/cocoa.  It draws real macOS windows, needs no X server and
+no XQuartz, and needs only the XCode command line tools.  From the src folder:
+
+    make -f Makefile.cocoa            (builds build-macos/libapp.a)
+    make -f Makefile.cocoa demo       (builds the example programs into build-macos/examples)
+    make -f Makefile.cocoa test       (runs the backend's pixel test and an end-to-end window/event test)
+
+Link your own programs with libapp.a and: -framework Cocoa -framework CoreText -framework CoreGraphics
+
+Everything is built in the build-macos folder, so the source folders stay clean.  Unlike the Linux makefile this one does not need to be
+renamed or edited.  If GraphApp can find its portable bitmap fonts (set APP_FONT_PATH to the fonts folder, or ship them as
+Contents/Resources/fonts in an .app bundle) they become the default font, otherwise the default is a native font (Arial).  See src/cocoa/README.md for
+how the backend works and what is not done yet (notably Retina resolution, native file dialogs, and app bundling).
 
 Custom Soft Fonts and UTF8 Fonts
 
