@@ -10,11 +10,16 @@
  *    3. type into the text field  -> field text changes
  *    4. click the check box       -> checked
  *    5. Cmd-D                     -> menu shortcut fires
- *    6. resize the window         -> controls re-laid out, surface resized
- *    7. snapshot, report, quit
+ *    6. press/drag/release on the File menu -> item chosen (mouse tracking)
+ *    7. resize the window         -> controls re-laid out, surface resized
+ *    8. snapshot, report, quit
  */
 
 #include "appint.h"
+
+#ifndef MENU_ITEM_Y
+#define MENU_ITEM_Y 52	/* second item of the File menu */
+#endif
 
 static App *app;
 static Window *win;
@@ -110,10 +115,20 @@ static void tick(Timer *t)
 
 	  case 5:
 		expect(shortcut_fired == 1, "Cmd-D menu shortcut fired");
-		app_size_window(win, rect(0, 0, 420, 260));
+		/* Pull-down menu: press on "File", drag onto an item, release.
+		   The menu code tracks the mouse in a blocking loop, so all
+		   three events are queued before the press is dispatched. */
+		gab_test_mouse(h, GAB_MOUSE_DOWN, 12, 8, 1, 0);
+		gab_test_mouse(h, GAB_MOUSE_DRAG, 20, MENU_ITEM_Y, 1, 0);
+		gab_test_mouse(h, GAB_MOUSE_UP, 20, MENU_ITEM_Y, 1, 0);
 		break;
 
 	  case 6:
+		expect(menu_fired == 1, "pull-down menu item chosen by mouse");
+		app_size_window(win, rect(0, 0, 420, 260));
+		break;
+
+	  case 7:
 		expect(win->area.width == 420 && win->area.height == 260,
 			"window resized to 420x260");
 		expect(win_extra(win)->surf.width == 420 &&

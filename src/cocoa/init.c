@@ -13,7 +13,41 @@
 
 #include "appint.h"
 
+#include <limits.h>
+#include <libgen.h>
+#include <sys/stat.h>
+#include <mach-o/dyld.h>
+
 App *app_the_app = NULL;	/* for callbacks that carry no window */
+
+/*
+ *  Point APP_FONT_PATH at the portable fonts shipped with the program, so
+ *  that it works from an .app bundle (Contents/Resources/fonts) or from a
+ *  fonts folder next to the executable, without the user setting anything.
+ *  A value the user has already set is left alone.
+ */
+static void app_find_bundled_fonts(void)
+{
+	char exe[PATH_MAX], real[PATH_MAX], cand[PATH_MAX + 32];
+	uint32_t size = sizeof(exe);
+	struct stat st;
+	char *dir;
+	int i;
+	static const char *where[] = { "%s/../Resources/fonts", "%s/fonts" };
+
+	if (getenv("APP_FONT_PATH") != NULL)
+		return;
+	if (_NSGetExecutablePath(exe, &size) != 0 || realpath(exe, real) == NULL)
+		return;
+	dir = dirname(real);
+	for (i=0; i < 2; i++) {
+		snprintf(cand, sizeof(cand), where[i], dir);
+		if (stat(cand, &st) == 0 && S_ISDIR(st.st_mode)) {
+			setenv("APP_FONT_PATH", cand, 0);
+			return;
+		}
+	}
+}
 
 App *app_new_app(int argc, char *argv[])
 {
@@ -48,6 +82,8 @@ App *app_new_app(int argc, char *argv[])
 
 	/* Deactivate X-Windows style mouse-based copy/paste */
 	app->use_X_copy_paste = 0;
+
+	app_find_bundled_fonts();
 
 	/* Initialise string table and similar portable things. */
 	app_app_initialise(app);
