@@ -1,5 +1,5 @@
 # GraphApp
- Cross-platform GUI Library in C for Windows, Linux and MacOS.  Devs have the option of creating MacOS/X Windows binaries or true MacOS/Cocoa native apps.  
+ Cross-platform GUI Library in C for Windows, Linux and MacOS.  Devs have the option of creating MacOS/X-Windows binaries or true MacOS/Cocoa native apps.  If you choose to create X-Windows binaries under MacOS, your target systems must have XQuartz installed so it is recommended that you just use Cocoa instead.
  
 This is a fork of the GraphApp GUI library found at http://enchantia.com/software/graphapp/
 It is a cross-platform GUI Library in C for Windows, Linux and MacOS but is easily adapted to C++.
