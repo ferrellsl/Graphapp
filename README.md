@@ -24,6 +24,10 @@ Tutorials can be found here:  http://enchantia.com/software/graphapp/doc/tutoria
 
 ##__Windows Build__
 
+<h1>This is large and bold (HTML H1)</h1>
+<h2>This is slightly smaller and bold (HTML H2)</h2>
+
+
 To build Windows binaries from source using Visual Studio, open a Visual Studio x64 native tools command prompt.  Go to the GraphApp
 directory and run the Build_MSVC.bat found there.  Successful builds have been tested on Visual Studio 2010 thru 2019.
 
