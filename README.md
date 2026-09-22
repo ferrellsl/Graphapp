@@ -1,5 +1,5 @@
 # GraphApp
- Cross-platform GUI Library in C for Windows, Linux and MacOS.  Devs have the option of creating MacOS/X-Windows binaries or true MacOS/Cocoa native apps.  If you choose to create X-Windows binaries under MacOS, your target systems must have XQuartz installed so it is recommended that you just use Cocoa instead.
+Lightweight cross-platform GUI Library in C for Windows, Linux and MacOS.  Devs have the option of creating macOS/X-Windows binaries or true macOS/Cocoa native apps.  If you choose to create X-Windows binaries under macOS, your target systems must have XQuartz installed so it is recommended that you just use Cocoa instead.
  
 This is a fork of the GraphApp GUI library found at http://enchantia.com/software/graphapp/
 It is a cross-platform GUI Library in C for Windows, Linux and MacOS but is easily adapted to C++.
@@ -52,7 +52,7 @@ Select the version that matches your macOS release and download the .dmg file.
 Open the downloaded file and double-click the .pkg installer to run it
 
 
-There is a MacOS makefile located in the src folder.  Delete the Linux makefile and rename makefile.MacOS to makefile and then run make from the src folder. MacOS users will also need an XWindows manager such as XQuartz which can be found here:  https://www.xquartz.org/
+There is a macOS makefile located in the src folder.  Delete the Linux makefile and rename makefile.MacOS to makefile and then run make from the src folder. MacOS users will also need an XWindows manager such as XQuartz which can be found here:  https://www.xquartz.org/
 
 <h2>MacOS Native (Cocoa) Build</h2>
 
