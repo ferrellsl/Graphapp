@@ -98,6 +98,12 @@ int  gab_next_event(int timeout_ms, GABMouse *mouse);
 int  gab_events_pending(void);
 
 /* Windows. (x, y, w, h) is the client area in top-left screen coords. */
+
+/* Shrinks and moves a titled window's client area to fit the main screen's
+   visible area (below the menu bar, clear of the Dock), as the Win32 and X11
+   backends do. Call before the window and its pixel surface are created. */
+void gab_fit_window_to_screen(int *x, int *y, int *w, int *h);
+
 void *gab_window_create(void *user, int x, int y, int w, int h,
 			int style, int centered, const char *title);
 void gab_window_destroy(void *handle);

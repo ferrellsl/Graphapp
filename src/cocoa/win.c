@@ -69,6 +69,12 @@ Window *app_new_window(App *app, Rect area, const char *name, long flags)
 
 	flags = app_actual_window_flags(flags);
 
+	/* A titled window bigger than the screen (e.g. QuikGrid's 1280x800
+	   main window on a smaller MacBook display) is shrunk and moved to fit. */
+	if (flags & TITLEBAR)
+		gab_fit_window_to_screen(&area.x, &area.y,
+				&area.width, &area.height);
+
 	win = app_zero_alloc(sizeof(struct Window));
 	win->app = app;
 	win->text = app_copy_string(name);
