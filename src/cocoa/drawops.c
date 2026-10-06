@@ -264,8 +264,8 @@ static int image_to_block(Image *img, Rect sr, SrcBlock *b)
 				col = img->cmap[img->data8[sr.y+y][sr.x+x]];
 			else
 				col = img->data32[sr.y+y][sr.x+x];
-			px[y * sr.width + x] = pack_rgb(col);
-			mask[y * sr.width + x] = (col.alpha > 0x7F) ? 0 : 1;
+			px[(size_t) y * sr.width + x] = pack_rgb(col);
+			mask[(size_t) y * sr.width + x] = (col.alpha > 0x7F) ? 0 : 1;
 		}
 	}
 	b->px = b->temp_px = px;

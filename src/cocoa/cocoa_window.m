@@ -244,6 +244,37 @@ static NSRect content_rect(int x, int y, int w, int h)
 	return NSMakeRect(x, gab_screen_height() - y - h, w, h);
 }
 
+void gab_fit_window_to_screen(int *x, int *y, int *w, int *h)
+{
+	@autoreleasepool {
+		NSScreen *scr = [NSScreen mainScreen];
+		NSRect vf, f;
+		CGFloat title, top, bottom;
+
+		if (scr == nil)
+			return;
+		vf = [scr visibleFrame];
+		f = [NSWindow frameRectForContentRect:NSMakeRect(0, 0, 100, 100)
+				styleMask:NSWindowStyleMaskTitled];
+		title = f.size.height - 100;			/* title bar height */
+		top = [scr frame].size.height - (vf.origin.y + vf.size.height);
+		bottom = top + vf.size.height;			/* top-left coords */
+
+		if (*w > (int) vf.size.width)
+			*w = (int) vf.size.width;
+		if (*h > (int) (vf.size.height - title))
+			*h = (int) (vf.size.height - title);
+		if (*x < (int) vf.origin.x)
+			*x = (int) vf.origin.x;
+		if (*x + *w > (int) (vf.origin.x + vf.size.width))
+			*x = (int) (vf.origin.x + vf.size.width) - *w;
+		if (*y < (int) (top + title))
+			*y = (int) (top + title);
+		if (*y + *h > (int) bottom)
+			*y = (int) bottom - *h;
+	}
+}
+
 void *gab_window_create(void *user, int x, int y, int w, int h,
 			int style, int centered, const char *title)
 {
