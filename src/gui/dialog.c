@@ -66,6 +66,7 @@ static const char * CONFIRM_OVERWRITE_STRING  = "Overwrite file?";
 	const char *result;
 	Control *btn[3];
 	Control *field;
+	Font *font;		/* font the message was measured in */
   };
 
   typedef struct FileDialog  FileDialog;
@@ -114,6 +115,10 @@ static void app_dialog_draw_text(Window *w, Graphics *g)
 	if (r.height > 50)
 		r.y += 10; r.height -= 50;
 
+	/* Draw in the same font the dialog was sized for; the window's
+	 * default font can be larger, which clipped the last lines. */
+	if (sd->font)
+		app_set_font(g, sd->font);
 	app_draw_text(g, r, ALIGN_LEFT | VALIGN_TOP, str, len);
 }
 
@@ -310,6 +315,7 @@ static int app_message_box(App *app, const char *title, const char *message,
 	app_del_graphics(g);
 	if (h > 400)
 		h = 400;
+	h += 10;	/* margin below the text, above the buttons */
 	if (h > r.height - 50) {
 		r.height = h + 50;
 		app_size_window(w, r);
@@ -319,6 +325,7 @@ static int app_message_box(App *app, const char *title, const char *message,
 
 	sd->message = message;
 	sd->result = NULL;
+	sd->font = f;
 
 	if (name1)
 		sd->btn[0] = app_new_button(w,
@@ -433,6 +440,7 @@ char *app_ask_string(App *app, const char *title, const char *message, const cha
 	app_del_graphics(g);
 	if (h > 400)
 		h = 400;
+	h += 10 + 44;	/* margin, plus room for the answer field */
 	if (h > r.height - 50) {
 		r.height = h + 50;
 		app_size_window(w, r);
@@ -442,6 +450,7 @@ char *app_ask_string(App *app, const char *title, const char *message, const cha
 
 	sd->message = message;
 	sd->result = NULL;
+	sd->font = f;
 
 	sd->btn[0] = app_new_button(w, rect(10,r.height-35,80,30),
 			app_get_string(app, OK_STRING),

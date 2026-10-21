@@ -37,45 +37,36 @@
 /*
  *  Functions:
  */
+static long app_window_style(long flags);
+static long app_window_extended_style(long flags);
+
 static Rect app_actual_area(App *app, Rect area, long flags)
 {
-	Rect screen, frame, border;
-	Rect menubar, scrollbar;
+	Rect screen;
+	RECT rc;
+	long actual_flags;
 
 	screen.width  = GetSystemMetrics(SM_CXSCREEN);
 	screen.height = GetSystemMetrics(SM_CYSCREEN);
-	frame.width   = GetSystemMetrics(SM_CXFRAME);
-	frame.height  = GetSystemMetrics(SM_CYFRAME);
-	menubar.height   = GetSystemMetrics(SM_CYMENU) + 1;
-	scrollbar.width  = GetSystemMetrics(SM_CXVSCROLL);
-	scrollbar.height = GetSystemMetrics(SM_CYHSCROLL);
 
-	if (flags & TITLEBAR) {
-		int titlebar_height = GetSystemMetrics(SM_CYCAPTION);
-
-		area.y -= titlebar_height;
-		area.height += titlebar_height;
-
-		border.width  = GetSystemMetrics(SM_CXDLGFRAME);
-		border.height = GetSystemMetrics(SM_CYDLGFRAME);
-	}
-	else {
-		border.width  = GetSystemMetrics(SM_CXBORDER);
-		border.height = GetSystemMetrics(SM_CYBORDER);
-	}
-
-	if (flags & RESIZE) {
-		area.x -= frame.width;
-		area.y -= frame.height;
-		area.width += frame.width * 2;
-		area.height += frame.height * 2;
-	}
-	else if (! (flags & POPUP)) {
-		area.x -= border.width;
-		area.y -= border.height;
-		area.width += border.width * 2;
-		area.height += border.height * 2;
-	}
+	/*
+	 * Convert the client area to the whole window's area.  Let Windows
+	 * work out the frame for the window's real style: since Vista,
+	 * frames include a padded border (SM_CXPADDEDBORDER) that adding up
+	 * the caption and frame metrics misses, which made every window's
+	 * client area smaller than asked for, clipping dialogs' contents.
+	 */
+	actual_flags = app_actual_window_flags(flags);
+	rc.left   = area.x;
+	rc.top    = area.y;
+	rc.right  = area.x + area.width;
+	rc.bottom = area.y + area.height;
+	AdjustWindowRectEx(&rc, app_window_style(actual_flags), FALSE,
+		app_window_extended_style(actual_flags));
+	area.x      = rc.left;
+	area.y      = rc.top;
+	area.width  = rc.right - rc.left;
+	area.height = rc.bottom - rc.top;
 
 	if (area.width > screen.width)
 		area.width = screen.width;
