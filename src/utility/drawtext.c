@@ -148,6 +148,14 @@ static int app_get_next_line(Font *f, int pixel_width,
 			glyph_width *= (dword+1); /* tabs = wide spaces */
 			tab = 0;
 		}
+		else if (f->style & NATIVE_FONT) {
+			/* A native font's advances are fractional, so the widths
+			   of single glyphs, each rounded, do not add up to the
+			   width of the line they make (and the line is drawn, and
+			   boxes such as menu names are sized, as a whole string).
+			   Measure the whole line so far instead. */
+			glyph_width = app_font_width(f, *line, lb + gb) - line_width;
+		}
 
 		if (glyph_width + line_width <= pixel_width)
 		{

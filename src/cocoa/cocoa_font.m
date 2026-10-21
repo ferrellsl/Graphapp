@@ -150,20 +150,7 @@ int gab_font_string_width(void *font, const char *utf8, int nbytes)
 	@autoreleasepool {
 		CTLineRef line = make_line(gf, utf8, nbytes);
 		if (line) {
-			double tw = CTLineGetTypographicBounds(line, NULL, NULL, NULL);
-			int i, first = 1;
-
-			/* GraphApp's text layout (utility/drawtext.c) fits a line into a
-			   box by adding up the widths of its glyphs one at a time, and
-			   boxes such as a menu name are sized from the whole string.
-			   CoreText advances are fractional, so rounding both to nearest
-			   let the glyph sum exceed the string width, and the last
-			   glyph was dropped ("Abou", "View.."). Round one glyph down
-			   and a whole string up so the glyphs always fit. */
-			for (i = 1; i < nbytes; i++)
-				if (((unsigned char) utf8[i] & 0xC0) != 0x80)
-					first = 0;
-			w = first ? (int) floor(tw) : (int) ceil(tw);
+			w = (int) lround(CTLineGetTypographicBounds(line, NULL, NULL, NULL));
 			CFRelease(line);
 		}
 	}
