@@ -5,6 +5,7 @@
  */
 
 #import "cocoa_internal.h"
+#import <QuartzCore/QuartzCore.h>
 
 /* Virtual key codes that are never typed text (arrows, F-keys, Return ...). */
 static BOOL is_special_keycode(int kc)
@@ -485,6 +486,13 @@ void gab_flush_windows(void)
 		for (win in [NSApp windows])
 			if ([win isKindOfClass:[GAWindow class]] && [win isVisible])
 				[win displayIfNeeded];
+		/* The views are layer-backed, so what displayIfNeeded drew only reaches
+		   the screen when the run loop's Core Animation transaction commits.
+		   GraphApp runs its own nested event loops (menu tracking, modal
+		   dialogs, progress loops) that never return to the main run loop, so
+		   without this a closed menu or dialog stays on screen until the next
+		   real event. */
+		[CATransaction flush];
 	}
 }
 

@@ -21,7 +21,7 @@ LIB         = $(BUILD)/libapp.a
 INCLUDES    = -Icocoa -Icocoa/shim -I. -Iutility -Igui -Ilibz -Ilibpng -Ilibjpeg -Ilibgif
 CFLAGS      = -arch $(ARCH) -O2 -Wall -Wno-deprecated-declarations -DPNG_NO_MMX_CODE $(INCLUDES)
 OBJCFLAGS   = $(CFLAGS) -fobjc-arc
-FRAMEWORKS  = -framework Cocoa -framework CoreText -framework CoreGraphics
+FRAMEWORKS  = -framework Cocoa -framework CoreText -framework CoreGraphics -framework QuartzCore
 LDLIBS      = $(FRAMEWORKS) -lm
 
 APP_OBJECTS = \
