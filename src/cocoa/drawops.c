@@ -142,6 +142,31 @@ static void fix_negative_rect(Rect *r)
 	}
 }
 
+/*
+ *  Pixels drawn or copied into a bitmap must show when the bitmap is copied
+ *  out again.  app_new_bitmap() gives a bitmap an all-transparent stencil (so
+ *  app_image_to_bitmap can supply its own), and copying honours the source's
+ *  stencil, so without this whatever was drawn into a plain bitmap was lost:
+ *  a menu's saved background was never put back, and the popup stayed on
+ *  screen until the window happened to repaint.
+ */
+static void make_opaque(Graphics *g, Rect c)
+{
+	Mask *m;
+	int y;
+
+	if (g->bmap == NULL)
+		return;
+	m = bitmap_extra(g->bmap)->clipmask;
+	if (m == NULL || m->bits == NULL)
+		return;
+	for (y = c.y; y < c.y + c.height; y++) {
+		if (y < 0 || y >= m->height || c.x < 0 || c.x + c.width > m->width)
+			continue;
+		memset(m->bits + (size_t) y * m->width + c.x, 1, (size_t) c.width);
+	}
+}
+
 static uint32_t blend_pixel(uint32_t dst, uint32_t src, unsigned a)
 {
 	unsigned inv = 255 - a;
@@ -198,6 +223,7 @@ static int surface_fill_rect(Graphics *dst, Rect r)
 			}
 		}
 		app_surface_mark_dirty(s, c);
+		make_opaque(dst, c);
 	}
 	return 1;
 }
@@ -383,6 +409,7 @@ static int surface_copy_rect(Graphics *dst, Point dp, Graphics *src, Rect sr)
 			}
 		}
 		app_surface_mark_dirty(ds, c);
+		make_opaque(dst, c);
 	}
 
 	free_src_block(&b);
@@ -447,6 +474,7 @@ static void draw_coverage(Graphics *dst, int dx, int dy,
 			}
 		}
 		app_surface_mark_dirty(s, c);
+		make_opaque(dst, c);
 	}
 }
 
@@ -489,6 +517,7 @@ static void draw_glyph_mask(Graphics *dst, Rect dr, const Mask *m, int gx, int g
 			}
 		}
 		app_surface_mark_dirty(s, c);
+		make_opaque(dst, c);
 	}
 }
 
