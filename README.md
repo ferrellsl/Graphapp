@@ -11,8 +11,8 @@ on the Mac in order to build and run the binaries properly (or use the native Co
 needs no X server).  Pre-compiled Windows binaries and a static library for
 Windows users can be found in the "Windows Binaries" folder of this repository.  This fork has also
 been successfully compiled using MSYS2/cygwin and Visual Studio versions 2010 thru 2019.  Successful builds have also been completed 
-under MacOS using the XCode command line tools and on Ubuntu 24.04.  A progress-bar indicator has also been added
-to this fork which is not present in the original library.  
+under MacOS using the XCode command line tools and on Ubuntu 24.04.  A progress-bar indicator and a busy spinner have also been added
+to this fork, neither of which is present in the original library.  
 
 The file dialogs that are part of GraphApp are very rudimentary and very ugly.  I recommend using TinyFileDialogs found
 here:https://sourceforge.net/projects/tinyfiledialogs/files/ which also provide native file dialogs for the target system.
@@ -69,6 +69,27 @@ Everything is built in the build-macos folder, so the source folders stay clean.
 renamed or edited.  If GraphApp can find its portable bitmap fonts (set APP_FONT_PATH to the fonts folder, or ship them as
 Contents/Resources/fonts in an .app bundle) they become the default font, otherwise the default is a native font (Arial).  See src/cocoa/README.md for
 how the backend works and what is not done yet (notably Retina resolution, native file dialogs, and app bundling).
+
+<h2>Busy Spinner</h2>
+
+![alt text](https://github.com/ferrellsl/Graphapp/blob/master/busyspinner.gif?raw=true)
+
+A "Busy..." window with a smoothly spinning ring, so users can see that a long task is still working and the program
+hasn't frozen.  It is a single header, src/examples/spinner.h, used the same way as the progress bar:
+
+    Window *spin = new_spinner_window(app, "Please wait", NULL);   /* NULL gives the message "Busy..." */
+    while (working) {
+        /* ...a piece of the work... */
+        spinner_step(spin);                    /* call it as often as you like */
+    }
+    del_spinner_window(spin);
+
+spinner_step() only draws when the next frame is due (60 frames a second) and lets GraphApp handle pending events, so the
+window keeps repainting and can be moved.  While a program waits in its main loop instead, the spinner's own timer keeps
+it turning.  set_spinner_message() changes the message ("Almost done...").  The ring is drawn antialiased into an image
+and copied to the window in one step, so it does not flicker.  It uses only the GraphApp API and builds on Windows,
+Linux and macOS.  See src/examples/spinner_demo.c; on Linux build it with:  make spinner_demo
+(macOS/Cocoa: make -f Makefile.cocoa examples/spinner_demo).  A Windows build is in the "Windows Binaries" folder.
 
 Custom Soft Fonts and UTF8 Fonts
 
