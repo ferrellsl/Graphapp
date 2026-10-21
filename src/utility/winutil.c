@@ -247,6 +247,24 @@ void app_on_window_mouse_move(Window *win, WindowMouseFunc mouse_move)
 		app_add_array_element((void **) win->mouse_move, mouse_move);
 }
 
+void app_on_window_mouse_wheel(Window *win, WindowWheelFunc mouse_wheel)
+{
+	win->mouse_wheel = (WindowWheelFunc *)
+		app_add_array_element((void **) win->mouse_wheel, mouse_wheel);
+}
+
+void app_on_window_mouse_wheel_up(Window *win, WindowMouseFunc mouse_wheel_up)
+{
+	win->mouse_wheel_up = (WindowMouseFunc *)
+		app_add_array_element((void **) win->mouse_wheel_up, mouse_wheel_up);
+}
+
+void app_on_window_mouse_wheel_down(Window *win, WindowMouseFunc mouse_wheel_down)
+{
+	win->mouse_wheel_down = (WindowMouseFunc *)
+		app_add_array_element((void **) win->mouse_wheel_down, mouse_wheel_down);
+}
+
 void app_on_window_key_down(Window *win, WindowKeyFunc key_down)
 {
 	win->key_down = (WindowKeyFunc *)

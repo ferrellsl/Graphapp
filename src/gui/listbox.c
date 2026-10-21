@@ -421,6 +421,24 @@ static void app_listbox_scroll_horizontal(Control *c)
 	app_del_graphics(g);
 }
 
+/* The wheel over the list: up and down by lines, sideways with a
+   sideways turn or Shift + wheel (by a line's height a step). */
+static void app_listbox_wheel(Control *c, int buttons, Point p,
+	int dx, int dy)
+{
+	ListBox *lb = c->parent->extra;
+
+	if ((buttons & SHIFT) && ! dx) {
+		dx = dy;
+		dy = 0;
+	}
+	if (dy)
+		app_nudge_scroll_bar(lb->vert, dy);
+	if (dx)
+		app_nudge_scroll_bar(lb->horz,
+			dx * lb->get_item_height(lb->parent, 0));
+}
+
 static void app_listbox_key_action(Control *c, unsigned long key)
 {
 	int dx=0, dy=0;
@@ -776,6 +794,7 @@ static Control *app_create_list_box(Control *c, Rect r, char *list[],
 	app_on_control_mouse_down(box, app_listbox_mouse_down);
 	app_on_control_mouse_drag(box, app_listbox_mouse_drag);
 	app_on_control_mouse_up(box, app_listbox_mouse_up);
+	app_on_control_mouse_wheel(box, app_listbox_wheel);
 	app_on_control_key_action(c, app_listbox_key_action);
 	app_on_control_refocus(c, app_listbox_refocus);
 	app_on_control_deletion(c, app_list_box_del);

@@ -718,6 +718,43 @@ static void app_release_scrollbar(Control *c, int buttons, Point p)
 	}
 }
 
+/*
+ *  Moves the scroll bar on by an amount (in its own units, negative
+ *  for up or left), as far as it goes, and tells its owner: the mouse
+ *  wheel turns scrolling into this.
+ */
+void app_nudge_scroll_bar(Control *c, int amount)
+{
+	ScrollBar *s;
+	int value;
+
+	if ((c == NULL) || (amount == 0) || ! app_is_enabled(c))
+		return;
+	s = c->extra;
+	value = s->ctrl->value + amount;
+	if (value > s->max)
+		value = s->max;
+	if (value < 0)
+		value = 0;
+	app_scrollbar_update_thumb(c, value);
+}
+
+/* The wheel over the scroll bar itself: a vertical one follows the
+   wheel; a horizontal one follows a sideways turn, Shift + wheel, or
+   the plain wheel. */
+static void app_wheel_scrollbar(Control *c, int buttons, Point p,
+	int dx, int dy)
+{
+	ScrollBar *s = c->extra;
+	int amount;
+
+	if (app_is_vertical_scroll_bar(app_get_control_area(c)))
+		amount = (buttons & SHIFT) ? 0 : dy;
+	else
+		amount = dx ? dx : dy;
+	app_nudge_scroll_bar(c, amount * s->minstep);
+}
+
 static void app_scrollbar_del(Control *c)
 {
 	app_free(c->extra);
@@ -772,6 +809,7 @@ static Control *app_create_scroll_bar(Control *c, Rect r, int max,
 	app_on_control_mouse_drag(c, app_drag_scrollbar);
 	app_on_control_mouse_up(c, app_release_scrollbar);
 	app_on_control_mouse_move(c, app_release_scrollbar);
+	app_on_control_mouse_wheel(c, app_wheel_scrollbar);
 	app_on_control_action(c, fn);
 	app_on_control_deletion(c, app_scrollbar_del);
 

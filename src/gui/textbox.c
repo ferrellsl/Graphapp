@@ -1496,6 +1496,16 @@ static void app_text_box_resize(Control *c)
 	app_text_box_scroll_page(t, 0);
 }
 
+/* The wheel over the text: up and down by lines. */
+static void app_text_box_wheel(Control *c, int buttons, Point p,
+	int dx, int dy)
+{
+	TextBox *t = c->parent->extra;
+
+	if (dy && ! (buttons & SHIFT))
+		app_nudge_scroll_bar(t->vert, dy);
+}
+
 static void app_text_box_scroll_vertical(Control *c)
 {
 	TextBox *t;
@@ -1600,6 +1610,7 @@ static Control *app_create_text_box(Control *c, Rect r, const char *text) //!!
 	app_on_control_mouse_down(box, app_text_box_mouse_down);
 	app_on_control_mouse_drag(box, app_text_box_mouse_drag);
 	app_on_control_mouse_up(box, app_text_box_mouse_up);
+	app_on_control_mouse_wheel(box, app_text_box_wheel);
 	app_on_control_key_down(c, app_text_box_key_down);
 	app_on_control_key_action(c, app_text_box_key_action);
 	app_on_control_update(c, app_text_box_update);

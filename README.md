@@ -11,8 +11,8 @@ on the Mac in order to build and run the binaries properly (or use the native Co
 needs no X server).  Pre-compiled Windows binaries and a static library for
 Windows users can be found in the "Windows Binaries" folder of this repository.  This fork has also
 been successfully compiled using MSYS2/cygwin and Visual Studio versions 2010 thru 2019.  Successful builds have also been completed 
-under MacOS using the XCode command line tools and on Ubuntu 24.04.  A progress-bar indicator and a busy spinner have also been added
-to this fork, neither of which is present in the original library.  
+under MacOS using the XCode command line tools and on Ubuntu 24.04.  A progress-bar indicator, a busy spinner and mouse-wheel scrolling have also been
+added to this fork; the original library has none of them except a basic wheel handler in its last release (3.71).  
 
 The file dialogs that are part of GraphApp are very rudimentary and very ugly.  I recommend using TinyFileDialogs found
 here:https://sourceforge.net/projects/tinyfiledialogs/files/ which also provide native file dialogs for the target system.
@@ -90,6 +90,26 @@ it turning.  set_spinner_message() changes the message ("Almost done...").  The 
 and copied to the window in one step, so it does not flicker.  It uses only the GraphApp API and builds on Windows,
 Linux and macOS.  See src/examples/spinner_demo.c; on Linux build it with:  make spinner_demo
 (macOS/Cocoa: make -f Makefile.cocoa examples/spinner_demo).  A Windows build is in the "Windows Binaries" folder.
+
+<h2>Mouse Wheel</h2>
+
+List boxes, text boxes and scroll bars scroll with the mouse wheel on Windows, Linux (X11) and macOS (Cocoa, including
+trackpads): 3 lines a notch, or as many as Windows is set to, and sideways with a tilting wheel or Shift + wheel.  The wheel
+events that are already waiting are combined into one scroll, so a fast spin, or a remote display such as WSLg, doesn't lag
+behind, and the small steps of touchpads and smooth-scrolling mice add up instead of being lost.
+
+Programs can handle the wheel themselves, on a window or on a control, for example to zoom a drawing:
+
+    void wheel(Control *c, int buttons, Point p, int dx, int dy)    /* lines turned; dy > 0 = toward you */
+    {
+        ...
+    }
+    on_control_mouse_wheel(canvas, wheel);        /* or on_window_mouse_wheel(win, ...) */
+
+nudge_scroll_bar(bar, amount) moves a scroll bar by an amount and tells its owner.  The handlers of GraphApp 3.70/3.71,
+on_window_mouse_wheel_up/down and on_control_mouse_wheel_up/down (one call a notch), work too.  See
+src/examples/wheel_demo.c; on Linux build it with:  make wheel_demo   (macOS/Cocoa: make -f Makefile.cocoa examples/wheel_demo).
+A Windows build is in the "Windows Binaries" folder.
 
 Custom Soft Fonts and UTF8 Fonts
 

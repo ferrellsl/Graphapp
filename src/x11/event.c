@@ -215,6 +215,62 @@ static void app_do_mouse_press(Window *win, int state, int x, int y,
 	}
 }
 
+/*
+ *  The mouse wheel.  X reports each notch as a press (and a release)
+ *  of button 4 (up), 5 (down), 6 (left) or 7 (right).  The notches
+ *  already waiting for the same window are taken too and handled as
+ *  one, so a fast spin, or the bursts a remote display (WSLg, ssh)
+ *  delivers, is one scroll and one redraw, not a queue of them.
+ */
+static int app_is_wheel_button(unsigned int button)
+{
+	return (button >= 4) && (button <= 7);
+}
+
+static Bool app_is_wheel_event(Display *d, XEvent *e, XPointer arg)
+{
+	return ((e->type == ButtonPress) || (e->type == ButtonRelease))
+		&& (e->xbutton.window == *(XID *) arg)
+		&& app_is_wheel_button(e->xbutton.button);
+}
+
+static void app_add_wheel_notch(unsigned int button, double *dx, double *dy)
+{
+	switch (button) {
+	  case 4: *dy -= 120; break;	/* up, away from the user */
+	  case 5: *dy += 120; break;
+	  case 6: *dx -= 120; break;	/* left */
+	  case 7: *dx += 120; break;
+	}
+}
+
+static void app_do_mouse_wheel_press(App *app, Window *win, XEvent *e)
+{
+	XEvent next;
+	XID xid = e->xbutton.window;
+	double dx = 0, dy = 0;
+	int buttons = 0;
+	Point p;
+
+	if (e->xbutton.state & ShiftMask)
+		buttons |= SHIFT;
+	if (e->xbutton.state & ControlMask)
+		buttons |= CONTROL;
+	p.x = e->xbutton.x;
+	p.y = e->xbutton.y;
+	app_add_wheel_notch(e->xbutton.button, &dx, &dy);
+
+	while (XCheckIfEvent(app_extra(app)->display, &next,
+			app_is_wheel_event, (XPointer) &xid)) {
+		if (next.type != ButtonPress)
+			continue;
+		app_add_wheel_notch(next.xbutton.button, &dx, &dy);
+		p.x = next.xbutton.x;
+		p.y = next.xbutton.y;
+	}
+	app_do_mouse_wheel(win, buttons, p, dx, dy, 3, 3);
+}
+
 static int app_mouse_release_buttons(int state, int released)
 {
 	int buttons, prior;
@@ -673,6 +729,10 @@ static void app_winproc(App *app, XEvent *e)
 		if (modal_in_front)
 			return;
 		app_extra(app)->last_event_time = e->xbutton.time;
+		if (app_is_wheel_button(e->xbutton.button)) {
+			app_do_mouse_wheel_press(app, win, e);
+			return;
+		}
 		app_do_mouse_press(win, e->xbutton.state,
 			e->xbutton.x, e->xbutton.y, e->xbutton.button);
 		return;
@@ -681,6 +741,8 @@ static void app_winproc(App *app, XEvent *e)
 		if (modal_in_front)
 			return;
 		app_extra(app)->last_event_time = e->xbutton.time;
+		if (app_is_wheel_button(e->xbutton.button))
+			return;	/* (the wheel: handled at the press) */
 		app_do_mouse_release(win, e->xbutton.state,
 			e->xbutton.x, e->xbutton.y, e->xbutton.button);
 		return;
@@ -802,6 +864,8 @@ static int app_get_mouse_events(App *app, XEvent *e, int *btns, Point *xy)
 		return 1;
 
 	  case ButtonPress:
+		if (app_is_wheel_button(e->xbutton.button))
+			return -1;	/* the wheel: not a click */
 		app_extra(app)->last_event_time = e->xbutton.time;
 		xy->x = e->xbutton.x;
 		xy->y = e->xbutton.y;
@@ -812,6 +876,8 @@ static int app_get_mouse_events(App *app, XEvent *e, int *btns, Point *xy)
 		return 1;
 
 	  case ButtonRelease:
+		if (app_is_wheel_button(e->xbutton.button))
+			return -1;	/* the wheel: not a click */
 		app_extra(app)->last_event_time = e->xbutton.time;
 		xy->x = e->xbutton.x;
 		xy->y = e->xbutton.y;

@@ -57,6 +57,77 @@ static int app_get_button_state(int wParam)
 	return buttons;
 }
 
+/*
+ *  The mouse wheel.  Windows says how far it turned in 120ths of a
+ *  notch (finer steps come from touchpads and smooth-scrolling mice),
+ *  at a point in screen co-ordinates.  The turns already waiting are
+ *  taken too and handled as one, so a fast spin is one scroll and one
+ *  redraw, not a queue of them.
+ */
+#ifndef WM_MOUSEHWHEEL
+#define WM_MOUSEHWHEEL 0x020E
+#endif
+#ifndef SPI_GETWHEELSCROLLCHARS
+#define SPI_GETWHEELSCROLLCHARS 0x006C
+#endif
+
+static int app_wheel_lines(int sideways)
+{
+	UINT n = 3;
+
+	if (! SystemParametersInfo(sideways ? SPI_GETWHEELSCROLLCHARS
+			: SPI_GETWHEELSCROLLLINES, 0, &n, 0))
+		n = 3;
+	if (n > 100)	/* WHEEL_PAGESCROLL: "a page", taken as 3 lines */
+		n = 3;
+	return (int) n;
+}
+
+static void app_add_wheel_turn(UINT msg, WPARAM wParam,
+	double *dx, double *dy)
+{
+	int delta = (short) HIWORD(wParam);
+
+	if (msg == WM_MOUSEWHEEL)
+		*dy -= delta;	/* positive = away from the user = up */
+	else
+		*dx += delta;	/* positive = right */
+}
+
+static void app_do_mouse_wheel_message(HWND hwnd, Window *win,
+	UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	MSG next;
+	POINT pt;
+	Point p;
+	double dx = 0, dy = 0;
+	int buttons = 0, more;
+
+	if (LOWORD(wParam) & MK_SHIFT)
+		buttons |= SHIFT;
+	if (LOWORD(wParam) & MK_CONTROL)
+		buttons |= CONTROL;
+
+	app_add_wheel_turn(msg, wParam, &dx, &dy);
+	do {
+		more = 0;
+		if (PeekMessage(&next, hwnd, WM_MOUSEWHEEL, WM_MOUSEWHEEL, PM_REMOVE)
+		 || PeekMessage(&next, hwnd, WM_MOUSEHWHEEL, WM_MOUSEHWHEEL, PM_REMOVE)) {
+			app_add_wheel_turn(next.message, next.wParam, &dx, &dy);
+			lParam = next.lParam;
+			more = 1;
+		}
+	} while (more);
+
+	pt.x = (short) LOWORD(lParam);
+	pt.y = (short) HIWORD(lParam);
+	ScreenToClient(hwnd, &pt);
+	p.x = pt.x;
+	p.y = pt.y;
+	app_do_mouse_wheel(win, buttons, p, dx, dy,
+		app_wheel_lines(1), app_wheel_lines(0));
+}
+
 static void app_do_mouse_down(Window *win, int buttons, int x, int y)
 {
 	int i;
@@ -472,6 +543,13 @@ app_winproc (HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			return 0;
 		app_do_mouse_up(win, app_get_button_state((int) wParam),
 					LOWORD(lParam), HIWORD(lParam));
+		return 0;
+
+	  case WM_MOUSEWHEEL:
+	  case WM_MOUSEHWHEEL:
+		if (app_modal_in_front(win))
+			return 0;
+		app_do_mouse_wheel_message(hwnd, win, msg, wParam, lParam);
 		return 0;
 
 	  case WM_KEYDOWN:

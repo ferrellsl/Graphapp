@@ -47,6 +47,7 @@
 #define change_default_font          app_change_default_font
 #define change_list_box              app_change_list_box
 #define change_scroll_bar            app_change_scroll_bar
+#define nudge_scroll_bar             app_nudge_scroll_bar
 #define check                        app_check
 #define check_menu_item              app_check_menu_item
 #define clear_text                   app_clear_text
@@ -252,6 +253,9 @@
 #define on_control_mouse_down        app_on_control_mouse_down
 #define on_control_mouse_drag        app_on_control_mouse_drag
 #define on_control_mouse_move        app_on_control_mouse_move
+#define on_control_mouse_wheel       app_on_control_mouse_wheel
+#define on_control_mouse_wheel_down  app_on_control_mouse_wheel_down
+#define on_control_mouse_wheel_up    app_on_control_mouse_wheel_up
 #define on_control_mouse_up          app_on_control_mouse_up
 #define on_control_redraw            app_on_control_redraw
 #define on_control_refocus           app_on_control_refocus
@@ -263,6 +267,9 @@
 #define on_window_mouse_down         app_on_window_mouse_down
 #define on_window_mouse_drag         app_on_window_mouse_drag
 #define on_window_mouse_move         app_on_window_mouse_move
+#define on_window_mouse_wheel        app_on_window_mouse_wheel
+#define on_window_mouse_wheel_down   app_on_window_mouse_wheel_down
+#define on_window_mouse_wheel_up     app_on_window_mouse_wheel_up
 #define on_window_mouse_up           app_on_window_mouse_up
 #define on_window_move               app_on_window_move
 #define on_window_redraw             app_on_window_redraw

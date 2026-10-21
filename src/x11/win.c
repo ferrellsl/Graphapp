@@ -295,6 +295,9 @@ void app_del_window(Window *win)
 	app_free(win->mouse_up);
 	app_free(win->mouse_drag);
 	app_free(win->mouse_move);
+	app_free(win->mouse_wheel);
+	app_free(win->mouse_wheel_up);
+	app_free(win->mouse_wheel_down);
 	app_free(win->key_down);
 	app_free(win->key_action);
 

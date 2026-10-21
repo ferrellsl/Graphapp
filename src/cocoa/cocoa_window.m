@@ -125,6 +125,19 @@ static unsigned long first_scalar(NSString *s)
 - (void)otherMouseDragged:(NSEvent *)e { [self deliverMouse:e]; }
 - (void)mouseMoved:(NSEvent *)e        { [self deliverMouse:e]; }
 
+/* The scroll wheel, and two-finger scrolling on a trackpad. */
+- (void)scrollWheel:(NSEvent *)e
+{
+	NSPoint p;
+
+	if (! ready || ! gab_callbacks.wheel)
+		return;
+	p = [self convertPoint:[e locationInWindow] fromView:nil];
+	gab_callbacks.wheel(user, gab_mods(e), (int) floor(p.x), (int) floor(p.y),
+		[e scrollingDeltaX], [e scrollingDeltaY],
+		[e hasPreciseScrollingDeltas] ? 1 : 0);
+}
+
 /* Keyboard */
 
 - (void)keyDown:(NSEvent *)e

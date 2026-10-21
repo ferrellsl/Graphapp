@@ -383,6 +383,33 @@ static void cb_mouse(void *w, int kind, int pressed, int mods, int x, int y)
 	}
 }
 
+/*
+ *  The scroll wheel.  GraphApp counts it in 120ths of a notch, positive
+ *  down and right, at 3 lines a notch (see utility/dispatch.c).  A wheel
+ *  mouse gives about 1 a notch (more when spun fast); a trackpad gives
+ *  points, taken here as 12 points a line.  macOS has already merged the
+ *  scroll events that were waiting.
+ */
+static void cb_wheel(void *w, int mods, int x, int y,
+	double dx, double dy, int precise)
+{
+	Window *win = (Window *) w;
+	double scale = precise ? (120.0 / (3 * 12)) : 120.0;
+	int buttons = 0;
+	Point p;
+
+	if (win == NULL || app_modal_in_front(win))
+		return;
+	if (mods & GAB_MOD_SHIFT)
+		buttons |= SHIFT;
+	if (mods & GAB_MOD_CTRL)
+		buttons |= CONTROL;
+	p.x = x;
+	p.y = y;
+	/* (Cocoa's deltas move the content; GraphApp's move the view) */
+	app_do_mouse_wheel(win, buttons, p, -dx * scale, -dy * scale, 3, 3);
+}
+
 static void cb_key(void *w, int keycode, unsigned long ch, int mods)
 {
 	app_do_key((Window *) w, keycode, ch, mods);
@@ -478,6 +505,7 @@ void app_install_bridge_callbacks(App *app)
 	cb.close = cb_close;
 	cb.quit = cb_quit;
 	cb.activated = cb_activated;
+	cb.wheel = cb_wheel;
 	gab_set_callbacks(&cb);
 }
 

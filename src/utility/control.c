@@ -477,6 +477,9 @@ static Control *app_locate_controls(int num, Control **list, Point p)
 			(c->mouse_up == NULL) &&
 			(c->mouse_move == NULL) &&
 			(c->mouse_drag == NULL) &&
+			(c->mouse_wheel == NULL) &&
+			(c->mouse_wheel_up == NULL) &&
+			(c->mouse_wheel_down == NULL) &&
 			(c->bg.alpha > 0x7F))	//!!
 				continue;
 
@@ -494,6 +497,19 @@ static Control *app_locate_controls(int num, Control **list, Point p)
  *  this window is visible. Returns NULL if no child control can
  *  handle the mouse click.
  */
+/*
+ *  The control under a point, whichever control has the mouse grabbed
+ *  (the mouse wheel goes to what is under the pointer).
+ */
+Control *app_locate_control_at(Window *w, Point p)
+{
+	if ((w->state & VISIBLE) == 0)
+		return NULL;
+	if (w->num_children > 0)
+		return app_locate_controls(w->num_children, w->children, p);
+	return NULL;
+}
+
 Control *app_locate_control(Window *w, Point p)
 {
 	if (w->mouse_grab)
@@ -1000,6 +1016,9 @@ static void app_del_control_tree(Control *c)
 	app_free(c->mouse_up);
 	app_free(c->mouse_drag);
 	app_free(c->mouse_move);
+	app_free(c->mouse_wheel);
+	app_free(c->mouse_wheel_up);
+	app_free(c->mouse_wheel_down);
 	app_free(c->key_down);
 	app_free(c->key_action);
 	app_free(c->action);
@@ -1142,6 +1161,24 @@ void app_on_control_mouse_move(Control *c, MouseFunc mouse_move)
 {
 	c->mouse_move = (MouseFunc *)
 		app_add_array_element((void **) c->mouse_move, mouse_move);
+}
+
+void app_on_control_mouse_wheel(Control *c, WheelFunc mouse_wheel)
+{
+	c->mouse_wheel = (WheelFunc *)
+		app_add_array_element((void **) c->mouse_wheel, mouse_wheel);
+}
+
+void app_on_control_mouse_wheel_up(Control *c, MouseFunc mouse_wheel_up)
+{
+	c->mouse_wheel_up = (MouseFunc *)
+		app_add_array_element((void **) c->mouse_wheel_up, mouse_wheel_up);
+}
+
+void app_on_control_mouse_wheel_down(Control *c, MouseFunc mouse_wheel_down)
+{
+	c->mouse_wheel_down = (MouseFunc *)
+		app_add_array_element((void **) c->mouse_wheel_down, mouse_wheel_down);
 }
 
 void app_on_control_key_down(Control *c, KeyFunc key_down)

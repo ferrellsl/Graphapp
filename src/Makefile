@@ -135,6 +135,9 @@ progress_bar_demo: static examples/progress_bar_demo.o
 spinner_demo: static examples/spinner_demo.o
 	$(CC) $(CFLAGS) -o examples/spinner_demo examples/spinner_demo.o $(LIB) $(XLIBS)
 
+wheel_demo: static examples/wheel_demo.o
+	$(CC) $(CFLAGS) -o examples/wheel_demo examples/wheel_demo.o $(LIB) $(XLIBS)
+
 smiley: static examples/smiley.o
 	$(CC) $(CFLAGS) -o examples/smiley examples/smiley.o $(LIB) $(XLIBS)
 

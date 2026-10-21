@@ -79,6 +79,12 @@ typedef struct GABCallbacks {
 	void (*close)(void *win);
 	void (*quit)(void);	/* Cmd-Q or Dock "Quit" */
 	void (*activated)(void *win);
+	/* The scroll wheel or a trackpad: dx, dy as NSEvent's
+	   scrollingDeltaX/Y (positive = content moves right/down), in
+	   points if precise (trackpads), else about 1 a wheel notch;
+	   (x, y) in client coordinates. */
+	void (*wheel)(void *win, int mods, int x, int y,
+		double dx, double dy, int precise);
 } GABCallbacks;
 
 void gab_set_callbacks(const GABCallbacks *cb);

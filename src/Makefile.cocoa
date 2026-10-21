@@ -102,7 +102,8 @@ $(BUILD)/%.o: %.m $(HEADERS) cocoa/cocoa_internal.h
 
 # Example programs: make -f Makefile.cocoa examples/<name>  (binary in build-macos/examples/)
 EXAMPLES = examples/smiley examples/arcs examples/alldemo examples/tester examples/editdraw \
-	examples/scribble examples/xortest examples/calc examples/imagine examples/utf8edit examples/spinner_demo
+	examples/scribble examples/xortest examples/calc examples/imagine examples/utf8edit examples/spinner_demo \
+	examples/wheel_demo
 
 demo: $(EXAMPLES)
 

@@ -96,11 +96,15 @@
   typedef void (*WindowMouseFunc) (Window *w, int buttons, Point xy);
   typedef void (*WindowKeyFunc)   (Window *w, unsigned long key);
   typedef void (*WindowDrawFunc)  (Window *w, Graphics *g);
+  typedef void (*WindowWheelFunc) (Window *w, int buttons, Point xy,
+                                   int dx, int dy);
 
   typedef void (*ControlFunc)     (Control *c);
   typedef void (*MouseFunc)       (Control *c, int buttons, Point xy);
   typedef void (*KeyFunc)         (Control *c, unsigned long key);
   typedef void (*DrawFunc)        (Control *c, Graphics *g);
+  typedef void (*WheelFunc)       (Control *c, int buttons, Point xy,
+                                   int dx, int dy);
 
   typedef void (*MenuAction)      (MenuItem *mi);
 
@@ -217,6 +221,11 @@
 
 	WindowKeyFunc *     key_down;       /* normal Unicode keystroke */
 	WindowKeyFunc *     key_action;     /* arrow keys, etc */
+
+	WindowWheelFunc *   mouse_wheel;    /* wheel turned: lines dx, dy */
+	WindowMouseFunc *   mouse_wheel_up;   /* one notch away (3.70 API) */
+	WindowMouseFunc *   mouse_wheel_down; /* one notch toward (3.70 API) */
+	double              wheel_left[4];  /* wheel turned, not yet used */
   };
 
   struct Bitmap {
@@ -318,6 +327,9 @@
 	ControlFunc *   update;             /* used when any data changes */
 	ControlFunc *   refocus;            /* used when focus changes */
 	ControlFunc *   del;                /* used during deletion */
+	WheelFunc *     mouse_wheel;        /* wheel turned: lines dx, dy */
+	MouseFunc *     mouse_wheel_up;     /* one notch away (3.70 API) */
+	MouseFunc *     mouse_wheel_down;   /* one notch toward (3.70 API) */
   };
 
   struct MenuBar {
@@ -718,6 +730,9 @@ void	app_on_window_mouse_down(Window *w, WindowMouseFunc mouse_down);
 void	app_on_window_mouse_up  (Window *w, WindowMouseFunc mouse_up);
 void	app_on_window_mouse_drag(Window *w, WindowMouseFunc mouse_drag);
 void	app_on_window_mouse_move(Window *w, WindowMouseFunc mouse_move);
+void	app_on_window_mouse_wheel(Window *w, WindowWheelFunc mouse_wheel);
+void	app_on_window_mouse_wheel_up  (Window *w, WindowMouseFunc mouse_wheel_up);
+void	app_on_window_mouse_wheel_down(Window *w, WindowMouseFunc mouse_wheel_down);
 void	app_on_window_key_down  (Window *w, WindowKeyFunc key_down);
 void	app_on_window_key_action(Window *w, WindowKeyFunc key_action);
 
@@ -768,6 +783,9 @@ void	app_on_control_mouse_down(Control *c, MouseFunc mouse_down);
 void	app_on_control_mouse_up  (Control *c, MouseFunc mouse_up);
 void	app_on_control_mouse_drag(Control *c, MouseFunc mouse_drag);
 void	app_on_control_mouse_move(Control *c, MouseFunc mouse_move);
+void	app_on_control_mouse_wheel(Control *c, WheelFunc mouse_wheel);
+void	app_on_control_mouse_wheel_up  (Control *c, MouseFunc mouse_wheel_up);
+void	app_on_control_mouse_wheel_down(Control *c, MouseFunc mouse_wheel_down);
 void	app_on_control_key_down  (Control *c, KeyFunc key_down);
 void	app_on_control_key_action(Control *c, KeyFunc key_action);
 void	app_on_control_action    (Control *c, ControlFunc action);
@@ -943,6 +961,7 @@ Control *app_add_scroll_bar(Control *c, Rect r, int max, int pagesize,
 		ControlFunc fn);
 
 void	app_change_scroll_bar(Control *c, int pos, int max, int pagesize);
+void	app_nudge_scroll_bar(Control *c, int amount);
 
 
 /*

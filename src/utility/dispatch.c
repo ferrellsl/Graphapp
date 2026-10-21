@@ -246,3 +246,92 @@ int app_do_alt_key_down(Window *win, unsigned long ch, int alt)
 	return 0;
 }
 
+/*
+ *  The mouse wheel.
+ *
+ *  The platform code calls this with how far the wheel turned, in
+ *  120ths of a notch (Windows' WHEEL_DELTA), dy positive toward the
+ *  user (scroll down), dx positive to the right, all the wheel events
+ *  that were waiting already added together; and how many lines one
+ *  notch scrolls (3, or the system's setting).
+ *
+ *  What is less than a whole line is kept for the next turn, so the
+ *  small steps of touchpads and smooth-scrolling mice add up.  The
+ *  control under the pointer gets it first (then its parents, if it
+ *  passes the event on), then the window:
+ *    mouse_wheel handlers get the lines, dx and dy, once;
+ *    3.70-style mouse_wheel_up/down handlers get one call per notch
+ *    (sideways turns come to them as Shift + wheel, as in 3.70).
+ */
+static int app_wheel_take(double *left, double amount)
+{
+	int whole;
+
+	if ((amount > 0 && *left < 0) || (amount < 0 && *left > 0))
+		*left = 0;	/* turned back: forget the rest */
+	*left += amount;
+	whole = (int) *left;	/* toward zero */
+	*left -= whole;
+	return whole;
+}
+
+static void app_wheel_notches(void *target, int is_window, MouseFunc *up,
+	MouseFunc *down, int buttons, Point p, int notches)
+{
+	int i, n;
+	MouseFunc *list = (notches < 0) ? up : down;
+
+	if (list == NULL)
+		return;
+	for (n = (notches < 0) ? -notches : notches; n > 0; n--)
+		for (i=0; list[i]; i++) {
+			if (is_window)
+				((WindowMouseFunc) list[i])((Window *) target, buttons, p);
+			else
+				list[i]((Control *) target, buttons, p);
+		}
+}
+
+void app_do_mouse_wheel(Window *win, int buttons, Point p,
+	double dx, double dy, int lines_x, int lines_y)
+{
+	int i, lx, ly, nx, ny;
+	Point q;
+	Control *c;
+
+	if (win == NULL)
+		return;
+
+	ly = app_wheel_take(&win->wheel_left[0], dy * lines_y / 120.0);
+	lx = app_wheel_take(&win->wheel_left[1], dx * lines_x / 120.0);
+	ny = app_wheel_take(&win->wheel_left[2], dy / 120.0);
+	nx = app_wheel_take(&win->wheel_left[3], dx / 120.0);
+	if (! (lx || ly || nx || ny))
+		return;
+
+	for (c = app_locate_control_at(win, p); c; c = c->parent) {
+		if (! (c->mouse_wheel || c->mouse_wheel_up || c->mouse_wheel_down))
+			continue;
+		q.x = p.x - c->offset.x;
+		q.y = p.y - c->offset.y;
+		if (c->mouse_wheel && (lx || ly))
+			for (i=0; c->mouse_wheel[i]; i++)
+				c->mouse_wheel[i](c, buttons, q, lx, ly);
+		app_wheel_notches(c, 0, c->mouse_wheel_up,
+			c->mouse_wheel_down, buttons, q, ny);
+		app_wheel_notches(c, 0, c->mouse_wheel_up,
+			c->mouse_wheel_down, buttons | SHIFT, q, nx);
+		if (win->pass_event)
+			win->pass_event = 0;
+		else
+			return;
+	}
+
+	if (win->mouse_wheel && (lx || ly))
+		for (i=0; win->mouse_wheel[i]; i++)
+			win->mouse_wheel[i](win, buttons, p, lx, ly);
+	app_wheel_notches(win, 1, (MouseFunc *) win->mouse_wheel_up,
+		(MouseFunc *) win->mouse_wheel_down, buttons, p, ny);
+	app_wheel_notches(win, 1, (MouseFunc *) win->mouse_wheel_up,
+		(MouseFunc *) win->mouse_wheel_down, buttons | SHIFT, p, nx);
+}

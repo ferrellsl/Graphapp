@@ -90,6 +90,9 @@ void    app_do_delayed_deletion(App *app);
 
 int     app_do_key_down(Window *win, unsigned long ch);
 int     app_send_key_value(Window *win, unsigned long ch, int pass_to);
+Control *app_locate_control_at(Window *w, Point p);
+void    app_do_mouse_wheel(Window *win, int buttons, Point p,
+                           double dx, double dy, int lines_x, int lines_y);
 int     app_do_alt_key_down(Window *win, unsigned long ch, int alt);
 
 /* Arrays: */
