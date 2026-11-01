@@ -68,6 +68,7 @@ namespace
   }
 
   const char* const parentProcProp = "Qwt3DParentProc";
+  const char* const parentWindowProp = "Qwt3DParentWindow";
 
   GLWidget* plotOf(HWND child)
   {
@@ -134,8 +135,8 @@ namespace
   /*
     GraphApp draws its pull-down menus straight on the window with GDI, which cannot
     draw over an OpenGL child window. So the child steps aside while a menu is open:
-    mouse presses in the parent (the plot takes its own) and Alt keys are what open one,
-    and GraphApp stays in the handler until it closes.
+    presses on the menu bar and Alt keys are what open one, and GraphApp stays in the
+    handler until it closes.
 
     GraphApp's window procedure ignores a window whose GWLP_WNDPROC is not itself, so
     it has to be put back for the length of each call.
@@ -147,10 +148,12 @@ namespace
     if (msg == WM_NCDESTROY)
     {
       RemovePropA(hwnd, parentProcProp);
+      RemovePropA(hwnd, parentWindowProp);
       return CallWindowProc(original, hwnd, msg, wp, lp);
     }
 
-    bool menu = (msg == WM_LBUTTONDOWN || msg == WM_SYSCHAR);
+    bool menu = msg == WM_SYSCHAR || (msg == WM_LBUTTONDOWN
+      && GraphAppHost::inMenuBar((Window*)GetPropA(hwnd, parentWindowProp), GET_X_LPARAM(lp), GET_Y_LPARAM(lp)));
     HWND focus = GetFocus();
     if (menu)
       EnumChildWindows(hwnd, freezePlot, 0);
@@ -330,6 +333,7 @@ GLWidget::GLWidget(Window* parent, int x, int y, int width, int height)
                    GetWindowLongPtr(parenthwnd, GWL_STYLE) | WS_CLIPCHILDREN);
   if (!GetPropA(parenthwnd, parentProcProp))
   {
+    SetPropA(parenthwnd, parentWindowProp, (HANDLE)parent);
     SetPropA(parenthwnd, parentProcProp, (HANDLE)GetWindowLongPtr(parenthwnd, GWLP_WNDPROC));
     SetWindowLongPtr(parenthwnd, GWLP_WNDPROC, (LONG_PTR)parentProc);
   }

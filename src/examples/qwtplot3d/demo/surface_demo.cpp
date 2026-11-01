@@ -19,6 +19,8 @@
 // the library first: graphapp.h defines macros such as check, enable, warning and rect
 #include <qwt3d_surfaceplot.h>
 #include <qwt3d_function.h>
+#include <qwt3d_parametricsurface.h>
+#include <qwt3d_enrichment.h>
 #include <qwt3d_io.h>
 
 extern "C" {
@@ -192,10 +194,6 @@ static Window* win;
 static MenuBar* bar;
 static Plot* plot;
 static MenuItem* styleitem[5];
-static MenuItem* resitem[5];
-static MenuItem* legenditem;
-static MenuItem* lightitem;
-static MenuItem* perspectiveitem;
 static const char* shotbase;
 static const char* mapname;
 static FILE* logfile;
@@ -207,12 +205,6 @@ static void setStyle(MenuItem* mi);
 static int barHeight()
 {
 	return bar->ctrl->area.height;
-}
-
-static void resized(Window* w)
-{
-	Rect r = get_window_area(w);
-	plot->setGeometry(0, barHeight(), r.width, r.height - barHeight());
 }
 
 static void quit(Window*)
@@ -291,55 +283,6 @@ static void resetColors(MenuItem*)
 	plot->resetColors();
 }
 
-static void setResolutionItem(MenuItem* mi)
-{
-	static const int steps[5] = {1, 2, 3, 5, 10};
-	for (int i = 0; i != 5; ++i)
-	{
-		if (resitem[i] == mi)
-		{
-			check_menu_item(mi);
-			plot->setResolution(steps[i]);
-		}
-		else
-			uncheck_menu_item(resitem[i]);
-	}
-}
-
-static void toggleLegend(MenuItem* mi)
-{
-	plot->legendShown = !plot->legendShown;
-	if (plot->legendShown)
-		check_menu_item(mi);
-	else
-		uncheck_menu_item(mi);
-	plot->redrawLegend(plot->legendShown);
-}
-
-static void togglePerspective(MenuItem* mi)
-{
-	bool ortho = !plot->ortho();
-	if (ortho)
-		uncheck_menu_item(mi);
-	else
-		check_menu_item(mi);
-	plot->setOrtho(ortho);
-}
-
-static void toggleLighting(MenuItem* mi)
-{
-	static bool on = false;
-	on = !on;
-	if (on)
-		check_menu_item(mi);
-	else
-		uncheck_menu_item(mi);
-	plot->enableLighting(on);
-	plot->illuminate(0);
-	plot->updateData();
-	plot->updateGL();
-}
-
 static void resetView(MenuItem*)
 {
 	plot->resetView();
@@ -363,6 +306,360 @@ static void viewChanged(double, double, double)
 static void zoomChanged(double)
 {
 	updateTitle();
+}
+
+// The controls around the plot, as in mesh2
+
+class LightPointer : public Qwt3D::VertexEnrichment
+{
+public:
+	Qwt3D::Enrichment* clone() const {return new LightPointer(*this);}
+	void configure() {plot = 0;}
+	void drawBegin()
+	{
+		GLint mode;
+		glGetIntegerv(GL_MATRIX_MODE, &mode);
+		glMatrixMode(GL_MODELVIEW);
+		glPushMatrix();
+		glColor3d(1, 0, 0);
+		glBegin(GL_LINES);
+			glVertex3d(pos.x, pos.y, pos.z);
+			glVertex3d(0, 0, 0);
+		glEnd();
+		glPopMatrix();
+		glMatrixMode(mode);
+	}
+	void draw(Qwt3D::Triple const&) {}
+
+	Qwt3D::Triple pos;
+};
+
+class Sphere : public Qwt3D::ParametricSurface
+{
+public:
+	Sphere(Qwt3D::SurfacePlot& pw) : Qwt3D::ParametricSurface(pw)
+	{
+		setMesh(41, 31);
+		setDomain(0, 2 * Qwt3D::PI, 0, Qwt3D::PI);
+		setPeriodic(false, false);
+	}
+
+	Qwt3D::Triple operator()(double u, double v)
+	{
+		return Qwt3D::Triple(cos(u) * sin(v), sin(u) * sin(v), cos(v));
+	}
+};
+
+// The sphere in the lighting dialog: turn it to turn the light.
+class LightPlot : public Qwt3D::SurfacePlot
+{
+public:
+	LightPlot(Window* w, int x, int y, int width, int height)
+		: Qwt3D::SurfacePlot(w, x, y, width, height)
+	{
+		Sphere sphere(*this);
+		sphere.create();
+		reset();
+		assignMouse(Qwt3D::LeftButton, Qwt3D::RightButton, Qwt3D::LeftButton,
+			Qwt3D::NoButton, Qwt3D::NoButton, Qwt3D::NoButton,
+			Qwt3D::NoButton, Qwt3D::NoButton, Qwt3D::NoButton);
+		stick = (LightPointer*)addEnrichment(LightPointer());
+		stick->pos = Qwt3D::Triple(0, 0, 1);
+		updateData();
+	}
+
+	void reset()
+	{
+		makeCurrent();
+		setRotation(0, 0, 0);
+		setTitle("Use your mouse buttons and keyboard");
+		setTitleFont("Arial", 8, Qwt3D::Font::Bold);
+		setTitleColor(Qwt3D::RGBA(0.9, 0.9, 0.9));
+		setSmoothMesh(true);
+		setZoom(0.9);
+		setCoordinateStyle(Qwt3D::NOCOORD);
+		setMeshColor(Qwt3D::RGBA(0.6, 0.6, 0.6, 0.3));
+		setPlotStyle(Qwt3D::FILLEDMESH);
+		setBackgroundColor(Qwt3D::RGBA(0, 0, 0));
+		updateData();
+	}
+
+	LightPointer* stick;
+};
+
+static Control* orthobox;
+static Control* legendbox;
+static Control* autoscalebox;
+static Control* mousebox;
+static Control* shadingbox;
+static Control* normalsbox;
+static Control* normalslabel;
+static Control* qualitybar;
+static Control* lengthbar;
+static Control* stdbutton;
+static Control* lightbutton;
+static Control* lightbox;
+static Control* offsetlabel;
+static Control* offsetbar;
+static Control* reslabel;
+static Control* resbar;
+
+static Window* lightwin;
+static LightPlot* lightplot;
+static Control* distbar;
+static Control* emissbar;
+static Control* diffbar;
+static Control* specbar;
+static Control* shinbar;
+
+enum { SIDEWIDTH = 120, BOTTOMHEIGHT = 58, MAXRES = 70 };
+
+static void placeControls(Rect r)
+{
+	int top = barHeight();
+	int plotheight = r.height - top - BOTTOMHEIGHT;
+	int side = r.width - SIDEWIDTH + 8;
+	plot->setGeometry(0, top, r.width - SIDEWIDTH, plotheight);
+
+	Control* boxes[6] = {orthobox, legendbox, autoscalebox, mousebox, shadingbox, normalsbox};
+	for (int i = 0; i != 6; ++i)
+		set_control_area(boxes[i], rect(side, top + 8 + 24 * i, SIDEWIDTH - 12, 22));
+	int barstop = top + 8 + 24 * 6 + 4;
+	set_control_area(qualitybar, rect(side + 16, barstop, 18, plotheight - barstop + top - 8));
+	set_control_area(lengthbar, rect(side + 64, barstop, 18, plotheight - barstop + top - 8));
+
+	int y = r.height - BOTTOMHEIGHT + 8;
+	int slider = (r.width - 240) / 2 - 16;
+	set_control_area(stdbutton, rect(8, y + 8, 60, 28));
+	set_control_area(lightbutton, rect(74, y + 8, 80, 28));
+	set_control_area(lightbox, rect(160, y + 12, 22, 22));
+	set_control_area(offsetlabel, rect(196, y - 2, slider, 20));
+	set_control_area(offsetbar, rect(196, y + 20, slider, 18));
+	set_control_area(reslabel, rect(196 + slider + 16, y - 2, slider, 20));
+	set_control_area(resbar, rect(196 + slider + 16, y + 20, slider, 18));
+}
+
+static void resized(Window* w)
+{
+	placeControls(get_window_area(w));
+}
+
+static void orthoChanged(Control* c)
+{
+	plot->setOrtho(is_checked(c) != 0);
+}
+
+static void legendChanged(Control* c)
+{
+	plot->legendShown = is_checked(c) != 0;
+	plot->redrawLegend(plot->legendShown);
+}
+
+static void autoscaleChanged(Control* c)
+{
+	plot->coordinates()->setAutoScale(is_checked(c) != 0);
+	plot->updateGL();
+}
+
+static void mouseChanged(Control* c)
+{
+	plot->enableMouse(is_checked(c) != 0);
+}
+
+static void shadingChanged(Control* c)
+{
+	plot->setShading(is_checked(c) ? Qwt3D::GOURAUD : Qwt3D::FLAT);
+	plot->updateData();
+	plot->updateGL();
+}
+
+static void normalsChanged(Control* c)
+{
+	plot->showNormals(is_checked(c) != 0);
+	plot->updateNormals();
+	plot->updateGL();
+}
+
+static void normalQualityChanged(Control* c)
+{
+	plot->setNormalQuality(3 + (32 - 3) - get_control_value(c)); // up is more
+	plot->updateNormals();
+	plot->updateGL();
+}
+
+static void normalLengthChanged(Control* c)
+{
+	plot->setNormalLength((1 + (100 - 1) - get_control_value(c)) / 400.);
+	plot->updateNormals();
+	plot->updateGL();
+}
+
+static void standardView(Control*)
+{
+	plot->resetView();
+}
+
+static void lightingChanged(Control* c)
+{
+	bool on = is_checked(c) != 0;
+	plot->enableLighting(on);
+	plot->illuminate(0);
+	plot->updateGL();
+	if (on)
+		enable(lightbutton);
+	else
+		disable(lightbutton);
+}
+
+static void offsetChanged(Control* c)
+{
+	plot->setPolygonOffset(get_control_value(c) / 10.0);
+	plot->updateData();
+	plot->updateGL();
+}
+
+static void resolutionChanged(Control* c)
+{
+	plot->setResolution(1 + get_control_value(c));
+}
+
+static void resolutionMoved(int res)
+{
+	change_scroll_bar(resbar, res - 1, MAXRES - 1, 1);
+	updateTitle();
+}
+
+static void lightEmission(Control* c)
+{
+	plot->setMaterialComponent(GL_EMISSION, get_control_value(c) / 100.);
+	plot->updateGL();
+}
+
+static void lightDiffuse(Control* c)
+{
+	plot->setLightComponent(GL_DIFFUSE, get_control_value(c) / 100.);
+	plot->updateGL();
+}
+
+static void lightSpecular(Control* c)
+{
+	plot->setMaterialComponent(GL_SPECULAR, get_control_value(c) / 100.);
+	plot->updateGL();
+}
+
+static void lightShininess(Control* c)
+{
+	plot->setShininess(get_control_value(c) / 100.);
+	plot->updateGL();
+}
+
+static void lightDistance(Control* c)
+{
+	int val = get_control_value(c);
+	lightplot->stick->pos = Qwt3D::Triple(0, 0, val / 100.);
+	lightplot->updateData();
+	lightplot->updateGL();
+
+	Qwt3D::ParallelEpiped h = plot->hull();
+	double drad = (h.maxVertex - h.minVertex).length() * val / 20.;
+	plot->setLightShift(drad, drad, drad);
+	plot->updateGL();
+}
+
+static void lightRotated(double x, double y, double z)
+{
+	lightDistance(distbar);
+	plot->setLightRotation(x, y, z);
+	plot->updateGL();
+}
+
+static void lightStandard(Control*)
+{
+	lightplot->reset();
+	plot->updateGL();
+}
+
+static void lightOk(Control*)
+{
+	hide_window(lightwin);
+}
+
+static void lightClosed(Window*)
+{
+	hide_window(lightwin);
+}
+
+static Control* lightSlider(const char* name, int y, int max, int value, ControlFunc fn)
+{
+	new_label(lightwin, rect(356, y, 200, 20), name, ALIGN_LEFT);
+	Control* c = new_scroll_bar(lightwin, rect(356, y + 22, 200, 18), max, 1, fn);
+	change_scroll_bar(c, value, max, 1);
+	return c;
+}
+
+static void pickLighting(Control*)
+{
+	if (!lightwin)
+	{
+		lightwin = new_window(app, rect(120, 120, 568, 366), "Lighting", TITLEBAR | CLOSEBOX);
+		on_window_close(lightwin, lightClosed);
+		set_window_background(lightwin, rgb(240, 240, 240));
+		distbar = lightSlider("Distance", 8, 1000, 100, lightDistance);
+		emissbar = lightSlider("Emission", 58, 100, 0, lightEmission);
+		diffbar = lightSlider("Ambient and Diffuse", 108, 100, 80, lightDiffuse);
+		specbar = lightSlider("Specular", 158, 100, 30, lightSpecular);
+		shinbar = lightSlider("Shininess", 208, 1000, 500, lightShininess);
+		new_button(lightwin, rect(356, 318, 90, 30), "Std", lightStandard);
+		new_button(lightwin, rect(466, 318, 90, 30), "OK", lightOk);
+		lightplot = new LightPlot(lightwin, 8, 8, 336, 336);
+		lightplot->onRotationChanged = lightRotated;
+	}
+	show_window(lightwin);
+	lightplot->show();
+}
+
+static void buildControls()
+{
+	orthobox = new_check_box(win, rect(0, 0, 10, 10), "Ortho", orthoChanged);
+	legendbox = new_check_box(win, rect(0, 0, 10, 10), "Legend", legendChanged);
+	autoscalebox = new_check_box(win, rect(0, 0, 10, 10), "Autoscale", autoscaleChanged);
+	mousebox = new_check_box(win, rect(0, 0, 10, 10), "Mouse", mouseChanged);
+	shadingbox = new_check_box(win, rect(0, 0, 10, 10), "Shading", shadingChanged);
+	normalsbox = new_check_box(win, rect(0, 0, 10, 10), "Normals", normalsChanged);
+	check(orthobox);
+	check(autoscalebox);
+	check(mousebox);
+	check(shadingbox);
+	qualitybar = new_scroll_bar(win, rect(0, 0, 18, 100), 32 - 3, 1, normalQualityChanged);
+	change_scroll_bar(qualitybar, 32 - 3, 32 - 3, 1);
+	lengthbar = new_scroll_bar(win, rect(0, 0, 18, 100), 100 - 1, 1, normalLengthChanged);
+	change_scroll_bar(lengthbar, 100 - 8, 100 - 1, 1);
+
+	stdbutton = new_button(win, rect(0, 0, 10, 10), "Std", standardView);
+	lightbutton = new_button(win, rect(0, 0, 10, 10), "Lighting", pickLighting);
+	disable(lightbutton);
+	lightbox = new_check_box(win, rect(0, 0, 10, 10), "", lightingChanged);
+	offsetlabel = new_label(win, rect(0, 0, 10, 10), "Polygon Offset", ALIGN_LEFT);
+	offsetbar = new_scroll_bar(win, rect(0, 0, 100, 18), 30, 1, offsetChanged);
+	change_scroll_bar(offsetbar, 5, 30, 1);
+	reslabel = new_label(win, rect(0, 0, 10, 10), "Resolution", ALIGN_LEFT);
+	resbar = new_scroll_bar(win, rect(0, 0, 100, 18), MAXRES - 1, 1, resolutionChanged);
+}
+
+// for testing: what clicking the control does
+static void clickBox(Control* c, ControlFunc fn)
+{
+	if (is_checked(c))
+		uncheck(c);
+	else
+		check(c);
+	fn(c);
+}
+
+static void moveBar(Control* c, int value, int max, ControlFunc fn)
+{
+	change_scroll_bar(c, value, max, 1);
+	fn(c);
 }
 
 static void testSave(const char* ext, const char* format)
@@ -389,15 +686,24 @@ static void testKey(Window*, unsigned long key)
 		case 'g': testSave("gif", "GIF"); break;
 		case 'e': testSave("eps", "EPS"); break;
 		case 'd': testSave("pdf", "PDF"); break;
-		case 'l': toggleLegend(legenditem); break;
-		case 'h': toggleLighting(lightitem); break;
-		case 'p': togglePerspective(perspectiveitem); break;
+		case 'l': clickBox(legendbox, legendChanged); break;
+		case 'h': clickBox(lightbox, lightingChanged); break;
+		case 'p': clickBox(orthobox, orthoChanged); break;
+		case 'x': clickBox(shadingbox, shadingChanged); break;
+		case 'n': clickBox(normalsbox, normalsChanged); break;
+		case 'b': clickBox(autoscalebox, autoscaleChanged); break;
+		case 'u': moveBar(offsetbar, 20, 30, offsetChanged); break;
+		case 'L': pickLighting(NULL); break;
+		case 'D': moveBar(distbar, 300, 1000, lightDistance); break;
+		case 'S': moveBar(specbar, 80, 100, lightSpecular); break;
+		case 'E': moveBar(emissbar, 20, 100, lightEmission); break;
+		case 'R': lightplot->setRotation(60, 0, 120); break;
 		case 'r': plot->showRipple(); break;
 		case 'v': plot->resetView(); break;
 		case 'o': openFile(NULL); break;
 		case 'M': openColorMap(NULL); break;
-		case 'a': setResolutionItem(resitem[0]); break;
-		case 'c': setResolutionItem(resitem[2]); break;
+		case 'a': moveBar(resbar, 0, MAXRES - 1, resolutionChanged); break;
+		case 'c': moveBar(resbar, 2, MAXRES - 1, resolutionChanged); break;
 		case 'm':
 			if (mapname)
 				plot->setColorMap(mapname);
@@ -479,14 +785,6 @@ static void buildMenus()
 	new_menu_item(m, "Open Color Map...", 'M', openColorMap);
 	new_menu_item(m, "Reset Colors", 0, resetColors);
 
-	m = new_menu(bar, "Resolution");
-	resitem[0] = new_menu_item(m, "Every Point", 0, setResolutionItem);
-	resitem[1] = new_menu_item(m, "1 in 2", 0, setResolutionItem);
-	resitem[2] = new_menu_item(m, "1 in 3", 0, setResolutionItem);
-	resitem[3] = new_menu_item(m, "1 in 5", 0, setResolutionItem);
-	resitem[4] = new_menu_item(m, "1 in 10", 0, setResolutionItem);
-	check_menu_item(resitem[2]);
-
 	m = new_menu(bar, "Style");
 	styleitem[0] = new_menu_item(m, "Filled Mesh", 0, setStyle);
 	styleitem[1] = new_menu_item(m, "Filled", 0, setStyle);
@@ -496,10 +794,6 @@ static void buildMenus()
 	check_menu_item(styleitem[0]);
 
 	m = new_menu(bar, "View");
-	legenditem = new_menu_item(m, "Color Legend", 0, toggleLegend);
-	perspectiveitem = new_menu_item(m, "Perspective", 0, togglePerspective);
-	lightitem = new_menu_item(m, "Lighting", 0, toggleLighting);
-	new_menu_item(m, "-", 0, NULL);
 	new_menu_item(m, "Reset View", 'R', resetView);
 }
 
@@ -523,14 +817,18 @@ int main(int argc, char* argv[])
 			file = argv[i];
 	}
 
-	win = new_window(app, rect(60, 60, 900, 680), "QwtPlot3D in GraphApp", STANDARD_WINDOW);
+	win = new_window(app, rect(60, 60, 1020, 740), "QwtPlot3D in GraphApp", STANDARD_WINDOW);
+	set_window_background(win, rgb(240, 240, 240));
 	on_window_close(win, quit);
 	on_window_resize(win, resized);
 	on_window_key_down(win, testKey);
 	buildMenus();
+	buildControls();
 
 	Rect r = get_window_area(win);
-	plot = new Plot(win, 0, barHeight(), r.width, r.height - barHeight());
+	plot = new Plot(win, 0, barHeight(), 100, 100);
+	placeControls(r);
+	plot->onResolutionChanged = resolutionMoved;
 	if (logfile)
 	{
 		plot->onRotationChanged = logRotation;

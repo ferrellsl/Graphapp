@@ -7,8 +7,8 @@ at the top of `3rdparty/tinyfd/tinyfiledialogs.h`.
 
 ![Wizard Island LIDAR grid with a color map](qwtplot3d.png)
 
-The Qt build this came from was a 60 MB folder of programs, Qt DLLs and plugins. This demo is one 1 MB
-executable that links only `OPENGL32`, `GLU32` and Windows system DLLs.
+The Qt build this came from was a 60 MB folder of programs, Qt DLLs and plugins. This demo is one
+small executable that links only `OPENGL32`, `GLU32` and Windows system DLLs.
 
 ## What the port took
 
@@ -56,6 +56,12 @@ faces the viewer.
 `r g b` lines from 0 to 255. No grids or maps are included. **Shift+wheel exaggerates Z** and the plain wheel zooms,
 as in mesh2: each notch adds 0.0513 to the Z scale. Grids open at 1 point in 3, like mesh2; the
 Resolution menu goes down to every point. The title bar shows what mesh2's status bar did.
+
+The controls follow mesh2: Ortho, Legend, Autoscale, Mouse, Shading and Normals on the right, with
+sliders for the quality and length of the normals; below, Std, the lighting check box, the Lighting
+dialog, and sliders for Polygon Offset and Resolution. In the dialog, turn the sphere with the mouse
+to move the light; its sliders set Distance, Emission, Ambient and Diffuse, Specular and Shininess.
+Lighting turns relief into shading, which often shows more than color alone.
 
 Unlike mesh2, a grid opens in the Filled style, because the mesh lines of a dense grid come out
 solid black, and with box axes.
@@ -107,4 +113,7 @@ The parent's HWND is read as the first field of GraphApp's private `WindowExtra`
 - JPEG is not offered: `app_save_jpeg` in GraphApp is a stub that always fails.
 - Needs a legacy OpenGL compatibility context. Tested on one GPU only.
 - The demo is not DPI aware, so at 150% scaling Windows enlarges it and text looks soft.
-- Only the `simpleplot` example was ported. `mesh2` and the others use Qt Designer forms.
+- The demo covers mesh2's main use, not all of it. Not ported: frame or no coordinate system, side
+  grids, floor styles, the color pickers for axes, background, mesh and text, the Fonts menu,
+  animation, FEM (`.nod`/`.cel`) files, most of its built-in functions and surfaces, and the color
+  map preview.

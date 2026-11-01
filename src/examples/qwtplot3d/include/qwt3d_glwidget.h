@@ -72,6 +72,7 @@ private:
 namespace GraphAppHost
 {
   void* nativeWindow(Window* w); //!< Registers the application too
+  bool inMenuBar(Window* w, int x, int y); //!< Is this point of the window in its menu bar?
   //! Renders one line of UTF-8 text as RGBA rows, bottom row first, coverage in alpha
   bool renderText(std::string const& text, Font const& font, double r, double g, double b,
                   std::vector<unsigned char>& rgba, int& width, int& height);

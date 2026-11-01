@@ -44,9 +44,18 @@ namespace
 void* Qwt3D::GraphAppHost::nativeWindow(::Window* w)
 {
   host = w->app;
-  hostwin = w;
+  if (!hostwin)
+    hostwin = w; // any window will do to make bitmaps with
   // no public accessor: the HWND is the first member of the private WindowExtra
   return *(void**)w->extra;
+}
+
+bool Qwt3D::GraphAppHost::inMenuBar(::Window* w, int x, int y)
+{
+  if (!w->menubar)
+    return false;
+  Rect r = w->menubar->ctrl->area;
+  return x >= r.x && y >= r.y && x < r.x + r.width && y < r.y + r.height;
 }
 
 bool Qwt3D::GraphAppHost::renderText(std::string const& text, Qwt3D::Font const& font,
