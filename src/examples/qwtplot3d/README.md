@@ -8,7 +8,8 @@ at the top of `3rdparty/tinyfd/tinyfiledialogs.h`.
 ![QwtPlot3D in GraphApp showing wiazrd1580.mes, a 1581x1581 mesh of a volcano in false color with shading](qwtplot3d-volcano-false-color.png)
 
 The Qt build this came from was a 60 MB folder of programs, Qt DLLs and plugins. This demo is one
-small executable that links only `OPENGL32`, `GLU32` and Windows system DLLs.
+small executable that links only `OPENGL32`, `GLU32` and Windows system DLLs, and it fits on a single
+1.44 MB floppy with room to spare.
 
 ## What the port took
 
