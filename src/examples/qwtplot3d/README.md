@@ -9,7 +9,7 @@ at the top of `3rdparty/tinyfd/tinyfiledialogs.h`.
 
 The Qt build this came from was a 60 MB folder of programs, Qt DLLs and plugins. This demo is one
 small executable that links only `OPENGL32`, `GLU32` and Windows system DLLs, and it fits on a single
-1.44 MB floppy with room to spare.
+1.44 MB floppy with room to spare. The Qt folder would take about 40.
 
 ## What the port took
 
