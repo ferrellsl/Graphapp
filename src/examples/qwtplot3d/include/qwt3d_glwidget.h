@@ -36,6 +36,8 @@ public:
   std::string askOpenFile(std::string const& title, std::string const& filter);
   std::string askSaveFile(std::string const& title, std::string const& filter, std::string const& name);
   void tellUser(std::string const& title, std::string const& message);
+  bool askColor(std::string const& title, unsigned char rgb[3]);
+  bool askFont(Font& font);
 
   void makeCurrent(); //!< Makes this area's OpenGL context the current one
   void updateGL(); //!< Redraws at once (no effect while hidden)

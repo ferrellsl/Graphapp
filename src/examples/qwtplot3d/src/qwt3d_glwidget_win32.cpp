@@ -6,6 +6,7 @@
 #endif
 #include <windows.h>
 #include <windowsx.h>
+#include <commdlg.h>
 #include <GL/gl.h>
 #include <string.h>
 
@@ -432,6 +433,39 @@ std::string GLWidget::askSaveFile(std::string const& title, std::string const& f
                                   std::string const& name)
 {
   return fileDialog(GetParent((HWND)hwnd_), title, filter, name, true);
+}
+
+bool GLWidget::askColor(std::string const& title, unsigned char rgb[3])
+{
+  EnumChildWindows(GetParent((HWND)hwnd_), thawPlot, 0);
+  tinyfd_winUtf8 = 0;
+  unsigned char start[3] = {255, 255, 255};
+  return tinyfd_colorChooser(dialogText(title).c_str(), 0, start, rgb) != 0;
+}
+
+// tinyfiledialogs has no font dialog
+bool GLWidget::askFont(Font& font)
+{
+  EnumChildWindows(GetParent((HWND)hwnd_), thawPlot, 0);
+
+  LOGFONTA lf;
+  ZeroMemory(&lf, sizeof(lf));
+  lf.lfHeight = -(font.pointSize() * 96 + 36) / 72;
+  lf.lfWeight = (font.weight() >= Font::Bold) ? FW_BOLD : FW_NORMAL;
+  lf.lfItalic = font.italic();
+  strncpy(lf.lfFaceName, font.family() == "Courier" ? "Courier New" : font.family().c_str(), LF_FACESIZE - 1);
+
+  CHOOSEFONTA cf;
+  ZeroMemory(&cf, sizeof(cf));
+  cf.lStructSize = sizeof(cf);
+  cf.hwndOwner = GetParent((HWND)hwnd_);
+  cf.lpLogFont = &lf;
+  cf.Flags = CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT;
+  if (!ChooseFontA(&cf))
+    return false;
+  font = Font(lf.lfFaceName, cf.iPointSize / 10,
+              lf.lfWeight >= FW_BOLD ? Font::Bold : Font::Normal, lf.lfItalic != 0);
+  return true;
 }
 
 void GLWidget::tellUser(std::string const& title, std::string const& message)

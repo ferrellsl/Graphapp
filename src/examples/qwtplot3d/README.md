@@ -57,14 +57,17 @@ faces the viewer.
 as in mesh2: each notch adds 0.0513 to the Z scale. Grids open at 1 point in 3, like mesh2; the
 Resolution menu goes down to every point. The title bar shows what mesh2's status bar did.
 
-The controls follow mesh2: Ortho, Legend, Autoscale, Mouse, Shading and Normals on the right, with
-sliders for the quality and length of the normals; below, Std, the lighting check box, the Lighting
-dialog, and sliders for Polygon Offset and Resolution. In the dialog, turn the sphere with the mouse
-to move the light; its sliders set Distance, Emission, Ambient and Diffuse, Specular and Shininess.
+The window follows mesh2. The toolbar has open, FEM open, save with its format list, the function
+and surface lists, animation, coordinate style, the six side grids, six plot styles, three floor
+styles and normals, with mesh2's icons (embedded in `demo/icons.h`). The menus have the color and
+font choices. On the right are Ortho, Legend, Autoscale, Mouse and Shading, with sliders for the
+quality and length of the normals; below are Std, the lighting check box, the Lighting dialog, and
+sliders for Polygon Offset and Resolution. In the dialog, turn the sphere with the mouse to move the
+light; its sliders set Distance, Emission, Ambient and Diffuse, Specular and Shininess.
 Lighting turns relief into shading, which often shows more than color alone.
 
 Unlike mesh2, a grid opens in the Filled style, because the mesh lines of a dense grid come out
-solid black, and with box axes.
+solid black, and with box axes, where mesh2 starts with none. File > Save As is an addition.
 
 Tested on 1409x1409 and 1581x1581 LIDAR grids (2.5 million points): about 1.3 s to open, and at
 every resolution redraws keep up with the 240 Hz display. A failed read leaves the plot as it was.
@@ -113,7 +116,6 @@ The parent's HWND is read as the first field of GraphApp's private `WindowExtra`
 - JPEG is not offered: `app_save_jpeg` in GraphApp is a stub that always fails.
 - Needs a legacy OpenGL compatibility context. Tested on one GPU only.
 - The demo is not DPI aware, so at 150% scaling Windows enlarges it and text looks soft.
-- The demo covers mesh2's main use, not all of it. Not ported: frame or no coordinate system, side
-  grids, floor styles, the color pickers for axes, background, mesh and text, the Fonts menu,
-  animation, FEM (`.nod`/`.cel`) files, most of its built-in functions and surfaces, and the color
-  map preview.
+- Differences from mesh2: no color map preview, the save list has PNG, GIF, EPS, PS and PDF only,
+  EPS and PDF text is part of the file where mesh2 wrote a separate TeX file, and the title bar
+  stands in for its status bar.
