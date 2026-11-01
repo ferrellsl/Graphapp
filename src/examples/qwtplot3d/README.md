@@ -5,7 +5,7 @@ with Qt removed, and its demo rebuilt on GraphApp. This is an altered version of
 library, not the original. See `COPYING` (zlib license), `3rdparty/gl2ps/COPYING.*` and the license
 at the top of `3rdparty/tinyfd/tinyfiledialogs.h`.
 
-![Wizard Island LIDAR grid with a color map](qwtplot3d.png)
+![QwtPlot3D in GraphApp showing wiazrd1580.mes, a 1581x1581 mesh of a volcano in false color with shading](qwtplot3d-volcano-false-color.png)
 
 The Qt build this came from was a 60 MB folder of programs, Qt DLLs and plugins. This demo is one
 small executable that links only `OPENGL32`, `GLU32` and Windows system DLLs.

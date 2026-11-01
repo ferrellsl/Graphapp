@@ -130,4 +130,6 @@ location mentioned earlier.
 
 ## Porting a Qt Application
 
+![QwtPlot3D in GraphApp showing wiazrd1580.mes, a 1581x1581 mesh of a volcano in false color with shading](src/examples/qwtplot3d/qwtplot3d-volcano-false-color.png)
+
 [`src/examples/qwtplot3d`](src/examples/qwtplot3d) is QwtPlot3D, a 3D surface plotting library, moved from Qt to GraphApp: a 60 MB folder of Qt DLLs and plugins replaced by one 1 MB executable. Its README covers what the port took, and how OpenGL lives alongside GraphApp's menus.
