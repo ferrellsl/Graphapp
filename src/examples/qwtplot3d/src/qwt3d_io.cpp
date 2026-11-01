@@ -1,0 +1,337 @@
+#include <ctype.h>
+#include <time.h>
+
+#include "qwt3d_plot.h"
+#include "qwt3d_io_gl2ps.h"
+#include "qwt3d_io_reader.h"
+
+using namespace Qwt3D;
+
+IO::Entry::Entry() : iofunc(0) 
+{
+}
+
+IO::Entry::~Entry() 
+{
+  delete iofunc;
+}
+
+IO::Entry::Entry(IO::Entry const& e)
+{
+  if (this==&e)
+    return;
+
+  fmt = e.fmt;
+  iofunc = e.iofunc->clone();
+}
+
+void IO::Entry::operator=(IO::Entry const& e)
+{
+  if (this==&e)
+    return;
+
+  delete iofunc;
+  fmt = e.fmt;
+  iofunc = e.iofunc->clone();
+}
+
+IO::Entry::Entry(std::string const& s, Functor const& f)
+  : fmt(s) 
+{ 
+  iofunc = f.clone();
+}
+
+IO::Entry::Entry(std::string const& s, Function f)
+  : fmt(s) 
+{ 
+  Wrapper  w(f);
+  iofunc = w.clone();
+}
+
+
+IO::FormatCompare::FormatCompare(IO::Entry const& e) 
+{
+  e_ = e;
+}
+
+bool IO::FormatCompare::operator() (IO::Entry const& e)
+{
+  return ( e.fmt == e_.fmt);
+}
+
+IO::FormatCompare2::FormatCompare2(std::string s) 
+{
+  s_ = s;
+}
+
+bool IO::FormatCompare2::operator() (IO::Entry const& e)
+{
+  return( e.fmt == s_);
+}
+
+
+
+
+bool IO::add_unique(Container& l, Entry const& e)
+{
+  FormatCompare comp(e);
+  l.erase(std::remove_if(l.begin(), l.end(), comp), l.end());
+  l.push_back(e);
+
+  return true;
+}
+
+IO::IT IO::find(Container& l, std::string const& fmt)
+{
+  FormatCompare2 comp(fmt);
+  return std::find_if(l.begin(), l.end(), comp); 
+}
+
+IO::Container& IO::rlist()
+{
+  static Container rl = Container();
+  static bool rfirst = true;
+  bool f = false;
+  f = rfirst;
+  if (rfirst)
+  {
+    rfirst = false;
+    setupHandler();
+  }
+  return rl;
+}
+
+IO::Container& IO::wlist()
+{
+  static Container wl = Container();
+  static bool wfirst = true;
+  bool f = false;
+  f = wfirst;
+  if (wfirst)
+  {
+    wfirst = false;
+    setupHandler();
+  }
+  return wl;
+}
+
+/*! 
+  Registers a new IO::Function for data input.\n
+  Every call overwrites a formerly registered handler for the same format string
+  (case sensitive).
+*/
+bool IO::defineInputHandler(std::string const& format, IO::Function func)
+{
+  return add_unique(rlist(), Entry(format, func));
+}
+
+/*! 
+  Registers a new Functor for data input.\n
+  Every call overwrites a formerly registered handler for the same format string
+  (case sensitive).
+*/
+bool IO::defineInputHandler(std::string const& format, IO::Functor const& func)
+{
+  return add_unique(rlist(), Entry(format, func));
+}
+
+/*! 
+  Registers a new IO::Function for data output.  
+  Every call overwrites a formerly registered handler for the same format string
+  (case sensitive).
+ */
+bool IO::defineOutputHandler(std::string const& format, IO::Function func)
+{
+  return add_unique(wlist(), Entry(format, func));
+}
+
+/*! 
+  Registers a new Functor for data output.\n
+  Every call overwrites a formerly registered handler for the same format string
+  (case sensitive).
+*/
+bool IO::defineOutputHandler(std::string const& format, IO::Functor const& func)
+{
+  return add_unique(wlist(), Entry(format, func));
+}
+
+/*!
+  Applies a reading IO::Function or IO::Functor.
+  \param plot Plot with the content that should be loaded
+  \param fname File name 
+  \param format Input format
+  \return The return value from the called Function/Functor. 
+  The function returns false, if no registered handler could be found.
+*/
+bool IO::load(Plot3D* plot, std::string const& fname, std::string const& format)
+{
+  IT it = IO::find(rlist(), format);
+
+  if (it == rlist().end())
+    return false;
+
+  return (*it->iofunc)(plot, fname);
+}
+
+/*!
+  Applies a writing IO::Function or IO::Functor.
+  \param plot Plot with the content that should be saved
+  \param fname File name
+  \param format Output format
+  \return The return value from the called Function/Functor.
+  The function returns false, if no registered handler could be found.
+*/
+bool IO::save(Plot3D* plot, std::string const& fname, std::string const& format)
+{
+  IT it = IO::find(wlist(), format);
+
+  if (it == wlist().end())
+    return false;
+
+  return (*it->iofunc)(plot, fname);
+}
+
+/*!
+  Returns a list of currently registered input formats. 
+*/
+std::vector<std::string> IO::inputFormatList()
+{
+  std::vector<std::string> list;
+  for ( IT it = rlist().begin(); it!=rlist().end(); ++it )
+    list.push_back(it->fmt);
+  
+  return list;
+}
+
+/*!
+  Returns a list of currently registered output formats. 
+*/
+std::vector<std::string> IO::outputFormatList()
+{
+  std::vector<std::string> list;  
+  for ( IT it = wlist().begin(); it!=wlist().end(); ++it )
+    list.push_back(it->fmt);
+  
+  return list;
+}
+
+/*! 
+  Returns the input functor in charge for format and 0 if non-existent. 
+*/
+IO::Functor* IO::inputHandler(std::string const& format)
+{
+  IO::IT it = IO::find(rlist(), format);
+  
+  if (it==rlist().end())
+    return 0;
+
+  return it->iofunc;
+}
+
+/*! 
+  Returns the output functor in charge for format and 0 if non-existent. 
+*/
+IO::Functor* IO::outputHandler(std::string const& format)
+{
+  IO::IT it = IO::find(wlist(), format);
+  
+  if (it==wlist().end())
+    return 0;
+
+  return it->iofunc;
+}
+
+bool PixmapWriter::operator()(Plot3D* plot, std::string const& fname)
+{
+  std::vector<unsigned char> rgba;
+  int w, h;
+  if (!plot->grabFrameBuffer(rgba, w, h))
+    return false;
+  return GraphAppHost::writeImage(rgba, w, h, fname, fmt_);
+}
+
+//! Kept for compatibility: GraphApp's image writers have no quality setting.
+void PixmapWriter::setQuality(int val)
+{
+  quality_ = val;  
+}
+
+void IO::setupHandler()
+{
+  std::vector<std::string> list = GraphAppHost::imageFormats();
+  PixmapWriter writer;
+  for (std::vector<std::string>::iterator it = list.begin(); it != list.end(); ++it)
+  {
+    writer.fmt_ = *it;
+    defineOutputHandler(*it, writer);
+    std::string lower(*it);
+    std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+    defineOutputHandler(lower, writer);
+  }
+  VectorWriter vecfunc; 
+  vecfunc.setCompressed(false);
+  vecfunc.setFormat("EPS");
+  defineOutputHandler("EPS", vecfunc);
+  vecfunc.setFormat("PS");
+  defineOutputHandler("PS", vecfunc);
+  
+#ifdef GL2PS_HAVE_ZLIB
+  vecfunc.setCompressed(true);
+  vecfunc.setFormat("EPS_GZ");
+  defineOutputHandler("EPS_GZ", vecfunc);
+  vecfunc.setFormat("PS_GZ");
+  defineOutputHandler("PS_GZ", vecfunc);
+#endif
+  vecfunc.setFormat("PDF");
+  defineOutputHandler("PDF", vecfunc);
+
+  defineInputHandler("mes", NativeReader());
+  defineInputHandler("MES", NativeReader());
+}
+
+/*!
+	\deprecated  Use Plot3D::save or IO::save instead.
+	
+  Writes vector data supported by gl2ps. The corresponding format types are "EPS","PS"or "PDF".
+  If zlib has been configured this will be extended by "EPS_GZ" and "PS_GZ". 
+	\b Beware: BSPSORT turns out to behave very slowly and memory consuming, especially in cases where
+	many polygons appear. It is still more exact than SIMPLESORT.
+*/
+bool Plot3D::saveVector(std::string const& fileName, std::string const& format, VectorWriter::TEXTMODE text, VectorWriter::SORTMODE sortmode)
+{
+  if (format == "EPS" || format == "EPS_GZ" || format == "PS" 
+    || format == "PS_GZ" || format == "PDF")
+  {  
+    VectorWriter* gl2ps = (VectorWriter*)IO::outputHandler(format);
+    if (gl2ps)
+    {
+      gl2ps->setSortMode(sortmode);
+      gl2ps->setTextMode(text);
+    }
+    return IO::save(this, fileName, format);
+  }
+  return false;
+}	
+/*!
+	\deprecated  Use Plot3D::save or IO::save instead.
+  
+  Saves the framebuffer to the file fileName using one of the image file formats supported by GraphApp.
+*/
+bool Plot3D::savePixmap(std::string const& fileName, std::string const& format)
+{
+  if (format == "EPS" || format == "EPS_GZ" || format == "PS" 
+    || format == "PS_GZ" || format == "PDF")
+    return false;
+  
+  return IO::save(this, fileName, format);
+}
+
+/*! 
+  Saves content in one of the registered output formats. To modify the 
+  behaviour for more complex output handling use IO::outputHandler.
+*/
+bool Plot3D::save(std::string const& fileName, std::string const& format)
+{
+  return IO::save(this, fileName, format);
+}
+

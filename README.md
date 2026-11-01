@@ -127,3 +127,7 @@ location mentioned earlier.
 ![alt text](https://github.com/ferrellsl/Graphapp/blob/master/tabpane2.png?raw=true)
 ![alt text](https://github.com/ferrellsl/Graphapp/blob/master/utf8edit.png?raw=true)
 ![alt text](https://github.com/ferrellsl/Graphapp/blob/master/unicode.png?raw=true)
+
+## Porting a Qt Application
+
+[`src/examples/qwtplot3d`](src/examples/qwtplot3d) is QwtPlot3D, a 3D surface plotting library, moved from Qt to GraphApp: a 60 MB folder of Qt DLLs and plugins replaced by one 1 MB executable. Its README covers what the port took, and how OpenGL lives alongside GraphApp's menus.
