@@ -50,10 +50,15 @@ Link `qwtplot3d.lib`, `graphapp.lib`, `opengl32.lib` and `glu32.lib`. Resize the
 Set an axis label on all four parallel axes (`X1`..`X4` and so on): the box shows whichever one
 faces the viewer.
 
+## Prebuilt binary
+
+`bin\surface_demo.exe` is a 64-bit Windows build. It needs no other files: the C runtime is linked in
+and the icons are embedded.
+
 ## LIDAR grids
 
-`demo\surface_demo.exe grid.mes`, or File > Open. Color > Open Color Map takes `.map` files of
-`r g b` lines from 0 to 255. No grids or maps are included. **Shift+wheel exaggerates Z** and the plain wheel zooms,
+`bin\surface_demo.exe grid.mes`, or File > Open. Color > Data color takes `.map` files of `r g b`
+lines from 0 to 255, and `colormaps\` has 141 of them. No grids are included. **Shift+wheel exaggerates Z** and the plain wheel zooms,
 as in mesh2: each notch adds 0.0513 to the Z scale. Grids open at 1 point in 3, like mesh2; the
 Resolution menu goes down to every point. The title bar shows what mesh2's status bar did.
 
@@ -108,6 +113,11 @@ not report Alt with the mouse or Alt+arrow keys. Three GraphApp behaviors shape 
   GraphApp fonts.
 
 The parent's HWND is read as the first field of GraphApp's private `WindowExtra`.
+
+## Color maps
+
+The `.map` files in `colormaps\` came with the Qt version's binaries. Their license is unknown, and
+they are not covered by the licenses above.
 
 ## Limits
 
