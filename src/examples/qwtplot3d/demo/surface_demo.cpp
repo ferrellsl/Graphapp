@@ -862,7 +862,7 @@ static void saveAs(MenuItem*)
 
 static bool askColor(const char* title, Qwt3D::RGBA& col)
 {
-	unsigned char rgb[3];
+	unsigned char rgb[3] = {255, 255, 255}; // where a color panel starts
 	if (!plot->askColor(title, rgb))
 		return false;
 	col = Qwt3D::RGBA(rgb[0] / 255., rgb[1] / 255., rgb[2] / 255., 1);

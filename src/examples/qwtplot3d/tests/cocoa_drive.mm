@@ -6,13 +6,15 @@
 // the plot view; keys and menu clicks go through GraphApp's own in-process test hooks
 // (gab_test_key, gab_test_mouse_front), which queue events for the demo's own window only.
 //
-//   QWT3D_DRIVE=basic|menu|dialogs|color|font|resize|close   which script to run
+//   QWT3D_DRIVE=basic|menu|dialogs|saveas|color|font|pi|resize|close   which script to run
 //   QWT3D_LOG=file                                   the demo's --log file, to report what each step did
 //   QWT3D_OUT=dir                                    where the report and pictures go (default /tmp/q3d)
 //
 // Each step reports the lines the demo logged while it ran.
 
+#include <qwt3d_surfaceplot.h>
 #import <Cocoa/Cocoa.h>
+#import <objc/runtime.h>
 #include <pthread.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -383,17 +385,111 @@ namespace
     if (panel)
       shotWindow(panel, "font_1_panel");
     // the real panel is shown; picking in it is by hand, so a pick is stood in for here:
-    // the font manager is asked to convert, as it is when a font is chosen
+    // the click in the panel's list is stood in for
     onMain(^{
       NSFontManager* fm = [NSFontManager sharedFontManager];
       id target = [fm target];
       say("  font manager target %s", target ? "set" : "MISSING");
+      // a stand-in for the click in the panel's list, which a script can't make: the target is
+      // sent changeFont: with a sender that converts to Times 22, as the font manager does
       [target changeFont:[[FontPicker alloc] init]];
       [[fm fontPanel:NO] close];
     });
     usleep(1500000);
     shot("font_2_after_pick");
     say("(font_2 should show the numbers in Times, size 22)");
+  }
+
+
+  // the SurfacePlot behind the plot view, through the view's public "widget" ivar
+  Qwt3D::SurfacePlot* surfacePlot()
+  {
+    Ivar iv = class_getInstanceVariable([plotView class], "widget");
+    if (!iv)
+      return 0;
+    void* w = *(void**)((char*)(__bridge void*)plotView + ivar_getOffset(iv));
+    return dynamic_cast<Qwt3D::SurfacePlot*>((Qwt3D::GLWidget*)w);
+  }
+
+  void pi()
+  {
+    shot("pi_0_before");
+    onMain(^{
+      Qwt3D::SurfacePlot* p = surfacePlot();
+      if (!p)
+      {
+        say("no SurfacePlot behind the view");
+        return;
+      }
+      p->setTitle("Rosenbrock \xCF\x80 and \xCE\xA9 (pi, Omega)");
+      const Qwt3D::AXIS xs[] = {Qwt3D::X1, Qwt3D::X2, Qwt3D::X3, Qwt3D::X4};
+      const Qwt3D::AXIS ys[] = {Qwt3D::Y1, Qwt3D::Y2, Qwt3D::Y3, Qwt3D::Y4};
+      const Qwt3D::AXIS zs[] = {Qwt3D::Z1, Qwt3D::Z2, Qwt3D::Z3, Qwt3D::Z4};
+      for (int i = 0; i != 4; ++i)
+      {
+        p->coordinates()->axes[xs[i]].setLabelString("x / \xCF\x80");
+        p->coordinates()->axes[ys[i]].setLabelString("y \xCE\xB1\xCE\xB2");
+        p->coordinates()->axes[zs[i]].setLabelString("z \xCE\xA3");
+      }
+      p->updateGL();
+    });
+    usleep(800000);
+    shot("pi_1_after");
+    say("title and axis labels set with pi, Omega, alpha, beta, Sigma: see pi_1_after.png");
+  }
+
+  void saveAsPanel();
+
+
+  void postKey(NSWindow* w, unsigned short code, NSString* chars, BOOL down)
+  {
+    NSEvent* e = [NSEvent keyEventWithType:down ? NSEventTypeKeyDown : NSEventTypeKeyUp
+                                  location:NSZeroPoint modifierFlags:0 timestamp:0
+                              windowNumber:[w windowNumber] context:nil characters:chars
+                charactersIgnoringModifiers:chars isARepeat:NO keyCode:code];
+    [NSApp postEvent:e atStart:NO];
+  }
+
+  void saveAsPanel()
+  {
+    unlink("/tmp/q3d/panel_saved.png");
+    chooseMenuItem(15, 65);
+    usleep(1500000);
+    NSWindow* panel = modalNow("File > Save As");
+    if (!panel)
+      return;
+    onMain(^{
+      NSSavePanel* sp = (NSSavePanel*)panel;
+      [sp setDirectoryURL:[NSURL fileURLWithPath:@"/tmp/q3d"]];
+      [sp setNameFieldStringValue:@"panel_saved.png"];
+      unsigned int n = 0;
+      Method* ms = class_copyMethodList([panel class], &n);
+      std::string l;
+      for (unsigned i = 0; i != n; ++i)
+      {
+        std::string name = sel_getName(method_getName(ms[i]));
+        if (name.find("ok") != std::string::npos || name.find("OK") != std::string::npos)
+          l += name + " ";
+      }
+      free(ms);
+      say("  panel class %s; ok-like methods: %s", class_getName([panel class]), l.c_str());
+    });
+    usleep(500000);
+    // a key event sent to this process alone (not the system's input), which AppKit routes to
+    // the panel as the key window, remote view and all
+    CGEventRef down = CGEventCreateKeyboardEvent(NULL, 36, true);
+    CGEventRef up = CGEventCreateKeyboardEvent(NULL, 36, false);
+    CGEventPostToPid(getpid(), down);
+    usleep(100000);
+    CGEventPostToPid(getpid(), up);
+    CFRelease(down);
+    CFRelease(up);
+    usleep(2500000);
+    struct stat st;
+    say("Save As through the panel wrote /tmp/q3d/panel_saved.png: %s",
+        stat("/tmp/q3d/panel_saved.png", &st) == 0 ? "yes" : "NO");
+    onMain(^{ if ([NSApp modalWindow]) [(NSSavePanel*)[NSApp modalWindow] cancel:nil]; }); // never leave it up
+    usleep(500000);
   }
 
   void closeWindow()
@@ -428,6 +524,10 @@ namespace
       menu();
     else if (!strcmp(which, "resize"))
       resize();
+    else if (!strcmp(which, "pi"))
+      pi();
+    else if (!strcmp(which, "saveas"))
+      saveAsPanel();
     else if (!strcmp(which, "dialogs"))
       dialogs();
     else if (!strcmp(which, "color"))

@@ -88,6 +88,9 @@ namespace GraphAppHost
   bool renderUnicodeText(std::string const& text, std::string const& family, int pixelHeight,
                          bool bold, bool italic, double r, double g, double b,
                          std::vector<unsigned char>& rgba, int& width, int& height);
+#ifdef __APPLE__
+  double backingScale(); //!< Backing pixels per point: labels are drawn this much larger
+#endif
   //! Writes RGBA rows, bottom row first, in the format named by fmt ("PNG" or "GIF")
   bool writeImage(std::vector<unsigned char> const& rgba, int width, int height,
                   std::string const& fname, std::string const& fmt);

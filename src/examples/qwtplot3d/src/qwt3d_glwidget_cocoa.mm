@@ -56,6 +56,16 @@ namespace
     return m;
   }
 
+  // backing pixels per point of the display the plot is on, for the size of label text
+  double backingFactor = 1;
+
+  void noteBacking(Qwt3DGLView* view)
+  {
+    double f = [[view window] backingScaleFactor];
+    if (f >= 1)
+      backingFactor = f;
+  }
+
   // GL works in backing pixels, mouse positions and GraphApp in points
   NSSize backingSize(Qwt3DGLView* view)
   {
@@ -102,6 +112,7 @@ struct GLWidgetEvents
 
   static void backingChanged(GLWidget* w)
   {
+    noteBacking(nativeOf(w->hwnd_)->view);
     w->resized_ = true;
     if (!nativeOf(w->hwnd_)->frozen)
       w->updateGL();
@@ -350,6 +361,11 @@ struct GLWidgetEvents
 
 // Core Text has the glyphs GraphApp's native fonts lack (pi, for one) and falls back to
 // another font for any the named one has not.
+double Qwt3D::GraphAppHost::backingScale()
+{
+  return backingFactor;
+}
+
 bool Qwt3D::GraphAppHost::renderUnicodeText(std::string const& text, std::string const& family,
                                             int pixelHeight, bool bold, bool italic,
                                             double r, double g, double b,
@@ -447,13 +463,14 @@ Qwt3D::GLWidget::GLWidget(::Window* parent, int x, int y, int width, int height)
   assert(format);
   n->view = [[Qwt3DGLView alloc] initWithFrame:NSMakeRect(x, y, width, height) pixelFormat:format];
   assert(n->view);
+  hwnd_ = n; // before the view can call back into the widget, which AppKit does as it goes in
   n->view->widget = this;
   n->view->held = NoButton;
   [n->view setWantsBestResolutionOpenGLSurface:YES];
   [n->view setHidden:YES];
-  hwnd_ = n; // before the view goes in: AppKit calls back into it as it does
   // GraphApp's window shows its own picture in its content view: the plot goes over that
   [[n->nswindow contentView] addSubview:n->view];
+  noteBacking(n->view);
 
   static QwtcCallbacks const calls = {GLWidgetEvents::arrow, GLWidgetEvents::freeze,
                                       GLWidgetEvents::thaw};
