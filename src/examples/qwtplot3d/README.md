@@ -3,14 +3,16 @@
 An example of moving a Qt application to GraphApp: QwtPlot3D 0.2.6, a 3D surface plotting library,
 with Qt removed, and its demo rebuilt on GraphApp. This is an altered version of Michael Bieber's
 library, not the original. See `COPYING` (zlib license) and `3rdparty/gl2ps/COPYING.*`. It runs on
-Windows and on Linux with X11.
+Windows, on Linux with X11 and on macOS.
 
 ![QwtPlot3D in GraphApp showing wiazrd1580.mes, a 1581x1581 mesh of a volcano in false color with shading](qwtplot3d-volcano-false-color.png)
 
 The Qt build this came from was a 60 MB folder of programs, Qt DLLs and plugins. This demo is one
 small executable that links only `OPENGL32`, `GLU32` and Windows system DLLs, and it fits on a single
 1.44 MB floppy with room to spare. The Qt folder would take about 40. The Linux build is a single
-926 KB file that needs only the system's OpenGL, GLU and X11 libraries, so it fits on a floppy too.
+926 KB file that needs only the system's OpenGL, GLU and X11 libraries, so it fits on a floppy too. The
+macOS build is one 1 MB executable per architecture (2 MB with both in one file) that links only Apple's
+system frameworks.
 
 ## What the port took
 
@@ -23,7 +25,8 @@ few places:
 - Signals became `std::function` members.
 
 Moving it to X then took one file for the OpenGL window, `src/qwt3d_glwidget_x11.cpp`, and a small
-bridge to GraphApp's insides. The library and the 1,500-line demo compile unchanged, and so does
+bridge to GraphApp's insides, and macOS took the same two, `src/qwt3d_glwidget_cocoa.mm` and
+`src/qwt3d_cocoa_bridge.c`. The library and the 1,500-line demo compile unchanged, and so does
 GraphApp: because the port keeps everything that depends on the system behind `GLWidget`, the plot
 and its window don't know which one they're on.
 
@@ -36,6 +39,15 @@ GraphApp headers and `Windows Binaries\graphapp.lib`, and produces `lib\qwtplot3
 **Linux:** run `make` in the `src` folder for `libapp.a`, then `sh build.sh` here. It needs the
 `libgl-dev`, `libglu1-mesa-dev` and `libx11-dev` packages and produces `lib/libqwtplot3d.a` and
 `demo/surface_demo`. Set `GRAPHAPP_LIB` to link another `libapp.a`.
+
+**macOS:** run `make -f Makefile.cocoa` in the `src` folder for `build-macos/libapp.a`, then
+`sh build-macos.sh` here. It needs the Xcode command line tools and produces
+`lib/libqwtplot3d_macos.a` and `demo/surface_demo_macos`. For a universal binary, build a universal
+`libapp.a` and run `GRAPHAPP_LIB=... ARCHS="-arch arm64 -arch x86_64" BUILD=build-macos/universal sh build-macos.sh`.
+The library calls Apple's deprecated but still shipped OpenGL 2.1 legacy context, so the script defines
+`GL_SILENCE_DEPRECATION`, adds `-Wno-c++11-narrowing` (newer clang rejects some initializers in the
+library, which is left as it was), and puts `src/macos_gl` on the include path, where `GL/gl.h` and
+`GL/glu.h` forward to Apple's `OpenGL/` headers.
 
 GraphApp itself needs no changes.
 
@@ -58,7 +70,8 @@ main_loop(app);
 ```
 
 Link `qwtplot3d.lib`, `graphapp.lib`, `opengl32.lib` and `glu32.lib`, or on Linux `libqwtplot3d.a`,
-`libapp.a` and `-lGL -lGLU -lX11 -lm`. Resize the plot with `plot->setGeometry()` from your
+`libapp.a` and `-lGL -lGLU -lX11 -lm`, or on macOS `libqwtplot3d_macos.a`, `libapp.a` and
+`-framework Cocoa -framework OpenGL -framework CoreText -framework CoreGraphics -framework QuartzCore`. Resize the plot with `plot->setGeometry()` from your
 `on_window_resize` handler.
 
 Set an axis label on all four parallel axes (`X1`..`X4` and so on): the box shows whichever one
@@ -72,6 +85,10 @@ and the icons are embedded.
 `bin/surface_demo` is a 64-bit Linux build, made on Ubuntu 24.04. It needs the system's OpenGL, GLU
 and X11 libraries. For the file dialogs, GraphApp uses zenity, kdialog, qarma or matedialog if one is
 installed, and its own dialog if not.
+
+`bin/surface_demo_macos` is a universal (arm64 and x86_64) macOS build for macOS 11 or later. It needs no
+other files and links only Apple's system frameworks. It is not signed or notarized, so Gatekeeper may
+ask you to approve it the first time. Only the arm64 half has been run.
 
 ## LIDAR grids
 
@@ -132,6 +149,32 @@ not report Alt with the mouse or Alt+arrow keys. Three GraphApp behaviors shape 
 
 The parent's HWND is read as the first field of GraphApp's private `WindowExtra`.
 
+### On Cocoa
+
+- `src/qwt3d_glwidget_cocoa.mm` is the only file that sees AppKit and Apple's OpenGL.
+- `src/qwt3d_cocoa_bridge.c` is the only file that sees GraphApp's private headers.
+
+GraphApp's window is an `NSWindow` whose content view blits a pixel surface, and its menus are drawn
+into that surface, so the plot is an `NSOpenGLView` placed over it. The parent's `NSWindow` is the first
+field of GraphApp's private `WindowExtra`, as the HWND is on Windows and the X window is on X11. Details
+that differ:
+
+- **Menus:** the same answer as on Windows and X11. The menu bar's press handler is wrapped, the current
+  frame is copied into the window's surface and the view hidden, then shown again when GraphApp returns.
+- **Keys:** the view never takes the keyboard, so keys reach the main window, where the menu shortcuts
+  and key handlers are. The arrow keys arrive through the main window's key action.
+- **Retina:** widths and positions are in points, as everywhere in GraphApp. The OpenGL surface is in
+  pixels, so the viewport and `grabFrameBuffer` use the backing size, and a saved picture of a plot 900
+  points wide is 1800 pixels wide. Labels are drawn in pixels, so on a 2x display they are half the
+  size relative to the plot that they are at 1x.
+- **Mouse:** Ctrl+click arrives from macOS as a right click with Control, and is treated as the left
+  button with Ctrl, so Ctrl+drag moves the plot. Option is Alt. Shift+wheel arrives as a horizontal
+  scroll, and is read as such. The wheel follows the system's natural scrolling setting, so turning it
+  away from you zooms in, as on Windows. A trackpad's 36 points count as one notch.
+- **Color and font:** `NSColorPanel` with OK and Cancel buttons added, and `NSFontPanel`. After either
+  closes, the plot's window is made the key window again.
+- **Text beyond Latin-1:** drawn with Core Text, which keeps the whole character.
+
 ### On X11
 
 - `src/qwt3d_glwidget_x11.cpp` is the only file that sees Xlib and GLX.
@@ -159,11 +202,12 @@ they are not covered by the licenses above.
 
 ## Limits
 
-- Windows and Linux with X11. macOS needs a Cocoa version of the OpenGL child window.
-- File dialogs and messages come from GraphApp. Its file dialogs take no filter, so all files are listed and the title says what to pick. It has no color or font dialog: Windows uses its own, and on Linux you type the color (`255 128 0`) or font (`Helvetica 12 bold`).
+- Windows, Linux with X11 and macOS.
+- File dialogs and messages come from GraphApp. Its file dialogs take no filter, so all files are listed and the title says what to pick. It has no color or font dialog: Windows uses its own, macOS uses its color and font panels, and on Linux you type the color (`255 128 0`) or font (`Helvetica 12 bold`).
 - On Linux the labels use GraphApp's bitmap X fonts, so they look plainer than on Windows, and text beyond Latin-1 comes out as wrong letters if the X server has no iso10646 fonts. WSLg has none, and that path has not yet been seen working.
 - JPEG is not offered: `app_save_jpeg` in GraphApp is a stub that always fails.
 - Needs a legacy OpenGL compatibility context. Tested on one GPU only. On Linux, tested only under WSLg, which runs X through Xwayland.
+- macOS uses Apple's OpenGL, which is deprecated but still shipped, in a 2.1 legacy context. If Apple removes it, a Metal version would be a rewrite of the library's fixed-function drawing, not of the window. Tested on one Apple Silicon Mac under one macOS, and text beyond Latin-1 (pi) has not been looked at there; the Intel half of the universal binary has not been run, and neither has Save As confirmed through the system's save panel.
 - The demo is not DPI aware, so at 150% scaling Windows enlarges it and text looks soft.
 - Differences from mesh2: no color map preview, the save list has PNG, GIF, EPS, PS and PDF only,
   EPS and PDF text is part of the file where mesh2 wrote a separate TeX file, and the title bar
