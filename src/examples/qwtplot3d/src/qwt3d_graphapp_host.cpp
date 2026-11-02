@@ -50,6 +50,42 @@ void* Qwt3D::GraphAppHost::nativeWindow(::Window* w)
   return *(void**)w->extra;
 }
 
+std::string Qwt3D::GraphAppHost::askFile(std::string const& title, std::string const& filter,
+                                         std::string const& name, bool save)
+{
+  // the system's file dialog, which GraphApp gives no filter: the title says what to pick
+  std::string heading = title;
+  size_t bar = filter.find('|');
+  if (bar != std::string::npos)
+  {
+    std::string patterns = filter.substr(bar + 1);
+    for (size_t semi; (semi = patterns.find(';')) != std::string::npos;)
+      patterns.replace(semi, 1, ", ");
+    heading += " (" + patterns + ")";
+  }
+  char* picked = save ? ask_file_save(host, heading.c_str(), "Save", name.c_str())
+                      : ask_file_open(host, heading.c_str(), "Open", name.c_str());
+  std::string result = picked ? picked : "";
+  if (picked)
+    del_string(picked);
+  return result;
+}
+
+void Qwt3D::GraphAppHost::tell(std::string const& title, std::string const& message)
+{
+  ask_ok(host, title.c_str(), message.c_str());
+}
+
+std::string Qwt3D::GraphAppHost::askString(std::string const& title, std::string const& question,
+                                           std::string const& answer)
+{
+  char* typed = ask_string(host, title.c_str(), question.c_str(), answer.c_str());
+  std::string result = typed ? typed : "";
+  if (typed)
+    del_string(typed);
+  return result;
+}
+
 bool Qwt3D::GraphAppHost::inMenuBar(::Window* w, int x, int y)
 {
   if (!w->menubar)
@@ -68,9 +104,10 @@ bool Qwt3D::GraphAppHost::renderText(std::string const& text, Qwt3D::Font const&
     return false;
 
   bool bold = font.weight() >= Qwt3D::Font::Bold;
-  if (beyondLatin1(text))
-    return renderUnicodeText(text, faceFor(font.family()), pixelHeight(font.pointSize()),
-                             bold, font.italic(), r, g, b, rgba, width, height);
+  // (if that fails, as on an X server without Unicode fonts, wrong letters beat no label)
+  if (beyondLatin1(text) && renderUnicodeText(text, faceFor(font.family()), pixelHeight(font.pointSize()),
+                                              bold, font.italic(), r, g, b, rgba, width, height))
+    return true;
 
   int style = NATIVE_FONT;
   if (bold)

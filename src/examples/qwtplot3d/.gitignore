@@ -3,3 +3,5 @@ lib/
 *.exe
 *.obj
 !bin/surface_demo.exe
+demo/surface_demo
+!bin/surface_demo

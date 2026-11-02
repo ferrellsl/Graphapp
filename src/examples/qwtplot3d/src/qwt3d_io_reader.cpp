@@ -2,6 +2,7 @@
 #pragma warning ( disable : 4786 )
 #endif
 
+#include <string.h>
 #include <float.h>
 #include <stdio.h>
 

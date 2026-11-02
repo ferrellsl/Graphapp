@@ -17,7 +17,7 @@ if not exist lib mkdir lib
 set CFLAGS=/nologo /MT /O2 /W3 /EHsc /DNDEBUG /D_CRT_SECURE_NO_WARNINGS /Iinclude
 cl %CFLAGS% /c /Fobuild\ src\qwt3d_*.cpp /I"%GRAPHAPP%\src" /MP
 if errorlevel 1 exit /b 1
-cl %CFLAGS% /c /Fobuild\ 3rdparty\gl2ps\gl2ps.c 3rdparty\tinyfd\tinyfiledialogs.c
+cl %CFLAGS% /c /Fobuild\ 3rdparty\gl2ps\gl2ps.c
 if errorlevel 1 exit /b 1
 lib /nologo /OUT:lib\qwtplot3d.lib build\*.obj
 if errorlevel 1 exit /b 1

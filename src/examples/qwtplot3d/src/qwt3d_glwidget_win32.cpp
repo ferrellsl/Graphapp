@@ -1,5 +1,7 @@
 // The OpenGL child window. The only file that sees windows.h and WGL.
 
+#ifdef _WIN32
+
 #define WIN32_LEAN_AND_MEAN
 #ifndef NOMINMAX
   #define NOMINMAX
@@ -11,7 +13,6 @@
 #include <string.h>
 
 #include "qwt3d_glwidget.h"
-#include "../3rdparty/tinyfd/tinyfiledialogs.h"
 
 using namespace Qwt3D;
 
@@ -362,88 +363,41 @@ GLWidget::GLWidget(Window* parent, int x, int y, int width, int height)
   SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this);
 }
 
-namespace
-{
-  // tinyfiledialogs refuses any text with ' " or `, on Windows too. Quotes become the
-  // Windows-1252 curly ones: tinyfd_winUtf8 is off, so file names suit fopen.
-  std::string dialogText(std::string const& text)
-  {
-    std::string s(text);
-    for (size_t i = 0; i != s.size(); ++i)
-    {
-      if (s[i] == '\'' || s[i] == '`')
-        s[i] = '\x92';
-      else if (s[i] == '"')
-        s[i] = '\x94';
-    }
-    return s;
-  }
-
-  // a starting path with a quote cannot be passed at all
-  const char* dialogStart(std::string const& path)
-  {
-    return path.find_first_of("'\"`") == std::string::npos ? path.c_str() : 0;
-  }
-
-  // "Description|*.a;*.b" into its parts
-  void splitFilter(std::string const& filter, std::string& description,
-                   std::vector<std::string>& patterns)
-  {
-    size_t bar = filter.find('|');
-    description = filter.substr(0, bar);
-    size_t pos = (bar == std::string::npos) ? filter.size() : bar + 1;
-    while (pos < filter.size())
-    {
-      size_t semi = filter.find(';', pos);
-      if (semi == std::string::npos)
-        semi = filter.size();
-      patterns.push_back(filter.substr(pos, semi - pos));
-      pos = semi + 1;
-    }
-  }
-
-  std::string fileDialog(HWND owner, std::string const& title, std::string const& filter,
-                         std::string const& name, bool save)
-  {
-    // a menu command runs while the plot is stepped aside for the menu: bring it back
-    EnumChildWindows(owner, thawPlot, 0);
-
-    tinyfd_winUtf8 = 0;
-    std::string description;
-    std::vector<std::string> patterns;
-    splitFilter(filter, description, patterns);
-    std::vector<const char*> list;
-    for (size_t i = 0; i != patterns.size(); ++i)
-      list.push_back(patterns[i].c_str());
-    std::string t = dialogText(title), d = dialogText(description);
-
-    const char* picked = save
-      ? tinyfd_saveFileDialog(t.c_str(), dialogStart(name), (int)list.size(), &list[0], d.c_str())
-      : tinyfd_openFileDialog(t.c_str(), 0, (int)list.size(), &list[0], d.c_str(), 0);
-    return picked ? picked : "";
-  }
-}
-
 std::string GLWidget::askOpenFile(std::string const& title, std::string const& filter)
 {
-  return fileDialog(GetParent((HWND)hwnd_), title, filter, "", false);
+  // a menu command runs while the plot is stepped aside for the menu: bring it back
+  EnumChildWindows(GetParent((HWND)hwnd_), thawPlot, 0);
+  return GraphAppHost::askFile(title, filter, "", false);
 }
 
 std::string GLWidget::askSaveFile(std::string const& title, std::string const& filter,
                                   std::string const& name)
 {
-  return fileDialog(GetParent((HWND)hwnd_), title, filter, name, true);
+  EnumChildWindows(GetParent((HWND)hwnd_), thawPlot, 0);
+  return GraphAppHost::askFile(title, filter, name, true);
 }
 
-bool GLWidget::askColor(std::string const& title, unsigned char rgb[3])
+// GraphApp has no color dialog
+bool GLWidget::askColor(std::string const&, unsigned char rgb[3])
 {
   EnumChildWindows(GetParent((HWND)hwnd_), thawPlot, 0);
-  tinyfd_winUtf8 = 0;
-  unsigned char start[3] = {255, 255, 255};
-  return tinyfd_colorChooser(dialogText(title).c_str(), 0, start, rgb) != 0;
+  static COLORREF custom[16];
+  CHOOSECOLORA cc;
+  ZeroMemory(&cc, sizeof(cc));
+  cc.lStructSize = sizeof(cc);
+  cc.hwndOwner = GetParent((HWND)hwnd_);
+  cc.rgbResult = RGB(255, 255, 255);
+  cc.lpCustColors = custom;
+  cc.Flags = CC_FULLOPEN | CC_RGBINIT;
+  if (!ChooseColorA(&cc))
+    return false;
+  rgb[0] = GetRValue(cc.rgbResult);
+  rgb[1] = GetGValue(cc.rgbResult);
+  rgb[2] = GetBValue(cc.rgbResult);
+  return true;
 }
 
-// tinyfiledialogs has no font dialog
+// nor a font dialog
 bool GLWidget::askFont(Font& font)
 {
   EnumChildWindows(GetParent((HWND)hwnd_), thawPlot, 0);
@@ -471,8 +425,7 @@ bool GLWidget::askFont(Font& font)
 void GLWidget::tellUser(std::string const& title, std::string const& message)
 {
   EnumChildWindows(GetParent((HWND)hwnd_), thawPlot, 0);
-  tinyfd_winUtf8 = 0;
-  tinyfd_messageBox(dialogText(title).c_str(), dialogText(message).c_str(), "ok", "info", 1);
+  GraphAppHost::tell(title, message);
 }
 
 GLWidget::~GLWidget()
@@ -557,3 +510,5 @@ bool GLWidget::grabFrameBuffer(std::vector<unsigned char>& rgba, int& width, int
   glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, &rgba[0]);
   return glGetError() == GL_NO_ERROR;
 }
+
+#endif // _WIN32

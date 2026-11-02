@@ -31,8 +31,9 @@ public:
   int height() const {return height_;}
   void setFocus();
 
-  //! File dialogs and messages from tinyfiledialogs: GraphApp's own has no drives.
-  /*! \param filter is "Description|*.ext;*.ext2". An empty result means Cancel. */
+  //! The system's file dialogs and GraphApp's messages, through GraphApp
+  /*! \param filter is "Description|*.ext;*.ext2"; the patterns go in the dialog's title, as
+      GraphApp's dialogs have no filter. An empty result means Cancel. */
   std::string askOpenFile(std::string const& title, std::string const& filter);
   std::string askSaveFile(std::string const& title, std::string const& filter, std::string const& name);
   void tellUser(std::string const& title, std::string const& message);
@@ -75,6 +76,11 @@ namespace GraphAppHost
 {
   void* nativeWindow(Window* w); //!< Registers the application too
   bool inMenuBar(Window* w, int x, int y); //!< Is this point of the window in its menu bar?
+  std::string askFile(std::string const& title, std::string const& filter,
+                      std::string const& name, bool save); //!< An empty result means Cancel
+  void tell(std::string const& title, std::string const& message);
+  std::string askString(std::string const& title, std::string const& question,
+                        std::string const& answer); //!< An empty result means Cancel
   //! Renders one line of UTF-8 text as RGBA rows, bottom row first, coverage in alpha
   bool renderText(std::string const& text, Font const& font, double r, double g, double b,
                   std::vector<unsigned char>& rgba, int& width, int& height);
