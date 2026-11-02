@@ -126,6 +126,7 @@ void save_file(char *name, char *text)
 	if (fwrite(text, 1, length, f) != length)
 		ask_ok(app, "Error",
 			"An error occurred writing that file.");
+	fclose(f);
 
 	/* remember new file name */
 	if (file_name)
