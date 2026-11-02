@@ -88,7 +88,7 @@ installed, and its own dialog if not.
 
 `bin/surface_demo_macos` is a universal (arm64 and x86_64) macOS build for macOS 11 or later. It needs no
 other files and links only Apple's system frameworks. It is not signed or notarized, so Gatekeeper may
-ask you to approve it the first time. Only the arm64 half has been run.
+ask you to approve it the first time. The Intel half has only been launched, under Rosetta.
 
 ## LIDAR grids
 
@@ -165,15 +165,15 @@ that differ:
   and key handlers are. The arrow keys arrive through the main window's key action.
 - **Retina:** widths and positions are in points, as everywhere in GraphApp. The OpenGL surface is in
   pixels, so the viewport and `grabFrameBuffer` use the backing size, and a saved picture of a plot 900
-  points wide is 1800 pixels wide. Labels are drawn in pixels, so on a 2x display they are half the
-  size relative to the plot that they are at 1x.
+  points wide is 1800 pixels wide. Label text is drawn at the display's backing factor, so labels are
+  the same size relative to the plot at 1x and 2x.
 - **Mouse:** Ctrl+click arrives from macOS as a right click with Control, and is treated as the left
   button with Ctrl, so Ctrl+drag moves the plot. Option is Alt. Shift+wheel arrives as a horizontal
   scroll, and is read as such. The wheel follows the system's natural scrolling setting, so turning it
   away from you zooms in, as on Windows. A trackpad's 36 points count as one notch.
 - **Color and font:** `NSColorPanel` with OK and Cancel buttons added, and `NSFontPanel`. After either
   closes, the plot's window is made the key window again.
-- **Text beyond Latin-1:** drawn with Core Text, which keeps the whole character.
+- **Text beyond Latin-1:** drawn with Core Text, so pi, Omega, alpha and Sigma come out as themselves, in titles and axis labels.
 
 ### On X11
 
@@ -207,7 +207,7 @@ they are not covered by the licenses above.
 - On Linux the labels use GraphApp's bitmap X fonts, so they look plainer than on Windows, and text beyond Latin-1 comes out as wrong letters if the X server has no iso10646 fonts. WSLg has none, and that path has not yet been seen working.
 - JPEG is not offered: `app_save_jpeg` in GraphApp is a stub that always fails.
 - Needs a legacy OpenGL compatibility context. Tested on one GPU only. On Linux, tested only under WSLg, which runs X through Xwayland.
-- macOS uses Apple's OpenGL, which is deprecated but still shipped, in a 2.1 legacy context. If Apple removes it, a Metal version would be a rewrite of the library's fixed-function drawing, not of the window. Tested on one Apple Silicon Mac under one macOS, and text beyond Latin-1 (pi) has not been looked at there; the Intel half of the universal binary has not been run, and neither has Save As confirmed through the system's save panel.
+- macOS uses Apple's OpenGL, which is deprecated but still shipped, in a 2.1 legacy context. If Apple removes it, a Metal version would be a rewrite of the library's fixed-function drawing, not of the window. Tested on one Apple Silicon Mac under one macOS. The Intel half of the universal binary has only been launched, under Rosetta, and two things were not checked by script, only by what the code does: a click in the font panel's list, and the OK of the system's save panel, which runs out of process.
 - The demo is not DPI aware, so at 150% scaling Windows enlarges it and text looks soft.
 - Differences from mesh2: no color map preview, the save list has PNG, GIF, EPS, PS and PDF only,
   EPS and PDF text is part of the file where mesh2 wrote a separate TeX file, and the title bar

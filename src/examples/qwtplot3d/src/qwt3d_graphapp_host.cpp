@@ -104,8 +104,13 @@ bool Qwt3D::GraphAppHost::renderText(std::string const& text, Qwt3D::Font const&
     return false;
 
   bool bold = font.weight() >= Qwt3D::Font::Bold;
+  int pixels = pixelHeight(font.pointSize());
+#ifdef __APPLE__
+  // the plot is drawn in backing pixels, twice the points on a Retina display
+  pixels = (int)(pixels * Qwt3D::GraphAppHost::backingScale() + 0.5);
+#endif
   // (if that fails, as on an X server without Unicode fonts, wrong letters beat no label)
-  if (beyondLatin1(text) && renderUnicodeText(text, faceFor(font.family()), pixelHeight(font.pointSize()),
+  if (beyondLatin1(text) && renderUnicodeText(text, faceFor(font.family()), pixels,
                                               bold, font.italic(), r, g, b, rgba, width, height))
     return true;
 
@@ -115,7 +120,7 @@ bool Qwt3D::GraphAppHost::renderText(std::string const& text, Qwt3D::Font const&
   if (font.italic())
     style |= ITALIC;
 
-  ::Font* f = new_font(host, faceFor(font.family()), style, pixelHeight(font.pointSize()));
+  ::Font* f = new_font(host, faceFor(font.family()), style, pixels);
   if (!f)
     return false;
 
