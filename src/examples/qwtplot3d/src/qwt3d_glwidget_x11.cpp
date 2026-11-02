@@ -1,7 +1,7 @@
 // The OpenGL child window on X11. The only file that sees Xlib and GLX; what it needs from
 // GraphApp's insides is in qwt3d_x11_bridge.c.
 
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(__APPLE__)
 
 // Xlib's names for these are also GraphApp's and the library's
 #define Window X_Window
@@ -525,4 +525,4 @@ bool GLWidget::grabFrameBuffer(std::vector<unsigned char>& rgba, int& width, int
   return glGetError() == GL_NO_ERROR;
 }
 
-#endif // _WIN32
+#endif // X11

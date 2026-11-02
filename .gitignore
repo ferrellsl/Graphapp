@@ -3,3 +3,8 @@
 
 # Out-of-tree macOS (Cocoa) build
 src/build-macos/
+
+# QwtPlot3D macOS build output (the binary to ship is bin/surface_demo_macos)
+src/examples/qwtplot3d/build-macos/
+src/examples/qwtplot3d/demo/surface_demo_macos
+src/examples/qwtplot3d/lib/libqwtplot3d_macos.a
