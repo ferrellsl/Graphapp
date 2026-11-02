@@ -14,8 +14,9 @@ been successfully compiled using MSYS2/cygwin and Visual Studio versions 2010 th
 under MacOS using the XCode command line tools and on Ubuntu 24.04.  A progress-bar indicator, a busy spinner and mouse-wheel scrolling have also been
 added to this fork; the original library has none of them except a basic wheel handler in its last release (3.71).  
 
-The file dialogs that are part of GraphApp are very rudimentary and very ugly.  I recommend using TinyFileDialogs found
-here:https://sourceforge.net/projects/tinyfiledialogs/files/ which also provide native file dialogs for the target system.
+ask_file_open and ask_file_save now show the system's own file dialogs, so existing programs get them just by rebuilding: the
+Common Item Dialog on Windows, NSOpenPanel and NSSavePanel on macOS, and on Linux zenity, kdialog, qarma or matedialog, whichever
+is installed (kdialog first on KDE).  If Linux has none of these, GraphApp's built-in dialog appears instead.
 
 A complete reference manual can be found online at:  http://enchantia.com/software/graphapp/doc/manual/index.html
 or in the https://github.com/ferrellsl/Graphapp/blob/master/graphapp_manual.pdf file in the root of this repository.
@@ -68,7 +69,7 @@ Link your own programs with libapp.a and: -framework Cocoa -framework CoreText -
 Everything is built in the build-macos folder, so the source folders stay clean.  Unlike the Linux makefile this one does not need to be
 renamed or edited.  If GraphApp can find its portable bitmap fonts (set APP_FONT_PATH to the fonts folder, or ship them as
 Contents/Resources/fonts in an .app bundle) they become the default font, otherwise the default is a native font (Arial).  See src/cocoa/README.md for
-how the backend works and what is not done yet (notably Retina resolution, native file dialogs, and app bundling).
+how the backend works and what is not done yet (notably Retina resolution and app bundling).
 
 <h2>Busy Spinner</h2>
 

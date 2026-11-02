@@ -22,7 +22,19 @@
    App Software License. See the file LICENSE.TXT for details.
 */
 
+#if defined(_MSC_VER) || defined(__MINGW64_VERSION_MAJOR)
+  #define APP_HAVE_ITEM_DIALOG
+  #define COBJMACROS
+  #ifndef _WIN32_WINNT
+    #define _WIN32_WINNT 0x0600
+  #endif
+#endif
+
 #include "appint.h"
+
+#ifdef APP_HAVE_ITEM_DIALOG
+  #include <shobjidl.h>
+#endif
 
 /*
  *  To change a file path into a canonical DOS path,
@@ -733,6 +745,272 @@ void main(int argc, char *argv[])
 	}
 	scanfolder(argv[1]);
 	exit(0);
+}
+
+#endif
+
+/*
+ *  The native file dialogs: Windows' Common Item Dialog.
+ *
+ *  COM and the shell are found at run-time, so that programs which
+ *  link only user32 and gdi32, as GraphApp programs always have,
+ *  need no change to their link lines. If any of it is missing we
+ *  return 0 and GraphApp shows its own dialog.
+ */
+#ifdef APP_HAVE_ITEM_DIALOG
+
+static const GUID app_clsid_open_dialog = { 0xDC1C5A9C, 0xE88A, 0x4DDE,
+	{ 0xA5, 0xA1, 0x60, 0xF8, 0x2A, 0x20, 0xAE, 0xF7 } };
+static const GUID app_clsid_save_dialog = { 0xC0B4E2F3, 0xBA21, 0x4773,
+	{ 0x8D, 0xBA, 0x33, 0x5E, 0xC9, 0x46, 0xEB, 0x8B } };
+static const GUID app_iid_file_dialog = { 0x42F85136, 0xDB7E, 0x439C,
+	{ 0x85, 0xF1, 0xE4, 0x07, 0x5D, 0x13, 0x5F, 0xC8 } };
+static const GUID app_iid_shell_item = { 0x43826D1E, 0xE718, 0x42EE,
+	{ 0xBC, 0x55, 0xA1, 0xE2, 0x61, 0xC3, 0x7B, 0xFE } };
+
+typedef HRESULT (WINAPI *CoInitializeExFunc)(void *, DWORD);
+typedef void    (WINAPI *CoUninitializeFunc)(void);
+typedef HRESULT (WINAPI *CoCreateInstanceFunc)(const GUID *, void *, DWORD,
+			const GUID *, void **);
+typedef void    (WINAPI *CoTaskMemFreeFunc)(void *);
+typedef HRESULT (WINAPI *ShellItemFromNameFunc)(const WCHAR *, void *,
+			const GUID *, void **);
+
+/*
+ *  Text may be UTF-8 or the local code page. Anything which is not
+ *  valid UTF-8 is taken to be in the local code page.
+ */
+static WCHAR *app_to_wide_string(const char *text)
+{
+	int n;
+	UINT code_page = CP_UTF8;
+	DWORD flags = MB_ERR_INVALID_CHARS;
+	WCHAR *wide;
+
+	n = MultiByteToWideChar(code_page, flags, text, -1, NULL, 0);
+	if (n == 0) {
+		code_page = CP_ACP;
+		flags = 0;
+		n = MultiByteToWideChar(code_page, flags, text, -1, NULL, 0);
+	}
+	wide = app_alloc(n * sizeof(WCHAR));
+	MultiByteToWideChar(code_page, flags, text, -1, wide, n);
+	return wide;
+}
+
+/*
+ *  The path given back must suit fopen, so it is in the local code
+ *  page. A name that code page cannot spell is given its short form.
+ */
+static char *app_from_wide_path(const WCHAR *path)
+{
+	BOOL lost = FALSE;
+	BOOL *lost_ptr = &lost;
+	DWORD flags = WC_NO_BEST_FIT_CHARS;
+	WCHAR short_path[MAX_PATH];
+	char *native, *portable;
+	int n;
+
+	if (GetACP() == CP_UTF8) {	/* these then may not be used */
+		lost_ptr = NULL;
+		flags = 0;
+	}
+	n = WideCharToMultiByte(CP_ACP, flags, path, -1, NULL, 0, NULL, lost_ptr);
+	if (lost && GetShortPathNameW(path, short_path, MAX_PATH)) {
+		path = short_path;
+		n = WideCharToMultiByte(CP_ACP, flags, path, -1, NULL, 0,
+				NULL, NULL);
+	}
+	native = app_alloc(n);
+	WideCharToMultiByte(CP_ACP, flags, path, -1, native, n, NULL, NULL);
+	portable = app_to_portable_path(native);
+	app_free(native);
+	return portable;
+}
+
+/*
+ *  The dialog's owner: the window the user was just working in.
+ */
+static HWND app_find_dialog_owner(App *app)
+{
+	int i;
+	HWND hwnd;
+
+	if (app->num_modals > 0)
+		return win_extra(app->modals[app->num_modals-1])->hwnd;
+	hwnd = GetActiveWindow();
+	for (i=0; i < app->num_windows; i++)
+		if (win_extra(app->windows[i])->hwnd == hwnd)
+			return hwnd;
+	for (i=0; i < app->num_windows; i++)
+		if (app->windows[i]->state & VISIBLE)
+			return win_extra(app->windows[i])->hwnd;
+	return NULL;
+}
+
+/*
+ *  Windows disables only the owner, whereas a GraphApp modal dialog
+ *  blocks all of the program's windows, so block the others here.
+ */
+static HWND *app_disable_other_windows(App *app, HWND owner)
+{
+	int i, n = 0;
+	HWND hwnd;
+	HWND *disabled;
+
+	disabled = app_zero_alloc((app->num_windows + 1) * sizeof(HWND));
+	for (i=0; i < app->num_windows; i++) {
+		hwnd = win_extra(app->windows[i])->hwnd;
+		if ((hwnd != owner) && IsWindowEnabled(hwnd)) {
+			EnableWindow(hwnd, FALSE);
+			disabled[n++] = hwnd;
+		}
+	}
+	return disabled;
+}
+
+static void app_enable_windows(HWND *disabled)
+{
+	int i;
+
+	for (i=0; disabled[i]; i++)
+		EnableWindow(disabled[i], TRUE);
+	app_free(disabled);
+}
+
+static void app_set_dialog_start(IFileDialog *dialog, const char *path,
+	ShellItemFromNameFunc item_from_name)
+{
+	char *name, *folder, *native;
+	WCHAR *wide;
+	IShellItem *item;
+
+	name = app_get_file_name(path);
+	if (name[0] != '\0') {
+		wide = app_to_wide_string(name);
+		IFileDialog_SetFileName(dialog, wide);
+		app_free(wide);
+	}
+
+	folder = app_copy_string(path);
+	folder[name - path] = '\0';
+	native = app_to_native_path(folder);
+	wide = app_to_wide_string(native);
+	if (SUCCEEDED(item_from_name(wide, NULL,
+			&app_iid_shell_item, (void **) &item))) {
+		IFileDialog_SetFolder(dialog, item);
+		IShellItem_Release(item);
+	}
+	app_free(wide);
+	app_del_string(native);
+	app_del_string(folder);
+}
+
+int app_native_file_dialog(App *app, int save, const char *title,
+	const char *button, const char *path, char **result)
+{
+	HMODULE ole32, shell32;
+	CoInitializeExFunc co_initialize;
+	CoUninitializeFunc co_uninitialize;
+	CoCreateInstanceFunc co_create_instance;
+	CoTaskMemFreeFunc co_task_mem_free;
+	ShellItemFromNameFunc item_from_name;
+	IFileDialog *dialog = NULL;
+	IShellItem *item;
+	WCHAR *wide, *chosen;
+	FILEOPENDIALOGOPTIONS options = 0;
+	COMDLG_FILTERSPEC all_files;
+	HRESULT hr, init;
+	HWND owner, *disabled;
+	int shown = 0;
+
+	*result = NULL;
+	if (! app->gui_available)
+		return 0;
+
+	ole32 = LoadLibraryA("ole32.dll");
+	shell32 = LoadLibraryA("shell32.dll");
+	if ((ole32 == NULL) || (shell32 == NULL))
+		return 0;
+	co_initialize = (CoInitializeExFunc)
+		GetProcAddress(ole32, "CoInitializeEx");
+	co_uninitialize = (CoUninitializeFunc)
+		GetProcAddress(ole32, "CoUninitialize");
+	co_create_instance = (CoCreateInstanceFunc)
+		GetProcAddress(ole32, "CoCreateInstance");
+	co_task_mem_free = (CoTaskMemFreeFunc)
+		GetProcAddress(ole32, "CoTaskMemFree");
+	item_from_name = (ShellItemFromNameFunc)
+		GetProcAddress(shell32, "SHCreateItemFromParsingName");
+	if (!co_initialize || !co_uninitialize || !co_create_instance
+	 || !co_task_mem_free || !item_from_name)
+		return 0;
+
+	init = co_initialize(NULL,
+		COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+
+	hr = co_create_instance(
+		save ? &app_clsid_save_dialog : &app_clsid_open_dialog,
+		NULL, CLSCTX_INPROC_SERVER, &app_iid_file_dialog,
+		(void **) &dialog);
+
+	if (SUCCEEDED(hr)) {
+		IFileDialog_GetOptions(dialog, &options);
+		options |= FOS_FORCEFILESYSTEM | FOS_NOCHANGEDIR
+			| FOS_PATHMUSTEXIST;
+		options |= save ? FOS_OVERWRITEPROMPT : FOS_FILEMUSTEXIST;
+		IFileDialog_SetOptions(dialog, options);
+
+		all_files.pszName = L"All Files";
+		all_files.pszSpec = L"*.*";
+		IFileDialog_SetFileTypes(dialog, 1, &all_files);
+
+		if (title) {
+			wide = app_to_wide_string(title);
+			IFileDialog_SetTitle(dialog, wide);
+			app_free(wide);
+		}
+		if (button) {
+			wide = app_to_wide_string(button);
+			IFileDialog_SetOkButtonLabel(dialog, wide);
+			app_free(wide);
+		}
+		app_set_dialog_start(dialog, path, item_from_name);
+
+		owner = app_find_dialog_owner(app);
+		disabled = app_disable_other_windows(app, owner);
+		hr = IFileDialog_Show(dialog, owner);
+		app_enable_windows(disabled);
+
+		if (SUCCEEDED(hr)) {
+			shown = 1;
+			if (SUCCEEDED(IFileDialog_GetResult(dialog, &item))) {
+				if (SUCCEEDED(IShellItem_GetDisplayName(item,
+						SIGDN_FILESYSPATH, &chosen))) {
+					*result = app_from_wide_path(chosen);
+					co_task_mem_free(chosen);
+				}
+				IShellItem_Release(item);
+			}
+		}
+		else if (hr == HRESULT_FROM_WIN32(ERROR_CANCELLED))
+			shown = 1;
+
+		IFileDialog_Release(dialog);
+	}
+
+	if (SUCCEEDED(init))
+		co_uninitialize();
+
+	return shown;
+}
+
+#else
+
+int app_native_file_dialog(App *app, int save, const char *title,
+	const char *button, const char *path, char **result)
+{
+	return 0;	/* a compiler too old to know the dialog */
 }
 
 #endif

@@ -1,5 +1,5 @@
 /*
- *  Clipboard and cursors.
+ *  Clipboard, file dialogs and cursors.
  *
  *  Platform: macOS (Objective-C, no GraphApp headers).
  */
@@ -41,6 +41,76 @@ int gab_clipboard_set(const char *utf8)
 		}
 	}
 	return ok;
+}
+
+/*
+ *  File dialogs.
+ *
+ *  runModal keeps its own event loop, and so all of the App's other
+ *  windows wait for the panel, just as for a GraphApp modal window.
+ */
+
+char *gab_file_dialog(int save, const char *title, const char *button,
+			const char *folder, const char *name)
+{
+	char *result = NULL;
+
+	@autoreleasepool {
+		NSSavePanel *panel;
+
+		if (save) {
+			panel = [NSSavePanel savePanel];
+			[panel setCanCreateDirectories:YES];
+			[panel setAllowsOtherFileTypes:YES];
+			[panel setExtensionHidden:NO];
+		}
+		else {
+			NSOpenPanel *open = [NSOpenPanel openPanel];
+
+			[open setCanChooseFiles:YES];
+			[open setCanChooseDirectories:NO];
+			[open setAllowsMultipleSelection:NO];
+			panel = open;
+		}
+
+		/* Current macOS panels show no title bar, only the message. */
+		if (title && title[0]) {
+			NSString *s = [NSString stringWithUTF8String:title];
+
+			if (s) {
+				[panel setTitle:s];
+				[panel setMessage:s];
+			}
+		}
+		if (button && button[0]) {
+			NSString *s = [NSString stringWithUTF8String:button];
+
+			if (s)
+				[panel setPrompt:s];
+		}
+		if (folder && folder[0]) {
+			NSString *s = [NSString stringWithUTF8String:folder];
+
+			if (s)
+				[panel setDirectoryURL:
+					[NSURL fileURLWithPath:s isDirectory:YES]];
+		}
+		if (name && name[0]) {
+			NSString *s = [NSString stringWithUTF8String:name];
+
+			if (s)
+				[panel setNameFieldStringValue:s];
+		}
+
+		[NSApp activateIgnoringOtherApps:YES];
+		if ([panel runModal] == NSModalResponseOK) {
+			const char *path = [[[panel URL] path] UTF8String];
+
+			if (path)
+				result = strdup(path);
+		}
+	}
+	return result;
 }
 
 /*

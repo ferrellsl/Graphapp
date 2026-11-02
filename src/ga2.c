@@ -2657,7 +2657,7 @@ char * askfilename(char *title, char *name)
 
 char * askfilesave(char *title, char *name)
 {
-	return app_ask_file_open(app, "Save File", "Save", name);
+	return app_ask_file_save(app, "Save File", "Save", name);
 }
 
 /*

@@ -19,6 +19,16 @@
 #include "app.h"
 
 /*
+ *  Each platform provides this. It shows the system's own file dialog,
+ *  starting from 'path' (a folder ending in a separator, or a file).
+ *  It returns 1 if a dialog was shown, with *result set to the chosen
+ *  path (from app_copy_string), or NULL if the user cancelled.
+ *  It returns 0 if there is no such dialog to show.
+ */
+int	app_native_file_dialog(App *app, int save, const char *title,
+		const char *button, const char *path, char **result);
+
+/*
  * APP_PRIVATE could be declared static if you don't want internal function
  * definitions leaking into a library or DLL.
  */

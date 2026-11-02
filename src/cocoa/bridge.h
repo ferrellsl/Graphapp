@@ -147,6 +147,14 @@ int  gab_font_render(void *font, const char *utf8, int nbytes,
 char *gab_clipboard_get(void);
 int   gab_clipboard_set(const char *utf8);
 
+/*
+ *  File dialogs: NSOpenPanel, or NSSavePanel if save is non-zero.  title and
+ *  button may be NULL.  Returns the chosen path as a malloc'd string in UTF-8,
+ *  or NULL if the user cancelled.
+ */
+char *gab_file_dialog(int save, const char *title, const char *button,
+			const char *folder, const char *name);
+
 /* Cursors. */
 void *gab_cursor_standard(int shape);	/* GraphApp StandardCursors value */
 void *gab_cursor_from_argb(const uint32_t *argb, int w, int h, int hx, int hy);

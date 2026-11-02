@@ -601,3 +601,29 @@ void main(int argc, char *argv[])
 
 #endif
 
+
+/*
+ *  The native file dialogs: NSOpenPanel and NSSavePanel, which are
+ *  in cocoa_misc.m. These are always available.
+ */
+int app_native_file_dialog(App *app, int save, const char *title,
+	const char *button, const char *path, char **result)
+{
+	char *name, *folder, *chosen;
+
+	*result = NULL;
+	if (! app->gui_available)
+		return 0;
+
+	name = app_get_file_name(path);
+	folder = app_copy_string(path);
+	folder[name - path] = '\0';
+	chosen = gab_file_dialog(save, title, button, folder, name);
+	app_del_string(folder);
+
+	if (chosen) {
+		*result = app_copy_string(chosen);
+		free(chosen);
+	}
+	return 1;
+}

@@ -70,12 +70,12 @@ Working: windows (titled, borderless, popup, modal, floating, centred), all port
 controls, menus with shortcuts and mouse tracking, keyboard (Unicode, dead keys, function
 and edit keys), mouse (3 buttons + modifiers), cursors, clipboard text, timers, native and
 portable fonts, images with transparency, XOR drawing, window resize, C++ consumers.
+File dialogs are `NSOpenPanel` and `NSSavePanel` (written without a Mac to run them on: not yet tested).
 
 Known gaps / decisions still open:
 
 - **Retina.** The surface is 1 pixel per point and shown pixel-doubled, unsmoothed, on Retina
   displays: crisp but chunky. A 2x surface needs a scale factor through the drawing code.
-- **File dialogs** are GraphApp's portable ones, not `NSOpenPanel`/`NSSavePanel`.
 - No mouse wheel event (GraphApp has none). No Alt-key menu mnemonics (Option types characters).
   Input-method marked text is not displayed.
 - `WAIT_CURSOR` is the arrow (macOS has no public wait cursor). Palettes are stubs.

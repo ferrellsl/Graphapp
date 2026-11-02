@@ -21,8 +21,12 @@
 #include "appint.h"
 
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <poll.h>
 
 /*
  *  On Linix, change '\' into '/'.
@@ -600,3 +604,233 @@ void main(int argc, char *argv[])
 
 #endif
 
+
+/*
+ *  The native file dialogs.
+ *
+ *  X has no file dialog of its own, so we run the desktop's dialog
+ *  program, and read the chosen path from its standard output.
+ *  Arguments go straight to the program with no shell, so a file name
+ *  may contain quotes or anything else. Events are handled while it
+ *  runs, so that the program's windows still redraw and its timers
+ *  still run. If no dialog program can be run we return 0, and
+ *  GraphApp shows its own dialog.
+ */
+static int app_is_program(const char *name)
+{
+	const char *start, *end;
+	char *folder, *file;
+	int found = 0;
+
+	start = getenv("PATH");
+	while (start && *start && !found) {
+		end = strchr(start, ':');
+		if (end == NULL)
+			end = start + strlen(start);
+		folder = app_alloc(end - start + 1);
+		memcpy(folder, start, end - start);
+		folder[end - start] = '\0';
+		file = app_form_file_path(folder, name);
+		found = (access(file, X_OK) == 0);
+		app_del_string(file);
+		app_free(folder);
+		start = (*end == ':') ? end + 1 : NULL;
+	}
+	return found;
+}
+
+static const char *app_find_dialog_program(void)
+{
+	/* qarma and matedialog take the same arguments as zenity */
+	static const char *names[] = {"zenity", "qarma", "matedialog", NULL};
+	const char *desktop = getenv("XDG_CURRENT_DESKTOP");
+	int i;
+
+	if ((getenv("KDE_FULL_SESSION") || (desktop && strstr(desktop, "KDE")))
+	 && app_is_program("kdialog"))
+		return "kdialog";
+	for (i=0; names[i]; i++)
+		if (app_is_program(names[i]))
+			return names[i];
+	if (app_is_program("kdialog"))
+		return "kdialog";
+	return NULL;
+}
+
+static char *app_join_strings(const char *a, const char *b)
+{
+	char *s = app_alloc(strlen(a) + strlen(b) + 1);
+
+	strcpy(s, a);
+	strcat(s, b);
+	return s;
+}
+
+/*
+ *  The child's end: standard output goes to the pipe, nothing else
+ *  of the dialog program's chatter reaches the terminal. It runs in
+ *  the starting folder, as a save dialog given no file starts there.
+ */
+static void app_run_dialog_program(char **argv, int out, const char *display,
+	const char *folder)
+{
+	int null = open("/dev/null", O_RDWR);
+
+	dup2(null, 0);
+	dup2(out, 1);
+	dup2(null, 2);
+	setenv("DISPLAY", display, 1);
+	if (chdir(folder) != 0)
+		_exit(127);
+	execvp(argv[0], argv);
+	_exit(127);
+}
+
+/*
+ *  Read all of the dialog program's output, handling events meanwhile.
+ *  The pretend modal window makes the event loop ignore the mouse and
+ *  keyboard in all of the program's windows, as a real modal would.
+ */
+static char *app_read_dialog_output(App *app, int fd)
+{
+	char *text = app_zero_alloc(1);
+	int length = 0, n;
+	struct pollfd fds[2];
+	Window pretend_modal;
+
+	app_remember_modal(app, &pretend_modal);
+	for (;;) {
+		fds[0].fd = fd;
+		fds[0].events = POLLIN;
+		fds[1].fd = app->socket_fd;
+		fds[1].events = POLLIN;
+		XFlush(app_extra(app)->display);
+		poll(fds, 2, TIMER_INTERVAL);
+
+		app_process_events(app);
+
+		if (fds[0].revents) {
+			text = app_realloc(text, length + 1024 + 1);
+			n = read(fd, text + length, 1024);
+			if ((n < 0) && (errno == EINTR))
+				continue;
+			if (n <= 0)
+				break;
+			length += n;
+		}
+	}
+	app_forget_modal(app, &pretend_modal);
+	text[length] = '\0';
+	return text;
+}
+
+/*
+ *  Run a dialog program once. The result is as for the function below.
+ */
+static int app_run_file_dialog(App *app, const char *program, int save,
+	int confirm, const char *title, const char *path, char **result)
+{
+	char *argv[10];
+	char *text, *title_arg, *path_arg = NULL, *placeholder, *folder;
+	const char *name;
+	int fd[2], n = 0, status = 0, length;
+	pid_t pid;
+
+	if (pipe(fd) != 0)
+		return 0;
+	name = app_get_file_name(path);
+	folder = app_copy_string(path);
+	folder[name - path] = '\0';
+
+	argv[n++] = (char *) program;
+	if (strcmp(program, "kdialog") == 0) {
+		title_arg = app_copy_string(title);
+		argv[n++] = "--title";
+		argv[n++] = title_arg;
+		argv[n++] = save ? "--getsavefilename" : "--getopenfilename";
+		argv[n++] = (char *) path;
+	}
+	else {
+		title_arg = app_join_strings("--title=", title);
+		argv[n++] = "--file-selection";
+		if (save)
+			argv[n++] = "--save";
+		if (confirm)
+			argv[n++] = "--confirm-overwrite";
+		argv[n++] = title_arg;
+		if (name[0] != '\0')
+			path_arg = app_join_strings("--filename=", path);
+		else if (! save) {
+			/* GTK opens at "Recent" if given no file, and given a
+			   folder may select it in its parent. A file which
+			   is not there opens the folder it would be in. */
+			path_arg = app_join_strings("--filename=", path);
+			placeholder = app_join_strings(path_arg, ".none");
+			app_del_string(path_arg);
+			path_arg = placeholder;
+		}
+		if (path_arg)
+			argv[n++] = path_arg;
+	}
+	argv[n] = NULL;
+
+	fcntl(fd[0], F_SETFD, FD_CLOEXEC);
+	fcntl(fd[1], F_SETFD, FD_CLOEXEC);
+	pid = fork();
+	if (pid == 0)
+		app_run_dialog_program(argv, fd[1],
+			DisplayString(app_extra(app)->display), folder);
+	close(fd[1]);
+
+	text = NULL;
+	if (pid > 0) {
+		text = app_read_dialog_output(app, fd[0]);
+		while ((waitpid(pid, &status, 0) < 0) && (errno == EINTR))
+			continue;
+	}
+	close(fd[0]);
+	app_del_string(folder);
+	app_del_string(title_arg);
+	if (path_arg)
+		app_del_string(path_arg);
+
+	/* 127: it could not be run; 255: it refused to run */
+	if ((text == NULL) || (WIFEXITED(status) &&
+	    ((WEXITSTATUS(status) == 127) || (WEXITSTATUS(status) == 255)))) {
+		app_free(text);
+		return 0;
+	}
+
+	length = strlen(text);
+	while ((length > 0) && (text[length-1] == '\n'))
+		text[--length] = '\0';
+	if (WIFEXITED(status) && (WEXITSTATUS(status) == 0) && (length > 0))
+		*result = app_copy_string(text);
+	app_free(text);
+	return 1;
+}
+
+int app_native_file_dialog(App *app, int save, const char *title,
+	const char *button, const char *path, char **result)
+{
+	const char *program;
+
+	*result = NULL;
+	if (! app->gui_available)
+		return 0;
+	program = app_find_dialog_program();
+	if (program == NULL)
+		return 0;
+	if (title == NULL)
+		title = "";
+
+	if (app_run_file_dialog(app, program, save, save, title, path, result))
+		return 1;
+
+	/* zenity has deprecated --confirm-overwrite, as GTK 4 always asks,
+	   and will refuse to run once it has gone */
+	if (save)
+		return app_run_file_dialog(app, program, save, 0,
+				title, path, result);
+	return 0;
+}

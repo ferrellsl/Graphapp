@@ -50,9 +50,11 @@ The <B>ask_yes_no_cancel</B> function operates the same way except it has anothe
 <P>
 The <B>ask_string</B> function displays the <TT>question</TT> string in a modal window with the specified <TT>title</TT>, which also has a text field into which the user can type a string. The text field is initially loaded with the <TT>default_answer</TT>. Space is allocated for the string using <B>alloc</B> and then returned to the programmer by the function (use <B>free</B> to free the returned string). If the user selects the "Cancel" button in this window, the function will instead return NULL.
 <P>
-The <B>ask_file_open</B> function displays a modal window which can be used to select a file from the file system. The <TT>path</TT> string is loaded into the filename text field if this is available. The function returns the complete file pathname as a string, or NULL if the user cancels the operation. The returned string should be freed using <B>free</B> when it is no longer needed.
+The <B>ask_file_open</B> function displays a modal window which can be used to select a file from the file system. This is the operating system's own file dialog where there is one: see below. The <TT>message</TT> string labels the button which accepts the file, if the system's dialog allows that. The file must already exist. The <TT>path</TT> string is loaded into the filename text field if this is available. The function returns the complete file pathname as a string, or NULL if the user cancels the operation. The returned string should be freed using <B>free</B> when it is no longer needed.
 <P>
 The <B>ask_file_save</B> function is similar, except that it is used when saving a file, and the window may appear differently to signal that fact. It will warn the user if a selected file already exists to confirm overwriting the file is allowed. The returned file path string should be freed using <B>free</B> when it is no longer needed.
+<P>
+On Windows these functions show the Common Item Dialog, and on macOS they show NSOpenPanel or NSSavePanel. X-Windows has no file dialog of its own, so there they run the first of zenity, qarma, matedialog or kdialog which is installed, trying kdialog first on the KDE desktop. Those programs ignore the <TT>message</TT> string, and zenity 4 ignores a <TT>path</TT> naming a file which does not exist yet. If none of them is installed, GraphApp shows its own file dialog, which will also ask before creating a file named in <B>ask_file_open</B>.
 <P>
 </BODY>
 </HTML>

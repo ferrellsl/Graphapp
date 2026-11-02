@@ -28,7 +28,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "app.h"
+#include "apputils.h"
 #include "appgui.h"
 
 /*
@@ -487,6 +487,11 @@ char *app_ask_string(App *app, const char *title, const char *message, const cha
 
 /*
  *  File dialog functions:
+ *
+ *  These use the operating system's own file dialogs, through the
+ *  platform's app_native_file_dialog (see its folder.c, or cocoa_misc.m).
+ *  The window built here is the fallback, used when the platform has
+ *  none to offer, such as an X server with no dialog program installed.
  */
 
 static void app_file_dialog_key(Window *w, unsigned long key)
@@ -928,6 +933,7 @@ char *app_ask_file_open(App *app, const char *title, const char *message,
 	char *folder;
 	char *current;
 	char *path;
+	char *chosen;
 
 	/* use remembered open_folder, if any */
 	current = app_current_folder();
@@ -938,16 +944,23 @@ char *app_ask_file_open(App *app, const char *title, const char *message,
 		path = app_form_file_path(folder, app_get_file_name(name));
 	else
 		path = app_copy_string(folder);
-	win = app_init_file_dialog(app, title, message, path,
-			& app->open_dialog_area, app_can_open);
-	app_del_string(path);
 
-	/* handle the dialog */
-	fd = app_get_window_data(win);
-	app_rescan_folder(win);
-	path = app_handle_file_dialog(win);
-	app_free(fd);
-	app_del_window(win);
+	if (app_native_file_dialog(app, 0, title, message, path, &chosen)) {
+		app_del_string(path);
+		path = chosen;
+	}
+	else {
+		win = app_init_file_dialog(app, title, message, path,
+				& app->open_dialog_area, app_can_open);
+		app_del_string(path);
+
+		/* handle the dialog */
+		fd = app_get_window_data(win);
+		app_rescan_folder(win);
+		path = app_handle_file_dialog(win);
+		app_free(fd);
+		app_del_window(win);
+	}
 
 	if (path == NULL) {
 		app_del_string(current);
@@ -978,6 +991,7 @@ char *app_ask_file_save(App *app, const char *title, const char *message,
 	char *folder;
 	char *current;
 	char *path;
+	char *chosen;
 
 	/* use remembered save_folder, if any */
 	current = app_current_folder();
@@ -988,16 +1002,23 @@ char *app_ask_file_save(App *app, const char *title, const char *message,
 		path = app_form_file_path(folder, app_get_file_name(name));
 	else
 		path = app_copy_string(folder);
-	win = app_init_file_dialog(app, title, message, path,
-			& app->save_dialog_area, app_can_save);
-	app_del_string(path);
 
-	/* handle the dialog */
-	fd = app_get_window_data(win);
-	app_rescan_folder(win);
-	path = app_handle_file_dialog(win);
-	app_free(fd);
-	app_del_window(win);
+	if (app_native_file_dialog(app, 1, title, message, path, &chosen)) {
+		app_del_string(path);
+		path = chosen;
+	}
+	else {
+		win = app_init_file_dialog(app, title, message, path,
+				& app->save_dialog_area, app_can_save);
+		app_del_string(path);
+
+		/* handle the dialog */
+		fd = app_get_window_data(win);
+		app_rescan_folder(win);
+		path = app_handle_file_dialog(win);
+		app_free(fd);
+		app_del_window(win);
+	}
 
 	if (path == NULL) {
 		app_del_string(current);
