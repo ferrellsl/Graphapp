@@ -30,6 +30,9 @@ extern "C" {
 }
 
 #include "icons.h"
+extern "C" {  // (spinner.h is C: its declarations of the Windows clock need C names)
+#include "../../spinner.h"  // GraphApp's busy spinner (src/examples)
+}
 
 // mesh2's functions and surfaces
 
@@ -762,6 +765,43 @@ static void openFem(Control*)
 	updateTitle();
 }
 
+// A busy spinner while an EPS, PS or PDF file is written: a large plot can take a
+// while.  It appears only if the file takes more than half a second.
+static Window* busywindow;
+static double busystart;
+static std::string busymessage;
+
+static void exportBusy()
+{
+	if (!busywindow)
+	{
+		if (spinner_seconds() - busystart < 0.5)
+			return;
+		busywindow = new_spinner_window(app, "Saving", busymessage.c_str());
+	}
+	spinner_step(busywindow);
+}
+
+static bool savePlot(const char* name, const std::string& format)
+{
+	bool vector = format == "EPS" || format == "PS" || format == "PDF";
+	if (vector)
+	{
+		busystart = spinner_seconds();
+		busymessage = "Writing the " + format + " file...";
+		Qwt3D::VectorWriter::setBusyCallback(exportBusy);
+	}
+	bool ok = plot->save(name, format);
+	if (vector)
+	{
+		Qwt3D::VectorWriter::setBusyCallback(NULL);
+		if (busywindow)
+			del_spinner_window(busywindow);
+		busywindow = NULL;
+	}
+	return ok;
+}
+
 // the save button: dump_N in the current folder, in the format of the list beside it
 static void dumpImage(Control*)
 {
@@ -774,7 +814,7 @@ static void dumpImage(Control*)
 	}
 	char name[64];
 	sprintf(name, "dump_%d.%s", dumps++, lower.c_str());
-	plot->save(name, format);
+	savePlot(name, format);
 	note("save button");
 }
 
@@ -856,7 +896,7 @@ static void saveAs(MenuItem*)
 	std::string ext = dot ? dot + 1 : "";
 	for (size_t i = 0; i != ext.size(); ++i)
 		ext[i] = (char)toupper((unsigned char)ext[i]);
-	if (!plot->save(name, ext))
+	if (!savePlot(name, ext))
 		plot->tellUser("Save plot", "That could not be saved. Is the extension one of those listed?");
 }
 
@@ -1304,7 +1344,7 @@ static void testSave(const char* ext, const char* format)
 {
 	char name[300];
 	sprintf(name, "%s_%d.%s", shotbase, ++shots, ext);
-	bool ok = plot->save(name, format);
+	bool ok = savePlot(name, format);
 	if (logfile)
 	{
 		fprintf(logfile, "saved %s: %s (rotation %g %g %g, zoom %g, size %dx%d)\n", name,

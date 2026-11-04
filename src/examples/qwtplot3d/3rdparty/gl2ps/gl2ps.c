@@ -607,6 +607,27 @@ static void *gl2psListPointer(GL2PSlist *list, GLint idx)
   return &list->array[idx * list->size];
 }
 
+/* QwtPlot3D/GraphApp additions (2026): a busy callback, called now and then
+   during the long loops of gl2psEndPage so a program can keep a busy
+   indicator turning, and a limit on the primitives that are occlusion
+   culled (culling takes time that grows much faster than the number of
+   primitives: 38 s for 283,000 triangles). */
+static void (*gl2ps_busy_callback)(void) = NULL;
+static GLint gl2ps_cull_limit = -1;   /* -1: no limit */
+
+GL2PSDLL_API void gl2psSetBusyCallback(void (*callback)(void))
+{
+  gl2ps_busy_callback = callback;
+}
+
+GL2PSDLL_API void gl2psSetOcclusionCullLimit(GLint primitives)
+{
+  gl2ps_cull_limit = primitives;
+}
+
+#define GL2PS_BUSY(i) \
+  do { if(gl2ps_busy_callback && ((i) & 4095) == 0) (*gl2ps_busy_callback)(); } while(0)
+
 static void gl2psListSort(GL2PSlist *list,
                           int (*fcmp)(const void *a, const void *b))
 {
@@ -620,6 +641,7 @@ static void gl2psListAction(GL2PSlist *list, void (*action)(void *data))
   GLint i;
 
   for(i = 0; i < gl2psListNbr(list); i++){
+    GL2PS_BUSY(i);
     (*action)(gl2psListPointer(list, i));
   }
 }
@@ -629,6 +651,7 @@ static void gl2psListActionInverse(GL2PSlist *list, void (*action)(void *data))
   GLint i;
 
   for(i = gl2psListNbr(list); i > 0; i--){
+    GL2PS_BUSY(i);
     (*action)(gl2psListPointer(list, i-1));
   }
 }
@@ -2249,11 +2272,14 @@ static void gl2psParseFeedbackBuffer(GLint used)
   GL2PSvertex vertices[3];
   GL2PSprimitive *prim;
   GL2PSimagemap *node;
+  GLint busycount = 0;
 
   current = gl2ps->feedback;
   boundary = gl2ps->boundary = GL_FALSE;
 
   while(used > 0){
+
+    GL2PS_BUSY(++busycount);
 
     if(GL_TRUE == boundary) gl2ps->boundary = GL_TRUE;
 
@@ -5611,7 +5637,7 @@ static GLint gl2psPrintPrimitives(void)
 {
   GL2PSbsptree *root;
   GL2PSxyz eye = {0.0F, 0.0F, 100.0F * GL2PS_ZSCALE};
-  GLint used;
+  GLint used, nprimitives;
 
   used = glRenderMode(GL_RENDER);
 
@@ -5640,6 +5666,7 @@ static GLint gl2psPrintPrimitives(void)
     /* empty feedback buffer and/or nothing else to print */
     return GL2PS_NO_FEEDBACK;
   }
+  nprimitives = gl2psListNbr(gl2ps->primitives);
 
   switch(gl2ps->sort){
   case GL2PS_NO_SORT :
@@ -5650,7 +5677,8 @@ static GLint gl2psPrintPrimitives(void)
     break;
   case GL2PS_SIMPLE_SORT :
     gl2psListSort(gl2ps->primitives, gl2psCompareDepth);
-    if(gl2ps->options & GL2PS_OCCLUSION_CULL){
+    if((gl2ps->options & GL2PS_OCCLUSION_CULL) &&
+       (gl2ps_cull_limit < 0 || nprimitives <= gl2ps_cull_limit)){
       gl2psListActionInverse(gl2ps->primitives, gl2psAddInImageTree);
       gl2psFreeBspImageTree(&gl2ps->imagetree);
     }
@@ -5663,7 +5691,8 @@ static GLint gl2psPrintPrimitives(void)
     root = (GL2PSbsptree*)gl2psMalloc(sizeof(GL2PSbsptree));
     gl2psBuildBspTree(root, gl2ps->primitives);
     if(GL_TRUE == gl2ps->boundary) gl2psBuildPolygonBoundary(root);
-    if(gl2ps->options & GL2PS_OCCLUSION_CULL){
+    if((gl2ps->options & GL2PS_OCCLUSION_CULL) &&
+       (gl2ps_cull_limit < 0 || nprimitives <= gl2ps_cull_limit)){
       gl2psTraverseBspTree(root, eye, -GL2PS_EPSILON, gl2psLess,
                            gl2psAddInImageTree, 1);
       gl2psFreeBspImageTree(&gl2ps->imagetree);

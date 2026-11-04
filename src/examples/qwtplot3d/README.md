@@ -126,8 +126,23 @@ every resolution redraws keep up with the 240 Hz display. A failed read leaves t
 | `renderPixmap` | Removed; `grabFrameBuffer` returns RGBA |
 | `PixmapWriter::setQuality` | Kept, has no effect |
 
-Everything else, including mouse and keyboard defaults and EPS, PS and PDF output, is as it was.
-Labels are now antialiased, where the original had a 1-bit mask.
+Everything else, including mouse and keyboard defaults, is as it was. Labels are now antialiased,
+where the original had a 1-bit mask.
+
+EPS, PS and PDF output is the same, but faster on large plots:
+
+- Hidden surfaces are left out of the file (gl2ps's occlusion culling) only for plots of up to
+  50,000 primitives: the time it takes grows much faster than the plot (38 s of a 39 s export for
+  283,000 triangles), and few parts of a surface are hidden. That PDF now takes 1.3 s.
+  `VectorWriter::setOcclusionCullLimit` changes the limit.
+- gl2ps's buffer doubles until the plot fits, instead of growing by 2 M floats and drawing the plot
+  again each time (13 passes for a 751 x 752 grid).
+- `VectorWriter::setBusyCallback` sets a function called now and then while the file is written.
+  The demo uses it for GraphApp's busy spinner (`src/examples/spinner.h`), shown if the file
+  takes more than half a second.
+
+For these, `3rdparty/gl2ps/gl2ps.c` has two additions, `gl2psSetBusyCallback` and
+`gl2psSetOcclusionCullLimit`; the rest of gl2ps 1.3.9 is unchanged.
 
 ## How it sits on GraphApp
 

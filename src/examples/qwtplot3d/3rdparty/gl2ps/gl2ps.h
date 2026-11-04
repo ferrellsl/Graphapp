@@ -172,6 +172,9 @@ GL2PSDLL_API GLint gl2psBeginPage(const char *title, const char *producer,
                                   FILE *stream, const char *filename);
 GL2PSDLL_API GLint gl2psEndPage(void);
 GL2PSDLL_API GLint gl2psSetOptions(GLint options);
+/* QwtPlot3D/GraphApp additions: see gl2ps.c */
+GL2PSDLL_API void gl2psSetBusyCallback(void (*callback)(void));
+GL2PSDLL_API void gl2psSetOcclusionCullLimit(GLint primitives);
 GL2PSDLL_API GLint gl2psGetOptions(GLint *options);
 GL2PSDLL_API GLint gl2psBeginViewport(GLint viewport[4]);
 GL2PSDLL_API GLint gl2psEndViewport(void);

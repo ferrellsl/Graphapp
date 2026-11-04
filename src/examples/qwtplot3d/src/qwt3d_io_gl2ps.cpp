@@ -104,16 +104,59 @@ bool VectorWriter::setFormat(std::string const& format)
   return true;
 }
 
+void (*VectorWriter::busycallback_)() = 0;
+int VectorWriter::culllimit_ = 50000;
+bool VectorWriter::saving_ = false;
+bool VectorWriter::writing_ = false;
+
+namespace
+{
+  // Render the plot into gl2ps's feedback buffer and write it, with a larger buffer
+  // until it fits: twice as large each time, not 2 M floats more (a large plot took
+  // dozens of passes).
+  GLint writePage(Plot3D* plot, GLint format, GLint sortmode, GLint options, GLint viewport[4],
+                  const char* producer, FILE* fp, const char* fname, GLint& bufsize,
+                  void (*busy)(), bool& writing)
+  {
+    GLint state = GL2PS_OVERFLOW;
+    while (state == GL2PS_OVERFLOW)
+    {
+      bufsize = bufsize ? 2 * bufsize : 2*1024*1024;
+      gl2psBeginPage("---", producer, viewport, format, sortmode, options, GL_RGBA, 0, NULL,
+                     0, 0, 0, bufsize, fp, fname);
+      plot->updateData();
+      plot->updateGL();
+      writing = true;  // (the busy callback may redraw the plot from here on)
+      state = gl2psEndPage();
+      writing = false;
+      if (busy)
+        busy();
+    }
+    return state;
+  }
+
+  // Set while a file is being saved; also clears gl2ps's busy callback afterwards.
+  struct SaveFlag
+  {
+    bool& flag;
+    SaveFlag(bool& f) : flag(f) { flag = true; }
+    ~SaveFlag() { flag = false; gl2psSetBusyCallback(0); }
+  };
+}
+
 //! Performs actual output
 bool VectorWriter::operator()(Plot3D* plot, std::string const& fname)
 {
-  if (formaterror_)
+  if (formaterror_ || saving_)
     return false;
+  SaveFlag saving(saving_);
+  gl2psSetBusyCallback(busycallback_);
+  gl2psSetOcclusionCullLimit(culllimit_);
 
   plot->makeCurrent();
  	
 
-	GLint bufsize = 0, state = GL2PS_OVERFLOW;
+	GLint bufsize = 0;
 	GLint viewport[4];
 
 	glGetIntegerv(GL_VIEWPORT, viewport);
@@ -192,18 +235,8 @@ bool VectorWriter::operator()(Plot3D* plot, std::string const& fname)
     Label::useDeviceFonts(false);
 		return false;
   }
-  while( state == GL2PS_OVERFLOW )
-	{ 
-		bufsize += 2*1024*1024;
-		gl2psBeginPage ( "---", producer.c_str(), viewport,
-										 gl2ps_format_, sortmode,
-										 options, GL_RGBA, 0, NULL, 0, 0, 0, bufsize,
-										 fp, fname.c_str() );
-		
-	  plot->updateData();
-	  plot->updateGL(); 
-		state = gl2psEndPage();
-	}
+  writePage(plot, gl2ps_format_, sortmode, options, viewport, producer.c_str(), fp, fname.c_str(),
+            bufsize, busycallback_, writing_);
 	fclose(fp);
 
   // extra TeX file
@@ -221,19 +254,9 @@ bool VectorWriter::operator()(Plot3D* plot, std::string const& fname)
     }    
     Label::useDeviceFonts(true);
 		options &= ~GL2PS_NO_PIXMAP & ~GL2PS_NO_TEXT;
-    state = GL2PS_OVERFLOW;
-    while( state == GL2PS_OVERFLOW )
-    { 
-      bufsize += 2*1024*1024;
-      gl2psBeginPage ( "---", producer.c_str(), viewport,
-        GL2PS_TEX, sortmode,
-        options, GL_RGBA, 0, NULL, 0, 0, 0, bufsize,
-        fp, fn.c_str() );
-      
-      plot->updateData();
-      plot->updateGL(); 
-      state = gl2psEndPage();
-    }
+    bufsize = 0;
+    writePage(plot, GL2PS_TEX, sortmode, options, viewport, producer.c_str(), fp, fn.c_str(),
+              bufsize, busycallback_, writing_);
     fclose(fp);
   }
 
@@ -289,6 +312,8 @@ GLint Qwt3D::drawDevicePixels(GLsizei width, GLsizei height,
                        const void *pixels)
 {
   glDrawPixels(width, height, format, type, pixels);
+  if (VectorWriter::writing())  // (a redraw while gl2ps is busy with the file)
+    return GL2PS_SUCCESS;
 
   if(format != GL_RGBA || type != GL_UNSIGNED_BYTE)
 		return GL2PS_ERROR;
@@ -378,7 +403,8 @@ GLint Qwt3D::drawDeviceText(const char* str, const char* fontname, int fontsize,
 	Triple adjpos(vp[0],vp[1],vp[2]);
 	
 	glRasterPos3d(adjpos.x, adjpos.y, adjpos.z);
-	ret = gl2psTextOpt(str, fontname, (int)fontsize, a, 0);
+	if (!VectorWriter::writing())  // (not in a redraw while gl2ps is busy with the file)
+		ret = gl2psTextOpt(str, fontname, (int)fontsize, a, 0);
 	glColor4dv(fcol);
 	glClearColor(bcol[0], bcol[1], bcol[2], bcol[3]);
   return ret;

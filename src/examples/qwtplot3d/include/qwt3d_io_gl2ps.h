@@ -60,6 +60,21 @@ public:
 
   bool setFormat(std::string const& format);
 
+  //! A function called now and then while a file is written, e.g. to keep a busy indicator turning.
+  /*!
+    It may let the program handle its events: if the plot is redrawn meanwhile, nothing
+    of it goes into the file.  A second save started meanwhile fails.
+  */
+  static void setBusyCallback(void (*callback)()) {busycallback_ = callback;}
+  //! Hidden surfaces are left out of the file only up to this many primitives (-1: always).
+  /*!
+    Finding them takes time that grows much faster than the number of primitives
+    (38 s for 283,000 triangles), and on a surface few are hidden.  Default 50,000.
+  */
+  static void setOcclusionCullLimit(int primitives) {culllimit_ = primitives;}
+  //! True while gl2ps is turning a frame into the file (the plot's drawing must not reach gl2ps).
+  static bool writing() {return writing_;}
+
 private:
   IO::Functor* clone() const;
   bool operator()(Plot3D* plot, std::string const& fname);
@@ -71,6 +86,10 @@ private:
   LANDSCAPEMODE landscape_;
   TEXTMODE textmode_;
   std::string texfname_;
+
+  static void (*busycallback_)();
+  static int culllimit_;
+  static bool saving_, writing_;
 };
 
 GLint setDeviceLineWidth(GLfloat val);
