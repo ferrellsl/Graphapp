@@ -80,7 +80,7 @@ faces the viewer.
 ## Prebuilt binary
 
 `bin\surface_demo.exe` is a 64-bit Windows build. It needs no other files: the C runtime is linked in
-and the icons are embedded.
+and the icons are embedded. It is linked as a GUI program, so it opens no console window.
 
 `bin/surface_demo` is a 64-bit Linux build, made on Ubuntu 24.04. It needs the system's OpenGL, GLU
 and X11 libraries. For the file dialogs, GraphApp uses zenity, kdialog, qarma or matedialog if one is

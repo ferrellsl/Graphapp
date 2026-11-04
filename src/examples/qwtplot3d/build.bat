@@ -1,6 +1,6 @@
 @echo off
-rem Builds lib\qwtplot3d.lib and demo\surface_demo.exe. Run from an
-rem "x64 Native Tools Command Prompt" for Visual Studio.
+rem Builds lib\qwtplot3d.lib and demo\surface_demo.exe (a GUI program, with no
+rem console window). Run from an "x64 Native Tools Command Prompt" for Visual Studio.
 rem Uses this repository's GraphApp; set GRAPHAPP_LIB to link another graphapp.lib.
 setlocal
 cd /d %~dp0
@@ -24,5 +24,6 @@ if errorlevel 1 exit /b 1
 
 cl %CFLAGS% /I"%GRAPHAPP%\src" /Fobuild\demo.obj /Fedemo\surface_demo.exe demo\surface_demo.cpp ^
   lib\qwtplot3d.lib "%GRAPHAPP_LIB%" opengl32.lib glu32.lib user32.lib gdi32.lib ^
-  comdlg32.lib shell32.lib advapi32.lib winmm.lib ole32.lib
+  comdlg32.lib shell32.lib advapi32.lib winmm.lib ole32.lib ^
+  /link /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup
 del build\demo.obj 2>nul
